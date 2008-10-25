@@ -23,7 +23,7 @@ public class Main {
     private enum Entity { SSW, NSW, Client, Server, TCP, Logger};
     private States SSWcurrentState = States.intial;
     private short clientAddress;
-    private short serverAddress;
+    private short serverAddress = 13;
     private short loggerAddress;
     
     /**
@@ -36,7 +36,8 @@ public class Main {
         }
         //loggerAddress = 13;
         short  a = 13;
-        //sendPacket(test,a,Entity.SSW);
+        Main o = new Main();
+        o.sendPacket(test,a,Entity.SSW);
     }
     
     /**
