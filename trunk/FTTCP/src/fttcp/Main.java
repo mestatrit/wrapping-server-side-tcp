@@ -128,8 +128,8 @@ public class Main {
                 receivedPacket = setAckNumber(receivedPacket, stable_seq);
                 
                 //Change advertised window size by adding ack#-stable_seq
-                short windowSize =(int) getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + stable_seq;
-                receivedPacket = setWindowSize(receivedPacket,windowSize);
+                int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + stable_seq;
+                 receivedPacket = setWindowSize(receivedPacket,intWindowSize);
                 
                 //Recompute Checksum
                 receivedPacket = recomputeChecksum(receivedPacket);
@@ -165,6 +165,8 @@ public class Main {
         return isLogAck;
     }
     
+    
+
     /**
      * Checks packet to see if it's an ACK from server
      * @param received Packet received
