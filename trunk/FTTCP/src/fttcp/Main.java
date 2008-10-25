@@ -11,6 +11,7 @@ package fttcp;
  */
 public class Main {
 
+    //GLOBAL VARIABLES
     private int delta_seq;
     private int stable_seq;
     private int server_seq;
@@ -41,6 +42,9 @@ public class Main {
             }
             else if(SSWcurrentState == States.normal){
                 SSWnormalOpp();
+            }
+            else if(SSWcurrentState == States.restarting){
+                SSWrestarting();
             }
         }
     }
@@ -94,6 +98,27 @@ public class Main {
      * South Side Wraps normal operation protocol
      */
     private void SSWnormalOpp(){
+        while(!restarting){
+            Object receivedPacket = readPacket();
+            short sender = getSenderAddress(receivedPacket);
+            if (sender == clientAddress){
+                //Forward packet to logger
+                sendPacket(receivedPacket, loggerAddress);
+            }
+            else if (sender == loggerAddress){
+                
+            }
+            else if (sender == serverAddress){
+                
+            }
+        }
+        SSWcurrentState = States.restarting;
+    }
+    
+    /**
+     * South Side Wraps restarting protocol
+     */
+    private void SSWrestarting(){
         
     }
     
@@ -132,7 +157,7 @@ public class Main {
     }
     
     /**
-     * Checks and returns packets sender address
+     * Gets packets sender address
      * @param received Packet received
      * @return Short containing sender address
      */
@@ -140,6 +165,17 @@ public class Main {
         //IMPLEMENT
         short address = 0;
         return address;
+    }
+    
+    /**
+     * Gets packets ACK number
+     * @param received Packet received
+     * @return int Packets ACK number
+     */
+    private int getAckNumber(Object received){
+        //IMPLEMENT
+        int ackNumber = 0;
+        return ackNumber;
     }
     
     /**
@@ -165,7 +201,8 @@ public class Main {
     }
     
     /**
-     * Read packet
+     * Periodically check to see if data to be read, if so, read it, and return
+     * @return Object Packet read
      */
     private Object readPacket(){
         //IMPLEMENT
