@@ -9,6 +9,8 @@ package fttcp;
  *
  * @author James Bossingham
  */
+import java.io.*;
+
 public class Main {
 
     //GLOBAL VARIABLES
@@ -297,8 +299,14 @@ public class Main {
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
-    private Object readPacket(){
+    private byte[] readPacket(){
         //IMPLEMENT
+        FileInputStream fileinputstream = new FileInputStream("");
+
+        int numberBytes = fileinputstream.available();
+        byte[] bytearray = new byte[numberBytes];
+
+        fileinputstream.read(bytearray);
         Object received = new Object();
         return received;
     }
