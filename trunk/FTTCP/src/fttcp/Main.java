@@ -79,7 +79,7 @@ public class Main {
             }
             else if(isServAck(received)){
                 servAck = received;
-                servAckRecv = false;
+                servAckRecv = true;
             }
         }
         
