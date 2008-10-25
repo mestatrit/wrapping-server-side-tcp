@@ -19,7 +19,8 @@ public class Main {
     private int server_seq;
     private int unstable_reads;
     private boolean restarting;
-    private enum States { intial,normal,restarting}
+    private enum States { intial,normal,restarting};
+    private enum Entity { SSW, NSW, Client, Server, TCP, Logger};
     private States SSWcurrentState = States.intial;
     private short clientAddress;
     private short serverAddress;
@@ -29,7 +30,13 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        byte[] test = new byte[5];
+        for(byte i=0;i<test.length;i++){
+            test[i] = i;
+        }
+        //loggerAddress = 13;
+        short  a = 13;
+        //sendPacket(test,a,Entity.SSW);
     }
     
     /**
@@ -73,10 +80,10 @@ public class Main {
         
         byte[] data = intToByteArr(clientInitSeqNum);
         //Send logger Client Initial Seq Num
-        sendPacket(data, loggerAddress);
+        sendPacket(data, loggerAddress, Entity.SSW);
         
         //Send SYN packet to server
-        sendPacket(clientSYN,serverAddress);
+        sendPacket(clientSYN,serverAddress, Entity.SSW);
         
         //While both packets aren't received, wait for them
         while(!servAckRecv || !logAckRecv){
@@ -91,7 +98,7 @@ public class Main {
         }
         
         //Send Servers ACK to client
-        sendPacket(servAck,clientAddress);
+        sendPacket(servAck,clientAddress, Entity.SSW);
         
         //Set currentState to normal
         SSWcurrentState = States.normal;
@@ -106,7 +113,7 @@ public class Main {
             short sender = getSenderAddress(receivedPacket);
             if (sender == clientAddress){
                 //Forward packet to logger
-                sendPacket(receivedPacket, loggerAddress);
+                sendPacket(receivedPacket, loggerAddress, Entity.SSW);
                 
                 //Subtracts delta_seq from ACK number, change packets ack#
                 int ackNumber = getAckNumber(receivedPacket) - delta_seq;
@@ -116,7 +123,7 @@ public class Main {
                 receivedPacket = recomputeChecksum(receivedPacket);
                 
                 //Send Packet to server (TCP layer)
-                sendPacket(receivedPacket,serverAddress);
+                sendPacket(receivedPacket,serverAddress, Entity.SSW);
             }
             else if (sender == loggerAddress){
                 //If ack is for client data packet with seq# from sn->sn+l, and 
@@ -131,14 +138,21 @@ public class Main {
                 receivedPacket = setAckNumber(receivedPacket, stable_seq);
                 
                 //Change advertised window size by adding ack#-stable_seq
+                //Convert int to short
                 int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + stable_seq;
-                 receivedPacket = setWindowSize(receivedPacket,intWindowSize);
+                byte[] intArr = intToByteArr(intWindowSize);
+                byte[] shortArr = new byte[2];
+                shortArr[0] = intArr[0];
+                shortArr[1] = intArr[1];
+                short windowSize = byteArrayToShort(shortArr,0);
+                //Set window size
+                receivedPacket = setWindowSize(receivedPacket,windowSize);
                 
                 //Recompute Checksum
                 receivedPacket = recomputeChecksum(receivedPacket);
                 
                 //Send to client (IP)
-                sendPacket(receivedPacket,clientAddress);
+                sendPacket(receivedPacket, clientAddress, Entity.SSW);
             }
         }
         SSWcurrentState = States.restarting;
@@ -192,7 +206,19 @@ public class Main {
         return value;
     }
 
-
+    private byte[] shortToByteArr(short num){
+        byte[] byteArr = new byte[2];
+        byteArr[1] =(byte)( num >> 8 );
+        byteArr[0] =(byte)( (num << 8) >> 8 );
+        return byteArr;
+    }
+    
+    private short byteArrayToShort(byte[] byteArr, int offset){
+        short shortVal = byteArr[offset];
+        shortVal += byteArr[offset+1] <<8;
+        return shortVal;
+    }
+    
     /**
      * Checks packet to see if it's an ACK from server
      * @param received Packet received
@@ -227,8 +253,7 @@ public class Main {
      * @return int Packets ACK number
      */
     private int getAckNumber(byte[] received){
-        //IMPLEMENT
-        int ackNumber = 0;
+        int ackNumber = byteArrayToInt(received,8);
         return ackNumber;
     }
     
@@ -238,8 +263,11 @@ public class Main {
      * @param ackNumber New ack number to be set
      * @return Object recieved Packet, with new ack number
      */
-    private byte[] setAckNumber(byte[] received, int newAckNumer){
-        //IMPLEMENT
+    private byte[] setAckNumber(byte[] received, int newAckNumber){
+        byte[] newAck = intToByteArr(newAckNumber);
+        for (int i=0;i<4;i++){
+            received[8+i] = newAck[i];
+        }
         return received;
     }
     
@@ -259,8 +287,13 @@ public class Main {
      * @return boolean True if packet is an ACK packet
      */
     private boolean isAckPacket(byte[] received){
-        //IMPLEMENT
-        boolean isAckPacket = false;
+        boolean isAckPacket;
+        int flags = received[13];
+        String str = Integer.toBinaryString(flags);
+        if(str.charAt(3)=='1'){
+            isAckPacket = true;
+        }
+        else isAckPacket = false;
         return isAckPacket;
     }
     
@@ -281,8 +314,7 @@ public class Main {
      * @return int Sequence Number of packet
      */
     private int getSequenceNumber(byte[] received){
-        //IMPLEMENT
-        int seqNumber = 0;
+        int seqNumber = byteArrayToInt(received,4);
         return seqNumber;
     }
     
@@ -293,7 +325,10 @@ public class Main {
      * @return Object packet with new sequence number
      */
     private byte[] setSequenceNumber(byte[] received, int seqNumber){
-        //IMPLEMENT
+        byte[] newSeq = intToByteArr(seqNumber);
+        for (int i=0;i<4;i++){
+            received[4+i] = newSeq[i];
+        }
         return received;
     }
     
@@ -303,9 +338,8 @@ public class Main {
      * @return short Sequence Number of packet
      */
     private short getWindowSize(byte[] received){
-        //IMPLEMENT
-        short seqNumber = 0;
-        return seqNumber;
+        short windowSize = byteArrayToShort(received,14);
+        return windowSize;
     }
     
     /**
@@ -314,8 +348,11 @@ public class Main {
      * @param windowSize new window size
      * @return Object packet with new window size
      */
-    private byte[] setWindowSize(byte[] received, int windowSize){
-        //IMPLEMENT
+    private byte[] setWindowSize(byte[] received, short windowSize){
+        byte[] newWindow = shortToByteArr(windowSize);
+        for (int i=0;i<2;i++){
+            received[14+i] = newWindow[i];
+        }
         return received;
     }
     
@@ -335,15 +372,45 @@ public class Main {
         catch(java.io.FileNotFoundException e){
             return null;
         } 
+        catch(java.io.IOException e){
+            return null;
+        } 
     }
     
     /**
      * Send packet to address
      * @param object Packet to be sent
      * @param address Place to send it to
+     * @param Entity Sender entity sending message
      */
-    private void sendPacket(byte[] data, short address){
-        //IMPLEMENT
+    private void sendPacket(byte[] data, short address, Entity sender ){
+        if(sender == Entity.SSW){
+            if(address == serverAddress){
+                //Put in file called received.TCP in server folder
+                writeFile(data,"serverBuffer/received.TCP");
+            }
+            else if(address == clientAddress){
+                //Put in file called received.TCP in client folder
+                writeFile(data,"clientBuffer/received.TCP");
+            }
+            else if(address == loggerAddress){
+                //Put in file called received.TCP in logger folder
+                writeFile(data,"loggerBuffer/received.TCP");
+            }
+        }
         
+    }
+    
+    private void writeFile(byte[] data, String path){
+        try{
+            FileOutputStream outStream = new FileOutputStream(path);
+            PrintWriter printW = new PrintWriter(outStream);
+            printW.print(data);
+            printW.flush();
+            outStream.close();
+        }
+        catch(IOException e){
+
+        }
     }
 }
