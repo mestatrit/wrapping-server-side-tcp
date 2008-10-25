@@ -104,12 +104,38 @@ public class Main {
             if (sender == clientAddress){
                 //Forward packet to logger
                 sendPacket(receivedPacket, loggerAddress);
+                
+                //Subtracts delta_seq from ACK number, change packets ack#
+                int ackNumber = getAckNumber(receivedPacket) - delta_seq;
+                receivedPacket = setAckNumber(receivedPacket, ackNumber);
+                
+                //Recompute Checksum
+                receivedPacket = recomputeChecksum(receivedPacket);
+                
+                //Send Packet to server (TCP layer)
+                sendPacket(receivedPacket,serverAddress);
             }
             else if (sender == loggerAddress){
-                
+                //If ack is for client data packet with seq# from sn->sn+l, and 
+                //sn+l+1 > stable_seq, set stable_seq to sn+l+1
             }
             else if (sender == serverAddress){
+                //Add delta_seq to sequence#
+                int sequenceNo = getSequenceNumber(receivedPacket);
+                receivedPacket = setSequenceNumber(receivedPacket, sequenceNo + delta_seq);
                 
+                //Change ack# to stable_seq
+                receivedPacket = setAckNumber(receivedPacket, stable_seq);
+                
+                //Change advertised window size by adding ack#-stable_seq
+                short windowSize =(int) getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + stable_seq;
+                receivedPacket = setWindowSize(receivedPacket,windowSize);
+                
+                //Recompute Checksum
+                receivedPacket = recomputeChecksum(receivedPacket);
+                
+                //Send to client (IP)
+                sendPacket(receivedPacket,clientAddress);
             }
         }
         SSWcurrentState = States.restarting;
@@ -179,6 +205,27 @@ public class Main {
     }
     
     /**
+     * Sets packets ACK number
+     * @param received Packet received
+     * @param ackNumber New ack number to be set
+     * @return Object recieved Packet, with new ack number
+     */
+    private Object setAckNumber(Object received, int newAckNumer){
+        //IMPLEMENT
+        return received;
+    }
+    
+    /**
+     * Recomputes a changed Packets checksum
+     * @param received Packet to be recomputed
+     * @return Object New packet with correct Checksum
+     */
+    private Object recomputeChecksum(Object received){
+        //IMPLEMENT
+        return received;
+    }
+    
+    /**
      * Checks to see if given packet is an ACK packet
      * @param received Object to be checked
      * @return boolean True if packet is an ACK packet
@@ -198,6 +245,50 @@ public class Main {
         //IMPLEMENT
         int initSeq = 0;
         return initSeq;
+    }
+   
+    /**
+     * Get Sequence Number from given packet
+     * @param received Packet 
+     * @return int Sequence Number of packet
+     */
+    private int getSequenceNumber(Object received){
+        //IMPLEMENT
+        int seqNumber = 0;
+        return seqNumber;
+    }
+    
+    /**
+     * Set Sequence Number for given packet
+     * @param received Packet
+     * @param seqNumber new sequence number
+     * @return Object packet with new sequence number
+     */
+    private Object setSequenceNumber(Object received, int seqNumber){
+        //IMPLEMENT
+        return received;
+    }
+    
+    /**
+     * Get Window size from given packet
+     * @param received Packet 
+     * @return short Sequence Number of packet
+     */
+    private short getWindowSize(Object received){
+        //IMPLEMENT
+        short seqNumber = 0;
+        return seqNumber;
+    }
+    
+    /**
+     * Set Window Size for given packet
+     * @param received Packet
+     * @param windowSize new window size
+     * @return Object packet with new window size
+     */
+    private Object setWindowSize(Object received, int windowSize){
+        //IMPLEMENT
+        return received;
     }
     
     /**
