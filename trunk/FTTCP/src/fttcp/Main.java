@@ -57,7 +57,7 @@ public class Main {
     private void SSWinitial(){
         boolean servAckRecv = false; 
         boolean logAckRecv = false;
-        Object servAck = null;
+        byte[] servAck = null;
         //Set variables (May need mutex lock on them)
         delta_seq = 0;
         unstable_reads = 0;
@@ -65,21 +65,22 @@ public class Main {
         int clientInitSeqNum;
         
         //Read Clients SYN packet
-        Object clientSYN = readPacket();
+        byte[] clientSYN = readPacket();
         
         //Set stable_seq as clients initial seq num + 1
         clientInitSeqNum = getInitSeq(clientSYN);
         stable_seq = clientInitSeqNum +1;
         
+        byte[] data = intToByteArr(clientInitSeqNum);
         //Send logger Client Initial Seq Num
-        sendPacket(clientInitSeqNum, loggerAddress);
+        sendPacket(data, loggerAddress);
         
         //Send SYN packet to server
         sendPacket(clientSYN,serverAddress);
         
         //While both packets aren't received, wait for them
         while(!servAckRecv || !logAckRecv){
-            Object received = readPacket();
+            byte[] received = readPacket();
             if (isLogAck(received)){
                 logAckRecv = true;
             }
@@ -101,7 +102,7 @@ public class Main {
      */
     private void SSWnormalOpp(){
         while(!restarting){
-            Object receivedPacket = readPacket();
+            byte[] receivedPacket = readPacket();
             short sender = getSenderAddress(receivedPacket);
             if (sender == clientAddress){
                 //Forward packet to logger
@@ -155,7 +156,7 @@ public class Main {
      * @param received Packet received
      * @return isServAck Boolean true if it is a logger ACK
      */
-    private boolean isLogAck(Object received){
+    private boolean isLogAck(byte[] received){
         boolean isLogAck = false;
         //Check to see if packet is from logger
         if(getSenderAddress(received) == loggerAddress){
@@ -167,14 +168,37 @@ public class Main {
         return isLogAck;
     }
     
+    private byte[] intToByteArr(int num){
+        byte[] byteArr = new byte[4];
+        byteArr[3] =(byte)( num >> 24 );
+        byteArr[2] =(byte)( (num << 8) >> 24 );
+        byteArr[1] =(byte)( (num << 16) >> 24 );
+        byteArr[0] =(byte)( (num << 24) >> 24 );
+        return byteArr;
+    }
     
+    /**
+     * Converts 4 bytes in byte array to an int, starting from offset
+     * @param byteArr Byte Array
+     * @param offset Place to start in array
+     * @return int value of four bytes
+     */
+    
+    private int byteArrayToInt(byte[] byteArr, int offset) {
+        int value = byteArr[0];
+        for (int i = 1; i < 4; i++) {
+            value += byteArr[i+offset] << 8;
+        }
+        return value;
+    }
+
 
     /**
      * Checks packet to see if it's an ACK from server
      * @param received Packet received
      * @return isServAck Boolean true if it is a server ACK
      */
-    private boolean isServAck(Object received){
+    private boolean isServAck(byte[] received){
         boolean isServAck = false;
         //Check to see if packet is from logger
         if(getSenderAddress(received) == serverAddress){
@@ -191,7 +215,7 @@ public class Main {
      * @param received Packet received
      * @return Short containing sender address
      */
-    private short getSenderAddress(Object received){
+    private short getSenderAddress(byte[] received){
         //IMPLEMENT
         short address = 0;
         return address;
@@ -202,7 +226,7 @@ public class Main {
      * @param received Packet received
      * @return int Packets ACK number
      */
-    private int getAckNumber(Object received){
+    private int getAckNumber(byte[] received){
         //IMPLEMENT
         int ackNumber = 0;
         return ackNumber;
@@ -214,7 +238,7 @@ public class Main {
      * @param ackNumber New ack number to be set
      * @return Object recieved Packet, with new ack number
      */
-    private Object setAckNumber(Object received, int newAckNumer){
+    private byte[] setAckNumber(byte[] received, int newAckNumer){
         //IMPLEMENT
         return received;
     }
@@ -224,7 +248,7 @@ public class Main {
      * @param received Packet to be recomputed
      * @return Object New packet with correct Checksum
      */
-    private Object recomputeChecksum(Object received){
+    private byte[] recomputeChecksum(byte[] received){
         //IMPLEMENT
         return received;
     }
@@ -234,7 +258,7 @@ public class Main {
      * @param received Object to be checked
      * @return boolean True if packet is an ACK packet
      */
-    private boolean isAckPacket(Object received){
+    private boolean isAckPacket(byte[] received){
         //IMPLEMENT
         boolean isAckPacket = false;
         return isAckPacket;
@@ -245,7 +269,7 @@ public class Main {
      * @param received Packet to analyse
      * @return int Initial Sequence Number of packet
      */
-    private int getInitSeq(Object received){
+    private int getInitSeq(byte[] received){
         //IMPLEMENT
         int initSeq = 0;
         return initSeq;
@@ -256,7 +280,7 @@ public class Main {
      * @param received Packet 
      * @return int Sequence Number of packet
      */
-    private int getSequenceNumber(Object received){
+    private int getSequenceNumber(byte[] received){
         //IMPLEMENT
         int seqNumber = 0;
         return seqNumber;
@@ -268,7 +292,7 @@ public class Main {
      * @param seqNumber new sequence number
      * @return Object packet with new sequence number
      */
-    private Object setSequenceNumber(Object received, int seqNumber){
+    private byte[] setSequenceNumber(byte[] received, int seqNumber){
         //IMPLEMENT
         return received;
     }
@@ -278,7 +302,7 @@ public class Main {
      * @param received Packet 
      * @return short Sequence Number of packet
      */
-    private short getWindowSize(Object received){
+    private short getWindowSize(byte[] received){
         //IMPLEMENT
         short seqNumber = 0;
         return seqNumber;
@@ -290,7 +314,7 @@ public class Main {
      * @param windowSize new window size
      * @return Object packet with new window size
      */
-    private Object setWindowSize(Object received, int windowSize){
+    private byte[] setWindowSize(byte[] received, int windowSize){
         //IMPLEMENT
         return received;
     }
@@ -301,14 +325,16 @@ public class Main {
      */
     private byte[] readPacket(){
         //IMPLEMENT
-        FileInputStream fileinputstream = new FileInputStream("");
-
-        int numberBytes = fileinputstream.available();
-        byte[] bytearray = new byte[numberBytes];
-
-        fileinputstream.read(bytearray);
-        Object received = new Object();
-        return received;
+        try{
+            FileInputStream fileinputstream = new FileInputStream("");
+            int numberBytes = fileinputstream.available();
+            byte[] bytearray = new byte[numberBytes];
+            fileinputstream.read(bytearray);
+            return bytearray;
+        }
+        catch(java.io.FileNotFoundException e){
+            return null;
+        } 
     }
     
     /**
@@ -316,7 +342,7 @@ public class Main {
      * @param object Packet to be sent
      * @param address Place to send it to
      */
-    private void sendPacket(Object object, short address){
+    private void sendPacket(byte[] data, short address){
         //IMPLEMENT
         
     }
