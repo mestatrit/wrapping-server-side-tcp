@@ -393,15 +393,15 @@ public class southSideWrap extends Thread{
         //NEED TO CHECK TO SEE IF FILE EXISTS, IF SO WAIT FOR IT TO GO THEN MAKE FILE
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
-            writeFile(data,"serverBuffer/received.TCP");
+            writeFile(data,"serverBuffer/received.SSW.TCP");
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
-            writeFile(data,"clientBuffer/received.TCP");
+            writeFile(data,"clientBuffer/received.SSW.TCP");
         }
         else if(address == m.getLoggerAddress()){
             //Put in file called received.TCP in logger folder
-            writeFile(data,"loggerBuffer/received.TCP");
+            writeFile(data,"loggerBuffer/received.SSW.TCP");
         }
         
     }
