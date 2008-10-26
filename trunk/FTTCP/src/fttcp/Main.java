@@ -30,13 +30,20 @@ public class Main {
         for(byte i=0;i<test.length;i++){
             test[i] = i;
         }
+        //Start threads
         Main main = new Main();
+        Thread log = new logger(main);
+        //log.start();
         Thread ssw = new southSideWrap(main);
         ssw.start();
+        Thread nsw = new northSideWrap(main);
+        //nsw.start();
+        Thread tcp = new TCP(main);
+       //tcp.start();
         Thread server = new server(main);
-        ssw.start();
+        //server.start();
         Thread client = new client(main);
-        ssw.start();
+        //client.start();
     }
     
     /**
