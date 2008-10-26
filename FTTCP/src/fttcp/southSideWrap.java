@@ -348,17 +348,29 @@ public class southSideWrap extends Thread{
     private byte[] readPacket(){
         //IMPLEMENT
         try{
-            FilenameFilter filter = new SSWFileFilter();
-            File f = new File("serverBuffer");
-            String[] files = f.list(filter);
-            for(int i=0;i<files.length;i++){
-                System.out.println(" "+files[i]);
+            while(true){
+                FilenameFilter filter = new SSWFileFilter();
+                File f = new File("serverBuffer");
+                String[] files = f.list(filter);
+                if(files[0] !=null){
+                    FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                    int numberBytes = fileinputstream.available();
+                    byte[] bytearray = new byte[numberBytes];
+                    fileinputstream.read(bytearray);
+                    //return bytearray;
+                    System.out.println(files[0]);
+                }
+                else{
+                    try{
+                        System.out.println("Going to sleep");
+                        this.sleep(3000);
+                        System.out.println("Waking up");
+                    }
+                    catch(java.lang.InterruptedException e){
+                        
+                    }
+                }
             }
-            FileInputStream fileinputstream = new FileInputStream("");
-            int numberBytes = fileinputstream.available();
-            byte[] bytearray = new byte[numberBytes];
-            fileinputstream.read(bytearray);
-            return bytearray;
         }
         catch(java.io.FileNotFoundException e){
             return null;
@@ -374,6 +386,7 @@ public class southSideWrap extends Thread{
      * @param address Place to send it to
      */
     private void sendPacket(byte[] data, short address){
+        //NEED TO CHECK TO SEE IF FILE EXISTS, IF SO WAIT FOR IT TO GO THEN MAKE FILE
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
             writeFile(data,"serverBuffer/received.TCP");
