@@ -27,7 +27,14 @@ public class southSideWrap extends Thread{
      */
     @Override
     public void run(){
+        byte[] send = new byte[1];
+        send[0] = 50;
+        sendPacket(send,m.getServerAddress());
+        //System.out.println(String.valueOf(send));
         byte[] j = readPacket();
+        for (int i=0;i<j.length;i++){
+            System.out.println(Byte.toString(j[i]));
+        }
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()
@@ -346,7 +353,6 @@ public class southSideWrap extends Thread{
      * @return Object Packet read
      */
     private byte[] readPacket(){
-        //IMPLEMENT
         try{
             while(true){
                 FilenameFilter filter = new SSWFileFilter();
@@ -357,14 +363,12 @@ public class southSideWrap extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
-                    //return bytearray;
-                    System.out.println(files[0]);
+                    return bytearray;
                 }
                 else{
                     try{
-                        System.out.println("Going to sleep");
+                        //Sleep for 3 seconds, then look again for file
                         this.sleep(3000);
-                        System.out.println("Waking up");
                     }
                     catch(java.lang.InterruptedException e){
                         
@@ -406,12 +410,15 @@ public class southSideWrap extends Thread{
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
-            printW.print(data);
+            for (int i=0;i<data.length;i++){
+                System.out.println("Writing: " + String.valueOf(data[i]));
+                printW.print(data[i]);
+            }
             printW.flush();
             outStream.close();
         }
         catch(IOException e){
-
+            System.out.println("SSW Cannot write file to: " + path);
         }
     }
 
