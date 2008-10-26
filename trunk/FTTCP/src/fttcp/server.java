@@ -55,17 +55,9 @@ public class server extends Thread{
      * @param address Place to send it to
      */
     private void sendPacket(byte[] data, short address){
-        if(address == m.getServerAddress()){
-            //Put in file called received.TCP in server folder
-            writeFile(data,"serverBuffer/received.TCP");
-        }
-        else if(address == m.getClientAddress()){
+        if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
-            writeFile(data,"clientBuffer/received.TCP");
-        }
-        else if(address == m.getLoggerAddress()){
-            //Put in file called received.TCP in logger folder
-            writeFile(data,"loggerBuffer/received.TCP");
+            writeFile(data,"serverBuffer/toSend.SRV.NSW");
         }
         
     }
