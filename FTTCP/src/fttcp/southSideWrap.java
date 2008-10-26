@@ -27,7 +27,7 @@ public class southSideWrap extends Thread{
      */
     @Override
     public void run(){
-        System.out.println("Hello");
+        byte[] j = readPacket();
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()
@@ -348,6 +348,12 @@ public class southSideWrap extends Thread{
     private byte[] readPacket(){
         //IMPLEMENT
         try{
+            FilenameFilter filter = new SSWFileFilter();
+            File f = new File("serverBuffer");
+            String[] files = f.list(filter);
+            for(int i=0;i<files.length;i++){
+                System.out.println(" "+files[i]);
+            }
             FileInputStream fileinputstream = new FileInputStream("");
             int numberBytes = fileinputstream.available();
             byte[] bytearray = new byte[numberBytes];
