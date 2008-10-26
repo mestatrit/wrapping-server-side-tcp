@@ -352,7 +352,7 @@ public class southSideWrap extends Thread{
                 FilenameFilter filter = new SSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
-                if(files[0] !=null){
+                if(files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
