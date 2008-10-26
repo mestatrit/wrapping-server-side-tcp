@@ -27,14 +27,6 @@ public class southSideWrap extends Thread{
      */
     @Override
     public void run(){
-        byte[] send = new byte[1];
-        send[0] = 50;
-        sendPacket(send,m.getServerAddress());
-        //System.out.println(String.valueOf(send));
-        byte[] j = readPacket();
-        for (int i=0;i<j.length;i++){
-            System.out.println(Byte.toString(j[i]));
-        }
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()
@@ -406,13 +398,17 @@ public class southSideWrap extends Thread{
         
     }
     
+/**
+     * Writes data array to given path
+     * @param data byte[] to be written
+     * @param path location to save file
+     */
     private void writeFile(byte[] data, String path){
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
             for (int i=0;i<data.length;i++){
-                System.out.println("Writing: " + String.valueOf(data[i]));
-                printW.print(data[i]);
+                printW.write((int)data[i]);
             }
             printW.flush();
             outStream.close();
