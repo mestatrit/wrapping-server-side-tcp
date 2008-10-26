@@ -33,18 +33,33 @@ public class client extends Thread{
         while (Serverreplied = true);
      
     }
-        /**
+     /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
     private byte[] readPacket(){
-        //IMPLEMENT
         try{
-            FileInputStream fileinputstream = new FileInputStream("");
-            int numberBytes = fileinputstream.available();
-            byte[] bytearray = new byte[numberBytes];
-            fileinputstream.read(bytearray);
-            return bytearray;
+            while(true){
+                FilenameFilter filter = new CLTFileFilter();
+                File f = new File("serverBuffer");
+                String[] files = f.list(filter);
+                if(files.length != 0){
+                    FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                    int numberBytes = fileinputstream.available();
+                    byte[] bytearray = new byte[numberBytes];
+                    fileinputstream.read(bytearray);
+                    return bytearray;
+                }
+                else{
+                    try{
+                        //Sleep for 3 seconds, then look again for file
+                        this.sleep(3000);
+                    }
+                    catch(java.lang.InterruptedException e){
+                        
+                    }
+                }
+            }
         }
         catch(java.io.FileNotFoundException e){
             return null;
@@ -66,17 +81,23 @@ public class client extends Thread{
         }
         
     }
-    
+    /**
+     * Writes data array to given path
+     * @param data byte[] to be written
+     * @param path location to save file
+     */
     private void writeFile(byte[] data, String path){
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
-            printW.print(data);
+            for (int i=0;i<data.length;i++){
+                printW.write((int)data[i]);
+            }
             printW.flush();
             outStream.close();
         }
         catch(IOException e){
-
+            System.out.println("SSW Cannot write file to: " + path);
         }
     }
      private byte[] intToByteArr(int num){
