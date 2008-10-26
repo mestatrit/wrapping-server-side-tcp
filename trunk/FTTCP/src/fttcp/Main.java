@@ -9,7 +9,6 @@ package fttcp;
  *
  * @author James Bossingham
  */
-import java.io.*;
 
 public class Main {
 
@@ -19,12 +18,9 @@ public class Main {
     private int server_seq;
     private int unstable_reads;
     private boolean restarting;
-    private enum States { intial,normal,restarting};
-    private enum Entity { SSW, NSW, Client, Server, TCP, Logger};
-    private States SSWcurrentState = States.intial;
-    private short clientAddress;
-    private short serverAddress = 13;
-    private short loggerAddress;
+    private short clientAddress = 0;
+    private short serverAddress = 0;
+    private short loggerAddress = 0;
     
     /**
      * @param args the command line arguments
@@ -34,384 +30,126 @@ public class Main {
         for(byte i=0;i<test.length;i++){
             test[i] = i;
         }
-        //loggerAddress = 13;
-        short  a = 13;
-        Main o = new Main();
-        o.sendPacket(test,a,Entity.SSW);
+        Main main = new Main();
+        Thread ssw = new southSideWrap(main);
+        ssw.start();
     }
     
     /**
-     * South Side Wraps thread
+     * Gets restarting
+     * @return boolean restarting
      */
-    private void SSWrunnable(){
-        //repeats this forever (or until connection ended for good)
-        while(true){
-            //If in initial state perform intial protocol SSWintial()
-            if(SSWcurrentState == States.intial){
-                SSWinitial();
-            }
-            else if(SSWcurrentState == States.normal){
-                SSWnormalOpp();
-            }
-            else if(SSWcurrentState == States.restarting){
-                SSWrestarting();
-            }
-        }
+    public boolean getRestarting(){
+        return restarting;
+    }
+    /**
+     * Gets restarting
+     * @return boolean restarting
+     */
+    public void getRestarting(boolean b){
+        restarting = b;
     }
     
     /**
-     * South Side Wraps intial connection protocol
+     * Gets delta_seq
+     * @return int delta_seq
      */
-    private void SSWinitial(){
-        boolean servAckRecv = false; 
-        boolean logAckRecv = false;
-        byte[] servAck = null;
-        //Set variables (May need mutex lock on them)
-        delta_seq = 0;
-        unstable_reads = 0;
-        restarting = false;
-        int clientInitSeqNum;
-        
-        //Read Clients SYN packet
-        byte[] clientSYN = readPacket();
-        
-        //Set stable_seq as clients initial seq num + 1
-        clientInitSeqNum = getInitSeq(clientSYN);
-        stable_seq = clientInitSeqNum +1;
-        
-        byte[] data = intToByteArr(clientInitSeqNum);
-        //Send logger Client Initial Seq Num
-        sendPacket(data, loggerAddress, Entity.SSW);
-        
-        //Send SYN packet to server
-        sendPacket(clientSYN,serverAddress, Entity.SSW);
-        
-        //While both packets aren't received, wait for them
-        while(!servAckRecv || !logAckRecv){
-            byte[] received = readPacket();
-            if (isLogAck(received)){
-                logAckRecv = true;
-            }
-            else if(isServAck(received)){
-                servAck = received;
-                servAckRecv = true;
-            }
-        }
-        
-        //Send Servers ACK to client
-        sendPacket(servAck,clientAddress, Entity.SSW);
-        
-        //Set currentState to normal
-        SSWcurrentState = States.normal;
+    public int getDelta_seq(){
+        return delta_seq;
+    }
+    /**
+     * Sets delta_seq
+     * @param s Int new delta_seq value
+     */
+    public void setDelta_seq(int s){
+        delta_seq = s;
     }
     
     /**
-     * South Side Wraps normal operation protocol
+     * Gets stable_seq
+     * @return int stable_seq
      */
-    private void SSWnormalOpp(){
-        while(!restarting){
-            byte[] receivedPacket = readPacket();
-            short sender = getSenderAddress(receivedPacket);
-            if (sender == clientAddress){
-                //Forward packet to logger
-                sendPacket(receivedPacket, loggerAddress, Entity.SSW);
-                
-                //Subtracts delta_seq from ACK number, change packets ack#
-                int ackNumber = getAckNumber(receivedPacket) - delta_seq;
-                receivedPacket = setAckNumber(receivedPacket, ackNumber);
-                
-                //Recompute Checksum
-                receivedPacket = recomputeChecksum(receivedPacket);
-                
-                //Send Packet to server (TCP layer)
-                sendPacket(receivedPacket,serverAddress, Entity.SSW);
-            }
-            else if (sender == loggerAddress){
-                //If ack is for client data packet with seq# from sn->sn+l, and 
-                //sn+l+1 > stable_seq, set stable_seq to sn+l+1
-            }
-            else if (sender == serverAddress){
-                //Add delta_seq to sequence#
-                int sequenceNo = getSequenceNumber(receivedPacket);
-                receivedPacket = setSequenceNumber(receivedPacket, sequenceNo + delta_seq);
-                
-                //Change ack# to stable_seq
-                receivedPacket = setAckNumber(receivedPacket, stable_seq);
-                
-                //Change advertised window size by adding ack#-stable_seq
-                //Convert int to short
-                int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + stable_seq;
-                byte[] intArr = intToByteArr(intWindowSize);
-                byte[] shortArr = new byte[2];
-                shortArr[0] = intArr[0];
-                shortArr[1] = intArr[1];
-                short windowSize = byteArrayToShort(shortArr,0);
-                //Set window size
-                receivedPacket = setWindowSize(receivedPacket,windowSize);
-                
-                //Recompute Checksum
-                receivedPacket = recomputeChecksum(receivedPacket);
-                
-                //Send to client (IP)
-                sendPacket(receivedPacket, clientAddress, Entity.SSW);
-            }
-        }
-        SSWcurrentState = States.restarting;
+    public int getStable_seq(){
+        return stable_seq;
+    }
+    /**
+     * Sets stable_seq
+     * @param s Int new stable_seq value
+     */
+    public void setStable_seq(int s){
+        stable_seq = s;
+    }
+    /**
+     * Gets server_seq
+     * @return int server_seq
+     */
+    public int getServer_seq(){
+        return server_seq;
+    }
+    /**
+     * Sets server_seq
+     * @param s Int new server_seq value
+     */
+    public void setServer_seq(int s){
+        server_seq = s;
+    }
+     /**
+     * Gets unstable_reads
+     * @return int unstable_reads
+     */
+    public int getUnstable_reads(){
+        return unstable_reads;
+    }
+    /**
+     * Sets unstable_reads
+     * @param s Int new unstable_reads value
+     */
+    public void setUnstable_reads(int s){
+        unstable_reads = s;
+    }
+    /**
+     * Gets Client Address
+     * @return short Client Address
+     */
+    public short getClientAddress(){
+        return clientAddress;
+    }
+    /**
+     * Sets client address
+     * @param a new client address
+     */
+    public void setClientAddress(short a){
+        clientAddress = a;
     }
     
     /**
-     * South Side Wraps restarting protocol
+     * Gets server Address
+     * @return short server Address
      */
-    private void SSWrestarting(){
-        
+    public short getServerAddress(){
+        return serverAddress;
     }
-    
     /**
-     * Checks packet to see if it's an ACK from logger
-     * @param received Packet received
-     * @return isServAck Boolean true if it is a logger ACK
+     * Sets server address
+     * @param a new server address
      */
-    private boolean isLogAck(byte[] received){
-        boolean isLogAck = false;
-        //Check to see if packet is from logger
-        if(getSenderAddress(received) == loggerAddress){
-            //Check to see if its an ACK packet
-            if(isAckPacket(received)){
-                isLogAck = true;
-            }
-        }
-        return isLogAck;
+    public void setServerAddress(short a){
+        serverAddress = a;
     }
     
-    private byte[] intToByteArr(int num){
-        byte[] byteArr = new byte[4];
-        byteArr[3] =(byte)( num >> 24 );
-        byteArr[2] =(byte)( (num << 8) >> 24 );
-        byteArr[1] =(byte)( (num << 16) >> 24 );
-        byteArr[0] =(byte)( (num << 24) >> 24 );
-        return byteArr;
+     /**
+     * Gets logger Adress
+     * @return short logger Address
+     */
+    public short getLoggerAddress(){
+        return loggerAddress;
     }
-    
     /**
-     * Converts 4 bytes in byte array to an int, starting from offset
-     * @param byteArr Byte Array
-     * @param offset Place to start in array
-     * @return int value of four bytes
+     * Sets logger address
+     * @param a new logger address
      */
-    
-    private int byteArrayToInt(byte[] byteArr, int offset) {
-        int value = byteArr[0];
-        for (int i = 1; i < 4; i++) {
-            value += byteArr[i+offset] << 8;
-        }
-        return value;
-    }
-
-    private byte[] shortToByteArr(short num){
-        byte[] byteArr = new byte[2];
-        byteArr[1] =(byte)( num >> 8 );
-        byteArr[0] =(byte)( (num << 8) >> 8 );
-        return byteArr;
+    public void setLoggerAddress(short a){
+        loggerAddress = a;
     }
     
-    private short byteArrayToShort(byte[] byteArr, int offset){
-        short shortVal = byteArr[offset];
-        shortVal += byteArr[offset+1] <<8;
-        return shortVal;
-    }
-    
-    /**
-     * Checks packet to see if it's an ACK from server
-     * @param received Packet received
-     * @return isServAck Boolean true if it is a server ACK
-     */
-    private boolean isServAck(byte[] received){
-        boolean isServAck = false;
-        //Check to see if packet is from logger
-        if(getSenderAddress(received) == serverAddress){
-            //Check to see if its an ACK packet
-            if(isAckPacket(received)){
-                isServAck = true;
-            }
-        }
-        return isServAck;
-    }
-    
-    /**
-     * Gets packets sender address
-     * @param received Packet received
-     * @return Short containing sender address
-     */
-    private short getSenderAddress(byte[] received){
-        //IMPLEMENT
-        short address = 0;
-        return address;
-    }
-    
-    /**
-     * Gets packets ACK number
-     * @param received Packet received
-     * @return int Packets ACK number
-     */
-    private int getAckNumber(byte[] received){
-        int ackNumber = byteArrayToInt(received,8);
-        return ackNumber;
-    }
-    
-    /**
-     * Sets packets ACK number
-     * @param received Packet received
-     * @param ackNumber New ack number to be set
-     * @return Object recieved Packet, with new ack number
-     */
-    private byte[] setAckNumber(byte[] received, int newAckNumber){
-        byte[] newAck = intToByteArr(newAckNumber);
-        for (int i=0;i<4;i++){
-            received[8+i] = newAck[i];
-        }
-        return received;
-    }
-    
-    /**
-     * Recomputes a changed Packets checksum
-     * @param received Packet to be recomputed
-     * @return Object New packet with correct Checksum
-     */
-    private byte[] recomputeChecksum(byte[] received){
-        //IMPLEMENT
-        return received;
-    }
-    
-    /**
-     * Checks to see if given packet is an ACK packet
-     * @param received Object to be checked
-     * @return boolean True if packet is an ACK packet
-     */
-    private boolean isAckPacket(byte[] received){
-        boolean isAckPacket;
-        int flags = received[13];
-        String str = Integer.toBinaryString(flags);
-        if(str.charAt(3)=='1'){
-            isAckPacket = true;
-        }
-        else isAckPacket = false;
-        return isAckPacket;
-    }
-    
-    /**
-     * Get Initial Sequence Number from given packet
-     * @param received Packet to analyse
-     * @return int Initial Sequence Number of packet
-     */
-    private int getInitSeq(byte[] received){
-        //IMPLEMENT
-        int initSeq = 0;
-        return initSeq;
-    }
-   
-    /**
-     * Get Sequence Number from given packet
-     * @param received Packet 
-     * @return int Sequence Number of packet
-     */
-    private int getSequenceNumber(byte[] received){
-        int seqNumber = byteArrayToInt(received,4);
-        return seqNumber;
-    }
-    
-    /**
-     * Set Sequence Number for given packet
-     * @param received Packet
-     * @param seqNumber new sequence number
-     * @return Object packet with new sequence number
-     */
-    private byte[] setSequenceNumber(byte[] received, int seqNumber){
-        byte[] newSeq = intToByteArr(seqNumber);
-        for (int i=0;i<4;i++){
-            received[4+i] = newSeq[i];
-        }
-        return received;
-    }
-    
-    /**
-     * Get Window size from given packet
-     * @param received Packet 
-     * @return short Sequence Number of packet
-     */
-    private short getWindowSize(byte[] received){
-        short windowSize = byteArrayToShort(received,14);
-        return windowSize;
-    }
-    
-    /**
-     * Set Window Size for given packet
-     * @param received Packet
-     * @param windowSize new window size
-     * @return Object packet with new window size
-     */
-    private byte[] setWindowSize(byte[] received, short windowSize){
-        byte[] newWindow = shortToByteArr(windowSize);
-        for (int i=0;i<2;i++){
-            received[14+i] = newWindow[i];
-        }
-        return received;
-    }
-    
-    /**
-     * Periodically check to see if data to be read, if so, read it, and return
-     * @return Object Packet read
-     */
-    private byte[] readPacket(){
-        //IMPLEMENT
-        try{
-            FileInputStream fileinputstream = new FileInputStream("");
-            int numberBytes = fileinputstream.available();
-            byte[] bytearray = new byte[numberBytes];
-            fileinputstream.read(bytearray);
-            return bytearray;
-        }
-        catch(java.io.FileNotFoundException e){
-            return null;
-        } 
-        catch(java.io.IOException e){
-            return null;
-        } 
-    }
-    
-    /**
-     * Send packet to address
-     * @param object Packet to be sent
-     * @param address Place to send it to
-     * @param Entity Sender entity sending message
-     */
-    private void sendPacket(byte[] data, short address, Entity sender ){
-        if(sender == Entity.SSW){
-            if(address == serverAddress){
-                //Put in file called received.TCP in server folder
-                writeFile(data,"serverBuffer/received.TCP");
-            }
-            else if(address == clientAddress){
-                //Put in file called received.TCP in client folder
-                writeFile(data,"clientBuffer/received.TCP");
-            }
-            else if(address == loggerAddress){
-                //Put in file called received.TCP in logger folder
-                writeFile(data,"loggerBuffer/received.TCP");
-            }
-        }
-        
-    }
-    
-    private void writeFile(byte[] data, String path){
-        try{
-            FileOutputStream outStream = new FileOutputStream(path);
-            PrintWriter printW = new PrintWriter(outStream);
-            printW.print(data);
-            printW.flush();
-            outStream.close();
-        }
-        catch(IOException e){
-
-        }
-    }
 }
