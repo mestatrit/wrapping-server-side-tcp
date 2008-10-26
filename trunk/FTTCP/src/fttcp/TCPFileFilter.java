@@ -9,7 +9,7 @@ import java.io.*;
  *
  * @author James Bossingham
  */
-class SSWFileFilter implements FilenameFilter {
+class TCPFileFilter implements FilenameFilter {
     public boolean accept(File dir, String name) {
         return name.toLowerCase().endsWith(".tcp");
     }
