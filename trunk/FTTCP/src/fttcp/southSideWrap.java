@@ -17,7 +17,6 @@ public class southSideWrap extends Thread{
     private enum States { intial,normal,restarting};
     private States SSWcurrentState = States.intial;
     private Main m;
-    private int k;
     
     public southSideWrap(Main main){
         m = main;

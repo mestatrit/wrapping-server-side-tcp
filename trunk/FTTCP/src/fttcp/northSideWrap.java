@@ -11,29 +11,24 @@ package fttcp;
  */
 import java.io.*;
 
-public class client extends Thread{
+public class northSideWrap extends Thread{
     private Main m;
     
-    public client(Main main){
+    /**
+     * Constructor
+     */
+    public northSideWrap(Main main){
         m = main;
     }
-
+    
     /**
-     * Client thread
+     * North Side Wrap thread
      */
     @Override
     public void run(){
-        boolean Serverreplied =true;
-        do
-            for (int i = 0; i<20; i++)
-            {
-                sendPacket(intToByteArr(i),m.getServerAddress());
-                System.out.println("client sending" + i);
-            }
-        while (Serverreplied = true);
-     
+        
     }
-        /**
+    /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
@@ -61,8 +56,16 @@ public class client extends Thread{
      */
     private void sendPacket(byte[] data, short address){
         if(address == m.getServerAddress()){
-            //Put in file called toSend.Server in client folder
-            writeFile(data,"clientBuffer/toSend.Server");
+            //Put in file called received.TCP in server folder
+            writeFile(data,"serverBuffer/received.TCP");
+        }
+        else if(address == m.getClientAddress()){
+            //Put in file called received.TCP in client folder
+            writeFile(data,"clientBuffer/received.TCP");
+        }
+        else if(address == m.getLoggerAddress()){
+            //Put in file called received.TCP in logger folder
+            writeFile(data,"loggerBuffer/received.TCP");
         }
         
     }

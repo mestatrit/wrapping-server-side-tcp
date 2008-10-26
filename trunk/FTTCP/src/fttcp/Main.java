@@ -19,8 +19,8 @@ public class Main {
     private int unstable_reads;
     private boolean restarting;
     private short clientAddress = 0;
-    private short serverAddress = 0;
-    private short loggerAddress = 0;
+    private short serverAddress = 1;
+    private short loggerAddress = 2;
     
     /**
      * @param args the command line arguments
@@ -32,6 +32,10 @@ public class Main {
         }
         Main main = new Main();
         Thread ssw = new southSideWrap(main);
+        ssw.start();
+        Thread server = new server(main);
+        ssw.start();
+        Thread client = new client(main);
         ssw.start();
     }
     
