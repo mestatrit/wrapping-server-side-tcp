@@ -13,12 +13,16 @@ import java.io.*;
 
 public class TCP extends Thread{
     private Main m;
+    private String entity;
+    private String direction;
     
     /**
      * Constructor
      */
-    public TCP(Main main){
+    public TCP(Main main, String e){
         m = main;
+        entity =e;
+        
     }
     
     /**
@@ -26,7 +30,8 @@ public class TCP extends Thread{
      */
     @Override
     public void run(){
-        
+        // when buffer is reabable i.e. sendToTCP then read and act on data
+        // use entity and direction to indicate what action to take
     }
     /**
      * Periodically check to see if data to be read, if so, read it, and return
@@ -35,11 +40,19 @@ public class TCP extends Thread{
     private byte[] readPacket(){
         try{
             while(true){
-                FilenameFilter filter = new SSWFileFilter();
-                File f = new File("serverBuffer");
+                FilenameFilter filter = new TCPFileFilter();
+                File f = new File(entity);
                 String[] files = f.list(filter);
                 if(files.length != 0){
-                    FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                    // find out direction the TCP Layer is intercepting buffer data
+                    // insteam - received (receive header)
+                    // outstream - sendTo (add header)
+                    if (files[0].startsWith("received")) 
+                        direction = "received";
+                    else
+                        direction = "sendTo";
+                    
+                    FileInputStream fileinputstream = new FileInputStream(entity+"/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
