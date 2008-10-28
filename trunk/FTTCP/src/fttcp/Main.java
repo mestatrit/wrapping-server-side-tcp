@@ -38,8 +38,12 @@ public class Main {
         ssw.start();
         Thread nsw = new northSideWrap(main);
         nsw.start();
-        Thread tcp = new TCP(main);
-       tcp.start();
+        Thread tcpSrv = new TCP(main, "SRV");
+       tcpSrv.start();
+       Thread tcpClt = new TCP(main, "CLT");
+       tcpClt.start();
+       Thread tcpLog = new TCP(main, "SRV");
+       tcpSrv.start();
         Thread server = new server(main);
         server.start();
         Thread client = new client(main);
