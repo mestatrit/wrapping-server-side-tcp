@@ -10,10 +10,15 @@ package fttcp;
  * @author James Bossingham
  */
 import java.io.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class logger extends Thread{
     private Main m;
-    
+    String direction;
+    int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
+    Thread NorthSideThread= new Thread();
+    Thread SouthSideThread=new Thread();
     /**
      * Constructor
      */
@@ -26,7 +31,41 @@ public class logger extends Thread{
      */
     @Override
     public void run(){
+       int length=100;
+       byte[][] readlength= new byte[length][length]; //to have the array received from the client
+       byte[] temp;
+       int count=0;
+       boolean finished=false;
+     
+       /*NSW*/
+      do{ //perform the code below until it is said to stop (program finishes)
+       do{
+           try{
+               temp = readPacket();
+               
+               for(int i=0; i<temp.length; i++){
+                   readlength[count][i] = temp[i];
+               }
+               sendACK();   // Supply an acknowledgement
+                count++;
+            }
+            catch(Exception e){}
         
+        
+       }while (emptyReadCounter < 3);
+       
+       /* Three empty reads occured in a row */
+       /* Assume server is disconnected */
+       /* Must attempt to re-establish connection */
+       
+       
+       
+       /* Then communicate with server to give it stored client data */
+       
+       
+       
+     }while(finished=false);
+      
     }
     /**
      * Periodically check to see if data to be read, if so, read it, and return
@@ -36,10 +75,11 @@ public class logger extends Thread{
         try{
             while(true){
                 FilenameFilter filter = new LOGFileFilter();
-                File f = new File("serverBuffer");
+                File f = new File("loggerBuffer");
                 String[] files = f.list(filter);
                 if(files.length != 0){
-                    FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                    emptyReadCounter = 0;   // Reset the consecutive read counter
+                    FileInputStream fileinputstream = new FileInputStream("loggerBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
@@ -49,6 +89,7 @@ public class logger extends Thread{
                     try{
                         //Sleep for 3 seconds, then look again for file
                         this.sleep(3000);
+                        emptyReadCounter++;     // Increment counter - another empty read has occured.
                     }
                     catch(java.lang.InterruptedException e){
                         
@@ -100,6 +141,11 @@ public class logger extends Thread{
             System.out.println("SSW Cannot write file to: " + path);
         }
     }
+    
+    public void sendACK(){
+        /* This may need parameters showing WHO the ACK is meant for (i.e. SSW or NSW) */
+    } 
+    
      private byte[] intToByteArr(int num){
         byte[] byteArr = new byte[4];
         byteArr[3] =(byte)( num >> 24 );
