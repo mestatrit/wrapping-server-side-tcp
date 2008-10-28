@@ -34,27 +34,37 @@ public class logger extends Thread{
     public void run(){
        int length=100;
        byte[][] readlength= new byte[length][length]; //to have the array received from the client
-       byte[] temp;
+       byte[] temp = new byte[length];
        int count=0;
        boolean finished=false;
        boolean serverAlive = true;
      
-       /*NSW*/
-      do{ //perform the code below until it is said to stop (program finishes)
-       do{
+
+       
+       
+      
+      do{ 
+
            try{
                temp = readPacket();
-               
-               for(int i=0; i<temp.length; i++){
-                   readlength[count][i] = temp[i];
+           
+           }  
+           catch(Exception e){}
+           
+        //perform the code below until it is said to stop (program finishes)
+           if(emptyReadCounter < 3){
+               if(sender=="NSW"){
+
+                       for(int i=0; i<temp.length; i++){
+                           readlength[count][i] = temp[i];
+                       }
+                       sendACK(entity.NSW);   // Supply an acknowledgement
+                       count++;
+                       emptyReadCounter = 0;
+               }else if(sender == "SSW"){
+
                }
-               sendACK(entity.NSW);   // Supply an acknowledgement
-                count++;
-            }
-            catch(Exception e){}
-        
-        
-       }while (emptyReadCounter < 3);
+           }
        
        /* Three empty reads occured in a row */
        /* Assume server is disconnected */
@@ -68,25 +78,29 @@ public class logger extends Thread{
        // if yes, send NSW all of the client data (in conversation)
        
        do{
-           temp = readPacket();
-         /*  
-           if(){
+
+           temp = readPacket(); 
+           
+           if(temp[0] == 3){        // 3 is CURRENTLY  the code (/flag) for an ACK 
                // If temp is correct format for an ACK then:
                serverAlive = true;
            }
            else{
-               this.sleep(3000);
+               try{
+                    this.sleep(3000);
+               } catch(java.lang.InterruptedException e){
+                   
+               }
            }
-           */
+
        }while(serverAlive = false);
-       
        
        /* Then communicate with server to give it stored client data */
        
        
        
      }while(finished=false);
-      
+   
     }
     /**
      * Periodically check to see if data to be read, if so, read it, and return
