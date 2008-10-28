@@ -36,6 +36,7 @@ public class logger extends Thread{
        byte[] temp;
        int count=0;
        boolean finished=false;
+       boolean serverAlive = true;
      
        /*NSW*/
       do{ //perform the code below until it is said to stop (program finishes)
@@ -58,6 +59,25 @@ public class logger extends Thread{
        /* Assume server is disconnected */
        /* Must attempt to re-establish connection */
        
+       serverAlive = false;
+       
+       // loop:
+       // read server
+       // check if read is ACK
+       // if yes, send NSW all of the client data (in conversation)
+       
+       do{
+           temp = readPacket();
+         /*  
+           if(){
+               // If temp is correct format for an ACK then:
+               serverAlive = true;
+           }
+           else{
+               this.sleep(3000);
+           }
+           */
+       }while(serverAlive = false);
        
        
        /* Then communicate with server to give it stored client data */
