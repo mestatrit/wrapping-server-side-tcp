@@ -17,6 +17,7 @@ public class southSideWrap extends Thread{
     private enum States { intial,normal,restarting};
     private States SSWcurrentState = States.intial;
     private Main m;
+    private String sender;
     
     public southSideWrap(Main main){
         m = main;
@@ -356,6 +357,9 @@ public class southSideWrap extends Thread{
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
                     boolean hadDel = (new File(files[0]).delete());
+                    //Find and set sender
+                    int length  = files[0].length();
+                    sender = files[0].substring(length-7,length-4);
                     return bytearray;
                 }
                 else{
