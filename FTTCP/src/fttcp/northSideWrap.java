@@ -13,6 +13,9 @@ import java.io.*;
 
 public class northSideWrap extends Thread{
     private Main m;
+    private String sender;
+    private enum States {normal, restarting};
+    private States NSWcurrentState = States.normal;
     
     /**
      * Constructor
@@ -27,6 +30,21 @@ public class northSideWrap extends Thread{
     @Override
     public void run(){
         
+        //while thread is running
+        while(true) {
+            //if server in normal operation, use normal method
+            if (NSWcurrentState==States.normal)
+                NSWnormalOperation();
+            //if server recovering, use recovering method
+            else if (NSWcurrentState==States.restarting)
+                NSWrestartingOperation();
+        }        
+        
+    }
+    
+    public void NSWnormalOperation() {
+        
+       
     }
    /**
      * Periodically check to see if data to be read, if so, read it, and return
