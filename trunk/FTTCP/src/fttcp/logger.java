@@ -15,8 +15,9 @@ import java.awt.event.*;
 
 public class logger extends Thread{
     private Main m;
-    String direction;
+    private String sender;
     int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
+    private enum entity {SSW,NSW};
     Thread NorthSideThread= new Thread();
     Thread SouthSideThread=new Thread();
     /**
@@ -47,7 +48,7 @@ public class logger extends Thread{
                for(int i=0; i<temp.length; i++){
                    readlength[count][i] = temp[i];
                }
-               sendACK();   // Supply an acknowledgement
+               sendACK(entity.NSW);   // Supply an acknowledgement
                 count++;
             }
             catch(Exception e){}
@@ -103,6 +104,10 @@ public class logger extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
+                    boolean hadDel = (new File(files[0]).delete());
+                    //Find and set sender
+                    int length  = files[0].length();
+                    sender = files[0].substring(length-7,length-4);
                     return bytearray;
                 }
                 else{
@@ -162,8 +167,16 @@ public class logger extends Thread{
         }
     }
     
-    public void sendACK(){
+    public void sendACK(entity e){
         /* This may need parameters showing WHO the ACK is meant for (i.e. SSW or NSW) */
+        byte[] empty = new byte[1];
+        empty[0] = 0;
+        if(e == entity.NSW){
+            writeFile(empty, "loggerBuffer/sendAck.NSW.LOG.TCP");
+        }
+        else if(e == entity.SSW){
+            writeFile(empty, "loggerBuffer/sendAck.SSW.LOG.TCP");
+        }        
     } 
     
      private byte[] intToByteArr(int num){
