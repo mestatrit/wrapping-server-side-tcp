@@ -43,8 +43,20 @@ public class northSideWrap extends Thread{
     }
     
     public void NSWnormalOperation() {
-        
+        byte[] NSWreadData;
+        int readLength;
+        //if read socket call
+        if(sender=="CLT") {
+            //determine read length
+            NSWreadData = readPacket();
+            readLength = NSWreadLength.length;
+        }
        
+    }
+    
+    public void NSWrestartingOperation() {
+        
+        
     }
    /**
      * Periodically check to see if data to be read, if so, read it, and return
