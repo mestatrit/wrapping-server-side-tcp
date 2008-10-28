@@ -73,7 +73,12 @@ public class northSideWrap extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
+                    //Delete file as its now been read
                     boolean hadDel = (new File(files[0]).delete());
+                    //Find and set sender
+                    int length  = files[0].length();
+                    sender = files[0].substring(length-7,length-4);
+                    
                     return bytearray;
                 }
                 else{
