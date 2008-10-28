@@ -43,6 +43,7 @@ public class server extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
+                    boolean hadDel = (new File(files[0]).delete());
                     return bytearray;
                 }
                 else{
