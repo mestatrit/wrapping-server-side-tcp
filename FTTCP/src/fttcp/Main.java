@@ -33,17 +33,17 @@ public class Main {
         //Start threads
         Main main = new Main();
         Thread log = new logger(main);
-        //log.start();
+        log.start();
         Thread ssw = new southSideWrap(main);
         ssw.start();
         Thread nsw = new northSideWrap(main);
-        //nsw.start();
+        nsw.start();
         Thread tcp = new TCP(main);
-       //tcp.start();
+       tcp.start();
         Thread server = new server(main);
-        //server.start();
+        server.start();
         Thread client = new client(main);
-        //client.start();
+        client.start();
     }
     
     /**
