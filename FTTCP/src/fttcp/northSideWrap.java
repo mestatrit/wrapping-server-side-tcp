@@ -60,8 +60,6 @@ public class northSideWrap extends Thread{
         if(sender=="CLT") {
             //determine read length
             readLength = NSWreadData.length;
-            
-            //send read length to logger
            
             //convert readLength to Byte Array
             tempReadLengthArray = intToByteArr(readLength);
