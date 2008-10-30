@@ -132,9 +132,21 @@ public class TCP extends Thread{
         System.out.println("rst: "+TCP.getRSTFlag(seg));
         System.out.println("syn: "+TCP.getSYNFlag(seg));
         System.out.println("fin: "+TCP.getFINFlag(seg));
+        System.out.println("window size: "+TCP.getWindowSize(seg));
         System.out.println("checksum: "+TCP.getChecksum(seg));
         System.out.println("urgent pointer: "+TCP.getUrgentPointer(seg));
         System.out.println("options: "+TCP.getOptions(seg));
+        
+        // conevrt int to byte array
+        byte[] bTest = TCP.convertDataToByteArray((short) -3784);
+        // -10110010101010011111100101
+        
+        for (int i = 0; i < bTest.length; i++) {
+            System.out.println("index "+i+" "+bTest[i]+" "+TCP.convertByteToBinaryString(bTest[i]));
+        }
+        
+        System.out.print("Value of byte array "+ByteArray.getShort(bTest,0));
+ 
     }
     
     
@@ -251,6 +263,33 @@ public class TCP extends Thread{
         byte newData = (new BigInteger(currentDataRepresentation,2)).byteValue();
         // write new data to byte array
         ByteArray.setByte(newData,bt,offset);
+    }
+    
+    public static byte[] convertDataToByteArray(byte i) {
+        byte[] bs = new byte[1];
+        bs[0] = i;
+        return bs;
+    }
+    
+    public static byte[] convertDataToByteArray(short i) {
+        return TCP.convertDataToByteArray((int) i);
+    }
+    
+    public static byte[] convertDataToByteArray(int i) {
+        BigInteger iAsBigInteger = new BigInteger(Integer.toString(i));
+        return iAsBigInteger.toByteArray();
+    }
+    
+    public static int convertByteArrayToInt(byte[] b, int offset) {
+        return ByteArray.getInt(b,offset);
+    }
+    
+    public static short convertByteArrayToShort(byte[] b, int offset) {
+        return ByteArray.getShort(b,offset);
+    }
+    
+    public static byte convertByteArrayToByte(byte[] b, int offset) {
+        return ByteArray.getByte(b,offset);
     }
     
     private static String convertByteToBinaryString(byte b) {
