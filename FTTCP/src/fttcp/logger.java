@@ -152,11 +152,19 @@ public class logger extends Thread{
     private void sendPacket(byte[] data, short address){
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
-            writeFile(data,"loggerBuffer/toSend.LOG.SRV");
+            writeFile(data,"loggerBuffer/toSend.LOG.SRV.TCP");
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
-            writeFile(data,"loggerBuffer/toSend.LOG.CLT");
+            writeFile(data,"loggerBuffer/toSend.LOG.CLT.TCP");
+        }
+        else if(address == m.getSSWAddress()){
+            //Put in file called received.TCP in client folder
+            writeFile(data,"loggerBuffer/toSend.LOG.NSW.TCP");
+        }
+        else if(address == m.getNSWAddress()){
+            //Put in file called received.TCP in client folder
+            writeFile(data,"loggerBuffer/toSend.LOG.SSW.TCP");
         }
         
     }
