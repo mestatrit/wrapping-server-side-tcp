@@ -63,7 +63,7 @@ public class Main {
      * Gets restarting
      * @return boolean restarting
      */
-    public void getRestarting(boolean b){
+    public void setRestarting(boolean b){
         restarting = b;
     }
     
