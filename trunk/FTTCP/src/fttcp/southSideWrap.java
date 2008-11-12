@@ -159,6 +159,7 @@ public class southSideWrap extends Thread{
         if (sender.equals("SRV")){
             //Reply with fake corresponding ACK
         }
+        SSWcurrentState = States.normal;
     }
     
     /**
