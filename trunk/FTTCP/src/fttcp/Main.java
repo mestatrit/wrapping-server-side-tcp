@@ -21,6 +21,8 @@ public class Main {
     private short clientAddress = 0;
     private short serverAddress = 1;
     private short loggerAddress = 2;
+    private short NSWAddress = 3;
+    private short SSWAddress = 4;
     
     /**
      * @param args the command line arguments
@@ -165,6 +167,35 @@ public class Main {
      */
     public void setLoggerAddress(short a){
         loggerAddress = a;
+    }
+     /**
+     * Gets logger Adress
+     * @return short logger Address
+     */
+    public short getNSWAddress(){
+        return NSWAddress;
+    }
+    /**
+     * Sets logger address
+     * @param a new logger address
+     */
+    public void setNSWAddress(short a){
+        NSWAddress = a;
+    }
+   
+     /**
+     * Gets logger Adress
+     * @return short logger Address
+     */
+    public short getSSWAddress(){
+        return SSWAddress;
+    }
+    /**
+     * Sets logger address
+     * @param a new logger address
+     */
+    public void setSSWAddress(short a){
+        SSWAddress = a;
     }
     
 }
