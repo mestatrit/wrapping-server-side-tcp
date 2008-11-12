@@ -177,11 +177,11 @@ public class northSideWrap extends Thread{
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
-            writeFile(data,"serverBuffer/toSend.NSW.TCP");
+            writeFile(data,"serverBuffer/toSend.NSW.CLT.TCP");
         }
         else if(address == m.getLoggerAddress()){
             //Put in file called received.TCP in logger folder
-            writeFile(data,"serverBuffer/toSend.NSW.LOG");
+            writeFile(data,"serverBuffer/toSend.NSW.LOG.TCP");
         }
         
     }
