@@ -53,7 +53,7 @@ public class southSideWrap extends Thread{
         //Set variables (May need mutex lock on them)
         m.setDelta_seq(0);
         m.setUnstable_reads(0);
-        m.getRestarting(false);
+        m.setRestarting(false);
         int clientInitSeqNum;
         
         //Read Clients SYN packet
@@ -147,7 +147,18 @@ public class southSideWrap extends Thread{
      * South Side Wraps restarting protocol
      */
     private void SSWrestarting(){
-        
+        while(m.getRestarting()){
+            //Send Closed window packets to client to keep connection alive
+        }
+        byte[] receivedPacket = readPacket();
+        if (sender.equals("NSW")){
+            //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
+        }
+        //Capture SRV's responding ACK
+        receivedPacket = readPacket();
+        if (sender.equals("SRV")){
+            //Reply with fake corresponding ACK
+        }
     }
     
     /**
@@ -390,11 +401,11 @@ public class southSideWrap extends Thread{
         //NEED TO CHECK TO SEE IF FILE EXISTS, IF SO WAIT FOR IT TO GO THEN MAKE FILE
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
-            writeFile(data,"serverBuffer/received.SSW.SRV.TCP");
+            writeFile(data,"serverBuffer/received.CLT.SRV.TCP");
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
-            writeFile(data,"clientBuffer/received.SSW.CLT.TCP");
+            writeFile(data,"clientBuffer/received.SRV.CLT.TCP");
         }
         else if(address == m.getLoggerAddress()){
             //Put in file called received.TCP in logger folder
