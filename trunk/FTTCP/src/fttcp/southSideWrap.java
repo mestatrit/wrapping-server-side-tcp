@@ -147,12 +147,18 @@ public class southSideWrap extends Thread{
      * South Side Wraps restarting protocol
      */
     private void SSWrestarting(){
+        short closedWindow = 0;
         while(m.getRestarting()){
             //Send Closed window packets to client to keep connection alive
+            byte[] closedWindowPacket = TCP.createTCPSegment();
+            TCP.setWindowSize(closedWindow, closedWindowPacket);
+            sendPacket(closedWindowPacket, m.getClientAddress());
         }
         byte[] receivedPacket = readPacket();
         if (sender.equals("NSW")){
             //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
+            byte[] SYNPacket = TCP.createTCPSegment();
+            
         }
         //Capture SRV's responding ACK
         receivedPacket = readPacket();
