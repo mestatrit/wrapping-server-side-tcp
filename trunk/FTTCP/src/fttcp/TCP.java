@@ -13,26 +13,83 @@ package fttcp;
 import java.io.*;
 import org.knopflerfish.util.ByteArray;
 import java.math.BigInteger;
+import java.lang.InterruptedException;
 
 public class TCP extends Thread{
     private Main m;
     private String entity;
     private String direction;
-    private static final int PACKET_SIZE = 48; // min size of 24 (would mean no data) 
+    private static final int HEADER_SIZE = 24;
+    private static final int DATA_SIZE = 24;
+    private static final int PACKET_SIZE = TCP.HEADER_SIZE + TCP.DATA_SIZE;
+    private static final int CLOSED = 0;
+    private static final int LISTEN = 1;
+    private static final int SYN_RCVD = 2;
+    private static final int SYN_SENT = 3;
+    private static final int ESTABLISHED = 4;
+    private static final int CLOSE_WAIT = 5;
+    private static final int LAST_ACK = 6;
+    private static final int FIN_WAIT_1 = 7;
+    private static final int FIN_WAIT_2 = 8;
+    private static final int CLOSING = 8;
+    
+    private String messageDetails = "";
+    
+    private String sender = "x";
+    private String destination = "x";
     
     /**
      * Constructor
      */
     
-    public TCP(Main main){
-        m = main;
-        entity ="test";
-        
-    }
-    
     public TCP(Main main, String e){
         m = main;
         entity =e;
+      
+        
+        // receieved - to go in 
+        // send - to go out
+        // next value: sender e.g. logger
+        // next value: sender ultimately
+        // who reads it next
+
+        
+        // E.G.     NSW and Logger
+        // NSW serverBuffer/toSend.NSW.LOG.TCP -- sending inital  message to TCP (ultimately LOG)
+        // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
+        // TCP (in logger) reads - strips header - label for logger - loggerBuffer/received.NSW.LOG
+        // Logger does stuff need to send to server so passes data to TCP - loggerBuffer/toSend.LOG.NSW.TCP
+        // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
+        // TCP (in server) strips header and marks for NSW in server - serverBuffer/received.LOG.NSW
+        
+        // E.G. App (SRV) and Logger - in error recovery
+        
+        
+        // E.G.    Client and Server
+        
+        // Client - send message to TCP ultimately Server - clientBuffer/sendTo.CLT.SRV.TCP
+        // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
+        // SSW (in server) plays with it sends to logger gets ack then marks for TCP - serverBuffer/received.CLT.SRV.TCP
+        // TCP (in server) strips header and marks for NSW (ultimately server) - serverBuffer/received.CLT.SRV.NSW
+        // * NSW (in server) passes info to server app - serverBuffer/received.CLT.SRV
+        // * App client message (send first to NSW) serverBuffer/sendTo.SRV.CLT.NSW
+        // NSW (in server) send data to TCP serverBuffer/sendTo.SRV.CLT.TCP
+        // TCP (in server) adds header mark for SSW - serverBuffer/sendTo.SRV.CLT.SSW
+        // SSW (in server) sends stuff to logger gets ack does stuff mark for client TCP - clientBuffer/received.SRV.CLT.TCP
+        // TCP (in client) strips header and marks for client - clientBuffer/received.SRV.CLT
+        
+        // E.G. SSW and Logger
+        
+        // SSW (in server) sends message to logger (first stop tcp) - loggerBuffer/receieved.SSW.LOG.TCP
+        // TCP (in logger) strips header and makes available for logger - loggerBuffer/receieved.SSW.LOG
+        // Logger sends ack (first to TCP) loggerBuffer/sendTo.LOG.SSW.TCP
+        // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
+        
+        // E.G. Heartbeat to Logger
+        
+        // Heartbeat sends data to logger (but TCP first) - serverBuffer/heartbeat.SRV.LOG.TCP
+        // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/heartbeat.SRV.LOG.TCP
+        // TCP (in logger) strips data and makes available to logger - loggerBuffer/heartbeat.SRV.LOG
         
     }
     
@@ -41,114 +98,47 @@ public class TCP extends Thread{
      */
     @Override
     public void run(){
-        System.out.println("test run thread");
-        // when buffer is reabable i.e. sendToTCP then read and act on data
-        // use entity and direction to indicate what action to take
-
         
-        byte[] sampleTCPSegment = new byte[TCP.PACKET_SIZE];
-        String sSampleTCPSegment = "";
-        
-        ByteArray.setShort((short) 23846,sampleTCPSegment,6);
-        ByteArray.setByte((byte) 1, sampleTCPSegment,0);
-        ByteArray.setByte((byte) 2, sampleTCPSegment,1);
-        ByteArray.setByte((byte) 3, sampleTCPSegment,2);
-        ByteArray.setByte((byte) 4, sampleTCPSegment,3);
-        ByteArray.setByte((byte) 3, sampleTCPSegment,4);
-        ByteArray.setByte((byte) 7, sampleTCPSegment,5);
-        
-        
-        TCP.writeByteStringToByteArray("X1X110XX", sampleTCPSegment, 7);
-        
-        //byte[] test = intToByteArr(16908546);
-        System.out.println("coversion is "+((byte)sampleTCPSegment[0]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[1]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[2]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[3]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[4]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[5]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[6]));
-        System.out.println("coversion is "+((byte)sampleTCPSegment[7]));
-        
-        // test BigInteger
-        
-        BigInteger bi = new BigInteger("00000000",2);
-        byte b = bi.byteValue();
-        System.out.println("byte value "+b);
-        byte[] ba = new byte[1];
-        ba[0] = b;
-        BigInteger bi2;
-        String s;
-        
-        if (b < 0) {
-            bi2 = new BigInteger(-1,ba);
-            s = bi2.toString(2).substring(1);
-        } else {
-            bi2 = new BigInteger(ba);
-            s = bi2.toString(2);
+        while (true) {
+            
+            byte[] buffer = readPacket();
+            
+            if (buffer != null) {
+                byte[] data = new byte[TCP.PACKET_SIZE];
+                
+                // add or strip header depending on direction data is travelling
+                if (direction.equals("sendTo")) {
+                    // add header
+                } else {
+                    // strip header
+                    TCP.stripHeader(buffer);
+                }
+                
+                // send data to the correct buffer
+                sendPacket(data);   
+            }
+            
+            try {
+                this.sleep(3000);
+            } catch (InterruptedException e) {
+                System.err.println(e);
+            }
         }
-        
-        System.out.println("original string is "+s);
-        
-        
-        // check TCP segment creation code
-        byte[] seg = TCP.createTCPSegment();
-        
-        // add values to fields
-        TCP.setSourcePort((short) 2000,seg);
-        TCP.setDestinationPort((short) 1080,seg);
-        TCP.setSequenceNumber(102456,seg);
-        TCP.setAcknowledgementNumber(102455,seg);
-        TCP.setDataOffset("1001",seg);
-        TCP.setReserved("0111",seg);
-        TCP.setCWRFlag(true,seg);
-        TCP.setECEFlag(true,seg);
-        TCP.setURGFlag(false,seg);
-        TCP.setACKFlag(true,seg);
-        TCP.setPSHFlag(false,seg);
-        TCP.setRSTFlag(false,seg);
-        TCP.setSYNFlag(true,seg);
-        TCP.setFINFlag(false,seg);
-        TCP.setWindowSize((short) 10000, seg);
-        TCP.setChecksum((short) 0,seg);
-        TCP.setUrgentPointer((short) 999, seg);
-        TCP.setOptions(23797474,seg);
-        
-        
-        // now read byte array and return values
-        System.out.println("source port: "+TCP.getSourcePort(seg));
-        System.out.println("dest port: "+TCP.getDestinationPort(seg));
-        System.out.println("seq num: "+TCP.getSequenceNumber(seg));
-        System.out.println("ack num: "+TCP.getAcknowledgementNumber(seg));
-        System.out.println("dataoffset + reserved string "+TCP.convertByteToBinaryString(seg[12]));
-        System.out.println("data offset: "+TCP.getDataOffset(seg));
-        System.out.println("reserved: "+TCP.getReserved(seg));
-        System.out.println("flags string "+TCP.convertByteToBinaryString(seg[13]));
-        System.out.println("cwr: "+TCP.getCWRFlag(seg));
-        System.out.println("ece: "+TCP.getECEFlag(seg));
-        System.out.println("urg: "+TCP.getURGFlag(seg));
-        System.out.println("ack: "+TCP.getACKFlag(seg));
-        System.out.println("psh: "+TCP.getPSHFlag(seg));
-        System.out.println("rst: "+TCP.getRSTFlag(seg));
-        System.out.println("syn: "+TCP.getSYNFlag(seg));
-        System.out.println("fin: "+TCP.getFINFlag(seg));
-        System.out.println("window size: "+TCP.getWindowSize(seg));
-        System.out.println("checksum: "+TCP.getChecksum(seg));
-        System.out.println("urgent pointer: "+TCP.getUrgentPointer(seg));
-        System.out.println("options: "+TCP.getOptions(seg));
-        
-        // conevrt int to byte array
-        byte[] bTest = TCP.convertDataToByteArray((short) -3784);
-        // -10110010101010011111100101
-        
-        for (int i = 0; i < bTest.length; i++) {
-            System.out.println("index "+i+" "+bTest[i]+" "+TCP.convertByteToBinaryString(bTest[i]));
-        }
-        
-        System.out.print("Value of byte array "+ByteArray.getShort(bTest,0));
  
     }
     
+    private static byte[] addHeader(byte[] data) {
+        // create TCP segment
+        byte[] seg = TCP.createTCPSegment();
+        // add data to tcp segment
+        TCP.setData(data,seg);
+        
+        return seg;
+    }
+    
+    private static byte[] stripHeader(byte[] seg) {
+       return TCP.getData(seg);
+    }
     
     /**
      * Periodically check to see if data to be read, if so, read it, and return
@@ -168,6 +158,13 @@ public class TCP extends Thread{
                         direction = "received";
                     else
                         direction = "sendTo";
+                    
+                    // store sender and receiver
+                    String[] info = files[0].split(".");
+                    if(info.length == 3 || info.length == 4){
+                        sender = info[1];
+                        destination = info[2];
+                    }
                     
                     FileInputStream fileinputstream = new FileInputStream(entity+"/"+files[0]);
                     int numberBytes = fileinputstream.available();
@@ -197,21 +194,65 @@ public class TCP extends Thread{
     /**
      * Send packet to address
      * @param object Packet to be sent
-     * @param address Place to send it to
      */
-    private void sendPacket(byte[] data, short address){
-        if(address == m.getServerAddress()){
-            //Put in file called received.TCP in server folder
-            writeFile(data,"serverBuffer/received.TCP");
-        }
-        else if(address == m.getClientAddress()){
-            //Put in file called received.TCP in client folder
-            writeFile(data,"clientBuffer/received.TCP");
-        }
-        else if(address == m.getLoggerAddress()){
-            //Put in file called received.TCP in logger folder
-            writeFile(data,"loggerBuffer/received.TCP");
-        }
+    private void sendPacket(byte[] data){
+        
+        if (entity.equals("SRV")) {
+            
+            // NSW serverBuffer/toSend.NSW.LOG.TCP -- sending inital  message to TCP (ultimately LOG)
+            if (sender.equals("NSW") && destination.equals("LOG")) {
+                // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
+                writeFile(data,"loggerBuffer/received.NSW.LOG.TCP");
+            }
+            // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
+            else if (sender.equals("LOG") && destination.equals("NSW")) {
+                // TCP (in server) strips header and marks for NSW in server - serverBuffer/received.LOG.NSW
+                writeFile(data,"serverBuffer/received.LOG.NSW");
+            }
+            // SSW (in server) plays with it sends to logger gets ack then marks for TCP - serverBuffer/received.CLT.SRV.TCP
+            else if (sender.equals("CLT") && destination.equals("SRV")) {
+                // TCP (in server) strips header and marks for NSW (ultimately server) - serverBuffer/received.CLT.SRV.NSW
+                writeFile(data,"serverBuffer/received.CLT.SRV.NSW");
+            }
+            // NSW (in server) send data to TCP serverBuffer/sendTo.SRV.CLT.TCP
+            else if (sender.equals("SRV") && destination.equals("CLT")) {
+                // TCP (in server) adds header mark for SSW - serverBuffer/sendTo.SRV.CLT.SSW
+                writeFile(data,"serverBuffer/sendTo.SRV.CLT.SSW");
+            }  
+        } else if (entity.equals("CLT")) {
+            // Client - send message to TCP ultimately Server - clientBuffer/sendTo.CLT.SRV.TCP
+            if (sender.equals("CLT") && destination.equals("SRV")) {
+                // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
+                writeFile(data,"serverBuffer/received.CLT.SRV.SSW");
+            } 
+            // SSW (in server) sends stuff to logger gets ack does stuff mark for client TCP - clientBuffer/received.SRV.CLT.TCP
+            else if (sender.equals("SRV") && destination.equals("CLT")) {
+                // TCP (in client) strips header and marks for client - clientBuffer/received.SRV.CLT
+                writeFile(data,"clientBuffer/received.SRV.CLT");
+            }   
+        } else { // LOG
+            // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
+            if (sender.equals("NSW") && destination.equals("LOG")) {
+                // TCP (in logger) reads - strips header - label for logger - loggerBuffer/received.NSW.LOG
+                writeFile(data,"serverBuffer/received.NSW.LOG");
+            }
+            // Logger does stuff need to send to server so passes data to TCP - loggerBuffer/toSend.LOG.NSW.TCP
+            else if (sender.equals("LOG") && destination.equals("NSW")) {
+                // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
+                writeFile(data,"serverBuffer/received.LOG.NSW.TCP");
+            }
+            // SSW (in server) sends message to logger (first stop tcp) - loggerBuffer/receieved.SSW.LOG.TCP
+            else if (sender.equals("SSW") && destination.equals("LOG")) {
+                // TCP (in logger) strips header and makes available for logger - loggerBuffer/receieved.SSW.LOG
+                writeFile(data,"loggerBuffer/received.SSW.LOG");
+            }
+            // Logger sends ack (first to TCP) loggerBuffer/sendTo.LOG.SSW.TCP
+            else if (sender.equals("LOG") && destination.equals("SSW")) {
+                // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
+                writeFile(data,"serverBuffer/received.LOG.SSW");
+            }       
+
+        } 
         
     }
     
@@ -263,6 +304,29 @@ public class TCP extends Thread{
         byte newData = (new BigInteger(currentDataRepresentation,2)).byteValue();
         // write new data to byte array
         ByteArray.setByte(newData,bt,offset);
+    }
+    
+    public static void setData(byte[] data, byte[] seg) {  
+        int newDataIndex = 0;
+        
+        // fill seg array (the data half) with data info
+        for (int i = TCP.DATA_SIZE; i < TCP.PACKET_SIZE; i++) {
+            seg[i] = data[i];
+            i++;
+        }
+    }
+    
+    public static byte[] getData(byte[] seg) {
+       byte[] data = new byte[TCP.DATA_SIZE];
+       
+       // get info from data segment index by index;
+       int newDataIndex = 0;
+       for (int i = TCP.DATA_SIZE; i < TCP.PACKET_SIZE; i++) {
+           data[newDataIndex] = seg[i];
+           i++;
+       }
+       
+       return data;
     }
     
     public static byte[] convertDataToByteArray(byte i) {
