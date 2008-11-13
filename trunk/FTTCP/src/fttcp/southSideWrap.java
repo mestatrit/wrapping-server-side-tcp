@@ -57,19 +57,22 @@ public class southSideWrap extends Thread{
         m.setRestarting(false);
         int clientInitSeqNum;
         byte[] clientSYN;
-        
-        //Read Clients SYN packet
-        while (!sender.equals("CLT")){
-            clientSYN = readPacket();
+        boolean isSYN = false;
+        while(!isSYN){
+            //Read Clients packet
+            while (!sender.equals("CLT")){
+                clientSYN = readPacket();
+            }
+            //Check to see if SYN
+            isSYN = isSYNPacket(clientSYN);
         }
         
         
-        
         //Set stable_seq as clients initial seq num + 1
-        clientInitSeqNum = getInitSeq(clientSYN);
+        clientInitSeqNum = TCP.getSequenceNumber(clientSYN);
         m.setStable_seq(clientInitSeqNum +1);
         
-        byte[] data = intToByteArr(clientInitSeqNum);
+        byte[] data = TCP.convertDataToByteArray(clientInitSeqNum);
         //Send logger Client Initial Seq Num
         sendPacket(data, m.getLoggerAddress());
         
@@ -79,12 +82,12 @@ public class southSideWrap extends Thread{
         //While both packets aren't received, wait for them
         while(!servAckRecv || !logAckRecv){
             byte[] received = readPacket();
-            if (isLogAck(received)){
-                logAckRecv = true;
+            if (sender.equals("LOG")){
+                logAckRecv = TCP.getACKFlag(received);
             }
-            else if(isServAck(received)){
+            else if(sender.equals("SRV")){
                 servAck = received;
-                servAckRecv = true;
+                servAckRecv = TCP.getACKFlag(received);
             }
         }
         
@@ -179,6 +182,7 @@ public class southSideWrap extends Thread{
   
         SSWcurrentState = States.normal;
     }
+    
     
     /**
      * Checks packet to see if it's an ACK from logger
@@ -297,18 +301,22 @@ public class southSideWrap extends Thread{
     }
     
     /**
+     * Checks to see if given packet is an SYN packet
+     * @param received Object to be checked
+     * @return boolean True if packet is an SYN packet
+     */
+    private boolean isSYNPacket(byte[] received){
+        boolean isSYNPacket = TCP.getSYNFlag(received);
+        return isSYNPacket;
+    }
+    
+    /**
      * Checks to see if given packet is an ACK packet
      * @param received Object to be checked
      * @return boolean True if packet is an ACK packet
      */
     private boolean isAckPacket(byte[] received){
-        boolean isAckPacket;
-        int flags = received[13];
-        String str = Integer.toBinaryString(flags);
-        if(str.charAt(3)=='1'){
-            isAckPacket = true;
-        }
-        else isAckPacket = false;
+        boolean isAckPacket = TCP.getACKFlag(received);
         return isAckPacket;
     }
     
