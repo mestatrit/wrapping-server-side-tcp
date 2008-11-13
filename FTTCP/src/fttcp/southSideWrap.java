@@ -18,6 +18,8 @@ public class southSideWrap extends Thread{
     private enum States { intial,normal,restarting};
     private States SSWcurrentState = States.intial;
     private Main m;
+    private byte initSeqNumFlag = 3;
+    private byte fwdCltPacketFlag = 4;
     private String sender = "x";
     private String destination = "x";
     
@@ -74,6 +76,11 @@ public class southSideWrap extends Thread{
         m.setStable_seq(clientInitSeqNum +1);
         
         byte[] data = TCP.convertDataToByteArray(clientInitSeqNum);
+        byte[] data2 = new byte[data.length+1];
+        data2[0] = initSeqNumFlag;
+        for(int i=1;i<data2.length;i++){
+            data2[i] = data[i-1];
+        }
         //Send logger Client Initial Seq Num
         sendPacket(data, m.getLoggerAddress());
         
@@ -107,7 +114,12 @@ public class southSideWrap extends Thread{
             byte[] receivedPacket = readPacket();
             if (sender.equals("CLT")){
                 //Forward packet to logger
-                sendPacket(receivedPacket, m.getLoggerAddress());
+                byte[] forwardPacket = TCP.getData(receivedPacket);
+                for (int i = forwardPacket.length-1;i>1;i--){
+                    forwardPacket[i-1] = forwardPacket[i];
+                }
+                forwardPacket[0] = fwdCltPacketFlag;
+                sendPacket(forwardPacket, m.getLoggerAddress());
                 
                 //Subtracts delta_seq from ACK number, change packets ack#
                 int ackNumber = TCP.getAcknowledgementNumber(receivedPacket) - m.getDelta_seq();
