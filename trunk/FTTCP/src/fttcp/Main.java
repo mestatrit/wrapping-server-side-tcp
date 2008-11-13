@@ -44,8 +44,8 @@ public class Main {
        tcpSrv.start();
        Thread tcpClt = new TCP(main, "CLT");
        tcpClt.start();
-       Thread tcpLog = new TCP(main, "SRV");
-       tcpSrv.start();
+       Thread tcpLog = new TCP(main, "LOG");
+       tcpLog.start();
         Thread server = new server(main);
         server.start();
         Thread client = new client(main);
