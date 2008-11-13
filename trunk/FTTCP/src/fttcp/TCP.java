@@ -37,6 +37,7 @@ public class TCP extends Thread{
     
     private String sender = "x";
     private String destination = "x";
+    private boolean heartbeat = false;
     
     /**
      * Constructor
@@ -87,9 +88,9 @@ public class TCP extends Thread{
         
         // E.G. Heartbeat to Logger
         
-        // Heartbeat sends data to logger (but TCP first) - serverBuffer/heartbeat.SRV.LOG.TCP
-        // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/heartbeat.SRV.LOG.TCP
-        // TCP (in logger) strips data and makes available to logger - loggerBuffer/heartbeat.SRV.LOG
+        // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/sendToHeartbeat.SRV.LOG.TCP
+        // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receievedHeartbeat.SRV.LOG.TCP
+        // TCP (in logger) strips data and makes available to logger - loggerBuffer/receievedHeartbeat.SRV.LOG
         
     }
     
@@ -159,6 +160,13 @@ public class TCP extends Thread{
                     else
                         direction = "sendTo";
                     
+                    // check whether heartbeat signal (or not
+                    if (files[0].indexOf("heartbeat",0) == -1) {
+                        heartbeat = false;
+                    } else {
+                        heartbeat = true;
+                    }
+                    
                     // store sender and receiver
                     String[] info = files[0].split(".");
                     if(info.length == 3 || info.length == 4){
@@ -219,6 +227,16 @@ public class TCP extends Thread{
                 // TCP (in server) adds header mark for SSW - serverBuffer/sendTo.SRV.CLT.SSW
                 writeFile(data,"serverBuffer/sendTo.SRV.CLT.SSW");
             }  
+            // handling heartbeat
+            
+            // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/sendToHeartbeat.SRV.LOG.TCP
+            else if (sender.equals("SRV") && destination.equals("LOG")) {
+                // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
+                writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG.TCP");
+            }
+            
+            
+            
         } else if (entity.equals("CLT")) {
             // Client - send message to TCP ultimately Server - clientBuffer/sendTo.CLT.SRV.TCP
             if (sender.equals("CLT") && destination.equals("SRV")) {
@@ -251,6 +269,14 @@ public class TCP extends Thread{
                 // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
                 writeFile(data,"serverBuffer/received.LOG.SSW");
             }       
+            // handling hearbeat
+            // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
+            else if  (sender.equals("SRV") && destination.equals("LOG")) {
+                // TCP (in logger) strips data and makes available to logger - loggerBuffer/receivedHeartbeat.SRV.LOG
+                writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG");
+            }
+            
+            
 
         } 
         
