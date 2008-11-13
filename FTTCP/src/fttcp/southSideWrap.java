@@ -10,6 +10,7 @@ package fttcp;
  * @author James Bossingham
  */
 import java.io.*;
+import org.knopflerfish.util.ByteArray;
 
 public class southSideWrap extends Thread{
     
@@ -56,7 +57,7 @@ public class southSideWrap extends Thread{
         m.setUnstable_reads(0);
         m.setRestarting(false);
         int clientInitSeqNum;
-        byte[] clientSYN;
+        byte[] clientSYN = null;
         boolean isSYN = false;
         while(!isSYN){
             //Read Clients packet
@@ -121,23 +122,27 @@ public class southSideWrap extends Thread{
             else if (sender.equals("LOG")){
                 //If ack is for client data packet with seq# from sn->sn+l, and 
                 //sn+l+1 > stable_seq, set stable_seq to sn+l+1
+                
             }
             else if (sender.equals("SRV")){
                 //Add delta_seq to sequence#
-                int sequenceNo = getSequenceNumber(receivedPacket);
-                receivedPacket = setSequenceNumber(receivedPacket, sequenceNo + m.getDelta_seq());
+                int sequenceNo = TCP.getSequenceNumber(receivedPacket);
+                TCP.setSequenceNumber(sequenceNo+m.getDelta_seq(),receivedPacket);
                 
-                //Change ack# to stable_seq
-                receivedPacket = setAckNumber(receivedPacket, m.getStable_seq());
+                //Change ack# to stable_seqwhile(!m.getRestarting()){
+                TCP.setAcknowledgementNumber(m.getStable_seq(),receivedPacket);
                 
                 //Change advertised window size by adding ack#-stable_seq
                 //Convert int to short
-                int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + m.getStable_seq();
-                byte[] intArr = intToByteArr(intWindowSize);
+                int intWindowSize = TCP.getWindowSize(receivedPacket) + TCP.getAcknowledgementNumber(receivedPacket) - m.getStable_seq();
+                //int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + m.getStable_seq();
+                short windowSize = ByteArray.getShort(TCP.convertDataToByteArray(intWindowSize),0);
+
+                /*byte[] intArr = intToByteArr(intWindowSize);
                 byte[] shortArr = new byte[2];
                 shortArr[0] = intArr[0];
                 shortArr[1] = intArr[1];
-                short windowSize = byteArrayToShort(shortArr,0);
+                short windowSize = byteArrayToShort(shortArr,0);*/
                 //Set window size
                 receivedPacket = setWindowSize(receivedPacket,windowSize);
                 
