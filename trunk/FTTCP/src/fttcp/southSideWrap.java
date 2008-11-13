@@ -104,26 +104,25 @@ public class southSideWrap extends Thread{
     private void SSWnormalOpp(){
         while(!m.getRestarting()){
             byte[] receivedPacket = readPacket();
-            short sender = getSenderAddress(receivedPacket);
-            if (sender == m.getClientAddress()){
+            if (sender.equals("CLT")){
                 //Forward packet to logger
                 sendPacket(receivedPacket, m.getLoggerAddress());
                 
                 //Subtracts delta_seq from ACK number, change packets ack#
-                int ackNumber = getAckNumber(receivedPacket) - m.getDelta_seq();
-                receivedPacket = setAckNumber(receivedPacket, ackNumber);
+                int ackNumber = TCP.getAcknowledgementNumber(receivedPacket) - m.getDelta_seq();
+                TCP.setAcknowledgementNumber(ackNumber,receivedPacket);
                 
-                //Recompute Checksum
+                //Recompute Checksum NEEDS IMPLEMENTING
                 receivedPacket = recomputeChecksum(receivedPacket);
                 
                 //Send Packet to server (TCP layer)
                 sendPacket(receivedPacket,m.getServerAddress());
             }
-            else if (sender == m.getLoggerAddress()){
+            else if (sender.equals("LOG")){
                 //If ack is for client data packet with seq# from sn->sn+l, and 
                 //sn+l+1 > stable_seq, set stable_seq to sn+l+1
             }
-            else if (sender == m.getServerAddress()){
+            else if (sender.equals("SRV")){
                 //Add delta_seq to sequence#
                 int sequenceNo = getSequenceNumber(receivedPacket);
                 receivedPacket = setSequenceNumber(receivedPacket, sequenceNo + m.getDelta_seq());
