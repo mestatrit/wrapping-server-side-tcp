@@ -144,7 +144,8 @@ public class southSideWrap extends Thread{
                 shortArr[1] = intArr[1];
                 short windowSize = byteArrayToShort(shortArr,0);*/
                 //Set window size
-                receivedPacket = setWindowSize(receivedPacket,windowSize);
+                TCP.setWindowSize(windowSize,receivedPacket);
+                //receivedPacket = setWindowSize(receivedPacket,windowSize);
                 
                 //Recompute Checksum
                 receivedPacket = recomputeChecksum(receivedPacket);
