@@ -17,7 +17,8 @@ public class southSideWrap extends Thread{
     private enum States { intial,normal,restarting};
     private States SSWcurrentState = States.intial;
     private Main m;
-    private String sender;
+    private String sender = "x";
+    private String destination = "x";
     
     public southSideWrap(Main main){
         m = main;
@@ -55,9 +56,14 @@ public class southSideWrap extends Thread{
         m.setUnstable_reads(0);
         m.setRestarting(false);
         int clientInitSeqNum;
+        byte[] clientSYN;
         
         //Read Clients SYN packet
-        byte[] clientSYN = readPacket();
+        while (!sender.equals("CLT")){
+            clientSYN = readPacket();
+        }
+        
+        
         
         //Set stable_seq as clients initial seq num + 1
         clientInitSeqNum = getInitSeq(clientSYN);
@@ -154,17 +160,23 @@ public class southSideWrap extends Thread{
             TCP.setWindowSize(closedWindow, closedWindowPacket);
             sendPacket(closedWindowPacket, m.getClientAddress());
         }
-        byte[] receivedPacket = readPacket();
-        if (sender.equals("NSW")){
-            //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
-            byte[] SYNPacket = TCP.createTCPSegment();
-            
+        while(!sender.equals("NSW")){
+            byte[] receivedPacket = readPacket();
         }
-        //Capture SRV's responding ACK
-        receivedPacket = readPacket();
-        if (sender.equals("SRV")){
-            //Reply with fake corresponding ACK
+        //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
+        byte[] SYNPacket = TCP.createTCPSegment();
+        TCP.setSYNFlag(true, SYNPacket);
+        TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
+        sendPacket(SYNPacket,m.getServerAddress());
+        while(!sender.equals("SRV")){
+            //Capture SRV's responding ACK
+            byte[] receivedPacket = readPacket();
         }
+        //Reply with fake corresponding ACK
+        byte[] ACKPacket = TCP.createTCPSegment();
+        TCP.setACKFlag(true,ACKPacket);
+        sendPacket(ACKPacket,m.getServerAddress());
+  
         SSWcurrentState = States.normal;
     }
     
@@ -377,7 +389,11 @@ public class southSideWrap extends Thread{
                     boolean hadDel = (new File(files[0]).delete());
                     //Find and set sender
                     int length  = files[0].length();
-                    sender = files[0].substring(length-7,length-4);
+                    String[] info = files[0].split(".");
+                    if(info.length == 3 || info.length == 4){
+                        sender = info[1];
+                        destination = info[2];
+                    }
                     return bytearray;
                 }
                 else{
