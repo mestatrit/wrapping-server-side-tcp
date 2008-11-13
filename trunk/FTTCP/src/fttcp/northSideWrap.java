@@ -111,7 +111,7 @@ public class northSideWrap extends Thread{
     }
         // NSW in restarting mode
         NSWcurrentState = States.restarting;
-    }
+  }
        
     //operation when server is restarting
     public void NSWrestartingOperation() {
@@ -128,7 +128,7 @@ public class northSideWrap extends Thread{
         while(m.getRestarting()) {
             
         //if it's a read socket call
-        if(sender.equals("CLT")) {
+        if(sender.equals("LOG")) {
             // NSW replies data read from logger
             sendPacket(NSWreadData, m.getServerAddress());
         }
@@ -154,7 +154,7 @@ public class northSideWrap extends Thread{
     }   
         // go back to normal operation
         NSWcurrentState = States.normal;
-    }
+  }
 
    /**
      * Periodically check to see if data to be read, if so, read it, and return
