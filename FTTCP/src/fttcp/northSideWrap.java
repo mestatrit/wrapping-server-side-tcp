@@ -16,7 +16,7 @@ public class northSideWrap extends Thread{
     private String sender;
     private enum States {normal, restarting};
     private States NSWcurrentState = States.normal;
-    private byte readFlag = 5;
+    private byte readFlag = 2;
     private int bytesWritten = 0;
     
     /**
@@ -34,12 +34,7 @@ public class northSideWrap extends Thread{
         
         //while thread is running
         while(true) {
-            
-            //set operation mode
-            if (m.getRestarting()==true)
-                NSWcurrentState=States.restarting;
-            else NSWcurrentState=States.normal;
-            
+                      
             //if server in normal operation, use normal method
             if (NSWcurrentState==States.normal)
                 NSWnormalOperation();
@@ -52,12 +47,15 @@ public class northSideWrap extends Thread{
     
     public void NSWnormalOperation() {
         byte[] NSWreadData = readPacket();
-        int readLength;
         byte[] readLengthArray = new byte[5];
         byte[] tempReadLengthArray;
+        int readLength;
+        int tempUnstableReads;
         
         //if read socket call
-        if(sender=="CLT") {
+        while(!m.getRestarting()) {
+        
+        if(sender.equals("CLT")) {
             //determine read length
             readLength = NSWreadData.length;
            
@@ -76,20 +74,22 @@ public class northSideWrap extends Thread{
             sendPacket(readLengthArray, m.getLoggerAddress());
             
             //increment unstable reads by 1
-            m.setUnstable_reads(m.getUnstable_reads() + 1);
+            tempUnstableReads = m.getUnstable_reads();
+            m.setUnstable_reads(tempUnstableReads + 1);
        
         }
         
         //if sender is logger
-        else if (sender=="LOG") {
+        else if (sender.equals("LOG")) {
             
             //decrement unstable reads by 1
-            m.setUnstable_reads(m.getUnstable_reads() - 1);
+            tempUnstableReads = m.getUnstable_reads();
+            m.setUnstable_reads(tempUnstableReads - 1);
             
         }
         
         //if write socket call
-        else if (sender=="SVR") {          
+        else if (sender.equals("SVR")) {          
             
             //if unstable reads exist, don't process, try again in 3 seconds
             while (m.getUnstable_reads() > 0) {
@@ -109,18 +109,51 @@ public class northSideWrap extends Thread{
         }
         
     }
+        // NSW in restarting mode
+        NSWcurrentState = States.restarting;
+    }
        
     //operation when server is restarting
     public void NSWrestartingOperation() {
         
+        byte[] NSWreadData = readPacket();
+        int bytesWritten = 0;
+        
+        //create message telling SSW to fabricate SYN
+        byte[] fabSyn = new byte[5];
+        //send message to SSW
+        sendPacket(fabSyn, m.getServerAddress());
+        
+        //while server is recovering
+        while(m.getRestarting()) {
+            
         //if it's a read socket call
-        if(sender=="CLT") {
+        if(sender.equals("CLT")) {
             // NSW replies data read from logger
+            sendPacket(NSWreadData, m.getServerAddress());
         }
         
-        else if (sender == "SVR") {
+        //if it's a write socket call
+        else if (sender.equals("SVR")) {
             // NSW keeps track of bytes written.
+            bytesWritten = bytesWritten + NSWreadData.length;
+            
+            //if data has previous been written
+            if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
+            
+            //discard the data (just return successful write)
+            }
+            
+            //if it's new data
+            else {
+                //all recovering data been replayed, resume normal operation
+                m.setRestarting(false);
+                
+            }
         }
+    }   
+        // go back to normal operation
+        NSWcurrentState = States.normal;
     }
 
    /**
