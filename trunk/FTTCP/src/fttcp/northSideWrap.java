@@ -55,52 +55,52 @@ public class northSideWrap extends Thread{
         //if read socket call
         while(!m.getRestarting()) {
         
-        if(sender.equals("CLT")) {
-            //determine read length
-            readLength = NSWreadData.length;
+             if(sender.equals("CLT")) {
+                 //determine read length
+                 readLength = NSWreadData.length;
            
-            //convert readLength to Byte Array
-            tempReadLengthArray = intToByteArr(readLength);
+                  //convert readLength to Byte Array
+                 tempReadLengthArray = intToByteArr(readLength);
             
-            //set Array[0] to readFlag
-            readLengthArray[0]=readFlag;
+                 //set Array[0] to readFlag
+                 readLengthArray[0]=readFlag;
             
-            //add readLength byte array to array with readFlag
-            for (int i = 1; i < 5; i++){
-                readLengthArray[i]=tempReadLengthArray[i-1];
-            }
+                    //add readLength byte array to array with readFlag
+                 for (int i = 1; i < 5; i++){
+                        readLengthArray[i]=tempReadLengthArray[i-1];
+                 }
             
-            //send readLength to logger
-            sendPacket(readLengthArray, m.getLoggerAddress());
+                 //send readLength to logger
+                 sendPacket(readLengthArray, m.getLoggerAddress());
             
-            //increment unstable reads by 1
-            tempUnstableReads = m.getUnstable_reads();
-            m.setUnstable_reads(tempUnstableReads + 1);
+                 //increment unstable reads by 1
+                 tempUnstableReads = m.getUnstable_reads();
+                  m.setUnstable_reads(tempUnstableReads + 1);
        
-        }
+               }
         
-        //if sender is logger
-        else if (sender.equals("LOG")) {
+                //if sender is logger
+               else if (sender.equals("LOG")) {
             
-            //decrement unstable reads by 1
-            tempUnstableReads = m.getUnstable_reads();
-            m.setUnstable_reads(tempUnstableReads - 1);
+                   //decrement unstable reads by 1
+                   tempUnstableReads = m.getUnstable_reads();
+                   m.setUnstable_reads(tempUnstableReads - 1);
             
-        }
+               }
         
-        //if write socket call
-        else if (sender.equals("SVR")) {          
+                //if write socket call
+                else if (sender.equals("SRV")) {          
             
-            //if unstable reads exist, don't process, try again in 3 seconds
-            while (m.getUnstable_reads() > 0) {
+                   //if unstable reads exist, don't process, try again in 3 seconds
+                   while (m.getUnstable_reads() > 0) {
                 
-                try{
-                        this.sleep(3000);
-                    }
-                    catch(java.lang.InterruptedException e){
-                        System.out.println("North Side Wrap thread interrupted");
-                    }
-            }
+                       try{
+                              this.sleep(3000);
+                          }
+                          catch(java.lang.InterruptedException e){
+                              System.out.println("North Side Wrap thread interrupted");
+                          }
+              }
             
             //if no unstable reads exist, send packet
             sendPacket(NSWreadData, m.getClientAddress());
@@ -127,31 +127,31 @@ public class northSideWrap extends Thread{
         //while server is recovering
         while(m.getRestarting()) {
             
-        //if it's a read socket call
-        if(sender.equals("LOG")) {
-            // NSW replies data read from logger
-            sendPacket(NSWreadData, m.getServerAddress());
-        }
+         //if it's a read socket call
+         if(sender.equals("LOG")) {
+                // NSW replies data read from logger
+                sendPacket(NSWreadData, m.getServerAddress());
+              }
         
-        //if it's a write socket call
-        else if (sender.equals("SVR")) {
-            // NSW keeps track of bytes written.
-            bytesWritten = bytesWritten + NSWreadData.length;
+              //if it's a write socket call
+              else if (sender.equals("SRV")) {
+                    // NSW keeps track of bytes written.
+                    bytesWritten = bytesWritten + NSWreadData.length;
             
-            //if data has previous been written
-            if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
+                    //if data has previous been written
+                    if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
             
-            //discard the data (just return successful write)
-            }
+                       //discard the data (just return successful write)
+                 }
             
-            //if it's new data
-            else {
-                //all recovering data been replayed, resume normal operation
-                m.setRestarting(false);
+                    //if it's new data
+                 else {
+                        //all recovering data been replayed, resume normal operation
+                    m.setRestarting(false);
                 
-            }
-        }
-    }   
+                 }
+          }
+      }   
         // go back to normal operation
         NSWcurrentState = States.normal;
   }
