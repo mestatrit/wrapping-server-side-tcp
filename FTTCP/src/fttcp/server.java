@@ -14,9 +14,11 @@ import org.knopflerfish.util.ByteArray;
 
 public class server extends Thread{
     private Main m;
+    private GUI gui;
     
-    public server(Main main){
+    public server(Main main, GUI g){
         m = main;
+        gui =g;
     }
 
     /**
@@ -24,7 +26,7 @@ public class server extends Thread{
      */
     @Override
     public void run(){
-        
+        gui.printToScreen("Server reporting in.");
         while(true){
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
