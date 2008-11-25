@@ -22,9 +22,11 @@ public class southSideWrap extends Thread{
     private byte fwdCltPacketFlag = 4;
     private String sender = "x";
     private String destination = "x";
+    private GUI gui;
     
-    public southSideWrap(Main main){
+    public southSideWrap(Main main, GUI g){
         m = main;
+        gui = g;
     }
     
     /**
@@ -32,6 +34,7 @@ public class southSideWrap extends Thread{
      */
     @Override
     public void run(){
+        gui.printToScreen("SSW Reporting in.");
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()
