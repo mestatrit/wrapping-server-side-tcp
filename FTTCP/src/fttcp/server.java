@@ -10,6 +10,7 @@ package fttcp;
  * @author James Bossingham
  */
 import java.io.*;
+import org.knopflerfish.util.ByteArray;
 
 public class server extends Thread{
     private Main m;
@@ -23,10 +24,43 @@ public class server extends Thread{
      */
     @Override
     public void run(){
+        
         while(true){
-            sendPacket(readPacket(),m.getClientAddress());
-            System.out.println("server sending" + readPacket());
+           /* sendPacket(readPacket(),m.getClientAddress());
+            System.out.println("server sending" + readPacket());*/
+       
+        byte[] serverReadData = readPacket();
+        char returnLetter = 'a';
+        short returnNumber = 0;
+        byte[] byteReturnLetter;
+        
+        //if there is data which has been read
+        if(serverReadData != null) {
+        
+        //convert data read to type short
+        short readData = TCP.convertByteArrayToShort(serverReadData, 0);
+        
+        //get char representation
+        returnLetter = (char)readData;
+        
+        //set correct ASCII representation
+        returnNumber = (short)(readData + 64);
+        
+        //convert short to byte array
+        byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
+        
+        //send packet to client
+        sendPacket(byteReturnLetter, m.getClientAddress());
+        System.out.println("Server sending " + (char)returnNumber);
+     }
+        else {
+            try {
+                this.sleep(2000);
+            }
+            catch(java.lang.InterruptedException e){
+                  }
         }
+    }
     }
     /**
      * Periodically check to see if data to be read, if so, read it, and return

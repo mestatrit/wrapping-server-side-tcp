@@ -7,7 +7,7 @@ package fttcp;
 
 /**
  *
- * @author James Bossingham
+ * @author James Malone Bossingham
  */
 import java.io.*;
 
@@ -52,9 +52,10 @@ public class northSideWrap extends Thread{
         int readLength;
         int tempUnstableReads;
         
-        //if read socket call
+
         while(!m.getRestarting()) {
         
+             //if read socket call
              if(sender.equals("CLT")) {
                  //determine read length
                  readLength = NSWreadData.length;
@@ -147,7 +148,8 @@ public class northSideWrap extends Thread{
                     //if it's new data
                  else {
                         //all recovering data been replayed, resume normal operation
-                    m.setRestarting(false);
+                        sendPacket(NSWreadData, m.getClientAddress());
+                        m.setRestarting(false);
                 
                  }
           }
