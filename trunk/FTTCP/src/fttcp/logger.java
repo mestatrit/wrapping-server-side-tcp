@@ -17,9 +17,17 @@ public class logger extends Thread{
     private Main m;
     private String sender;
     int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
+    int initialClientSequenceNumber = 0;
+    
+    private byte heartbeatFlag = 1;
+    private byte readLengthFlag = 2;
+    private byte initClientSeqNumber = 3;
+    private byte fwdClientPktFlag = 4;
+   
+    
     private enum entity {SSW,NSW};
-    Thread NorthSideThread= new Thread();
-    Thread SouthSideThread=new Thread();
+    Thread WrappersThread= new Thread();
+    Thread bufferChecker= new Thread();
     /**
      * Constructor
      */
@@ -32,74 +40,90 @@ public class logger extends Thread{
      */
     @Override
     public void run(){
-       int length=100;
-       byte[][] readlength= new byte[length][length]; //to have the array received from the client
+       int length=100;// Need to update length!!!
+       int newReadLength = 0;
+       int[] readLengthArray = new int[length]; //to have the array received from the client
        byte[] temp = new byte[length];
-       int count=0;
+       byte[][] ClientData = new byte[TCP.DATA_SIZE][length];
+
+       int clientDataCounter = 0;
+       int readLengthCounter=0;
+       
        boolean finished=false;
-       boolean serverAlive = true;
-     
 
+
+       // Start-up
+       
+       // Create instance of Heartbeat
+       Heartbeat heartbeatThread = new Heartbeat(m);
+       heartbeatThread.run();
        
        
-      
-      do{ 
-
+       
+       
+      do{
+           //perform the code below until it is said to stop (program finishes)
            try{
                temp = readPacket();
-           
-           }  
+           }
            catch(Exception e){}
            
-        //perform the code below until it is said to stop (program finishes)
-           if(emptyReadCounter < 3){
+           if(heartbeatThread.getServerAlive() == true){
+               // BEHAVIOUR UNDER NORMAL OPERATION
+              
+               // TODO: Update sender before it is accessed.
+               
                if(sender=="NSW"){
-
-                       for(int i=0; i<temp.length; i++){
-                           readlength[count][i] = temp[i];
-                       }
+                    
+                   // Only ever recieve read lengths from NSW, but check flag type anyway.
+                   if(temp[0] == readLengthFlag){
+                       // Convert to int everything except flag in order to get readlength.
+                       newReadLength = TCP.convertByteArrayToInt(temp, 1);
+                       readLengthArray[readLengthCounter] = newReadLength;  // Store read length.            
                        sendACK(entity.NSW);   // Supply an acknowledgement
-                       count++;
-                       emptyReadCounter = 0;
+                       readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
+                   }
+                       
                }else if(sender == "SSW"){
-
-               }
-           }
-       
-       /* Three empty reads occured in a row */
-       /* Assume server is disconnected */
-       /* Must attempt to re-establish connection */
-       
-       serverAlive = false;
-       
-       // loop:
-       // read server
-       // check if read is ACK
-       // if yes, send NSW all of the client data (in conversation)
-       
-       do{
-
-           temp = readPacket(); 
-           
-           if(temp[0] == 3){        // 3 is CURRENTLY  the code (/flag) for an ACK 
-               // If temp is correct format for an ACK then:
-               serverAlive = true;
-           }
-           else{
-               try{
-                    this.sleep(3000);
-               } catch(java.lang.InterruptedException e){
                    
+                    if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
+                        // Store initial client sequence number
+                        initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);
+                    }
+                    else if(temp[0] == 4){  // If the incoming data is forwarded client data..
+                        // It is data from the client which must be stored.
+                        ClientData[0][clientDataCounter] = (byte)(initialClientSequenceNumber + clientDataCounter);
+                        // Copy each position in temp, into the new array.
+                        for(int i = 1; i < temp.length; i++){
+                            ClientData[i][clientDataCounter] = temp[i];
+                        }
+                        sendACK(entity.SSW);
+                        clientDataCounter++;
+                    }
                }
-           }
+        }
+        else if(heartbeatThread.getServerAlive() == false){
+               // Server has failed. 
+               
+               do{
+                   // Check for client data from the NSW
+                   try{
+                        temp = readPacket();
+                        // There must have been something in the buffer, or else try would have failed and gone to catch
+                        
+                   }
+                   catch(Exception e){
+                        // There was nothing in the buffer or something else went wrong.
+                   }
+                   
 
-       }while(serverAlive = false);
+                   
+               }while(heartbeatThread.getServerAlive() == false);
+        }
+           
+
        
-       /* Then communicate with server to give it stored client data */
-       
-       
-       
-     }while(finished=false);
+      }while(!finished);
    
     }
     /**
@@ -209,4 +233,5 @@ public class logger extends Thread{
         byteArr[0] =(byte)( (num << 24) >> 24 );
         return byteArr;
     }
+     
 }
