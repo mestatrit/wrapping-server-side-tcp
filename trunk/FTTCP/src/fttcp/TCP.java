@@ -17,6 +17,7 @@ import java.lang.InterruptedException;
 
 public class TCP extends Thread{
     private Main m;
+    private GUI gui;
     private String entity;
     private String direction;
     
@@ -46,9 +47,10 @@ public class TCP extends Thread{
      * Constructor
      */
     
-    public TCP(Main main, String e){
+    public TCP(Main main, String e, GUI g){
         m = main;
         entity =e;
+        gui = g;
         
         
         
