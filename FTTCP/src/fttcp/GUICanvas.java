@@ -43,6 +43,8 @@ public class GUICanvas extends JPanel{
     
     private Point[] stringCoords;
     
+    private Point[] dotCoords;
+    
     private String[] strings;
     
     /**Hold value of property xCoordinate*/
@@ -106,16 +108,17 @@ public class GUICanvas {
                 }
             }
         }
+        if(dotCoords != null){
+            if(dot != null){
+                for(int i=0;i<dotCoords.length;i++){
+                    g.drawImage(dot, dotCoords[i].x, dotCoords[i].y, this);
+                }
+            }
+        }
        if(stringCoords != null){
             
                 for(int i=0;i<stringCoords.length;i++){
                     if(strings[i] != null){
-                        g.drawImage(dot, stringCoords[i].x-1, stringCoords[i].y-10, this);
-                        if(strings[i].length()>1){
-                            for(int j =1;j<strings[i].length();j++){
-                                g.drawImage(dot, (stringCoords[i].x-1)+j*9, (stringCoords[i].y-10), this);
-                            }
-                        }
                         g.drawString(strings[i], stringCoords[i].x, stringCoords[i].y);
                     }
                 }
@@ -185,6 +188,15 @@ public class GUICanvas {
     /**Set image coordinates*/
     public void setTCPCoords(Point[] coords){
         this.tcpCoords = coords;
+        repaint();
+    }
+    /**Get image coordinates*/
+    public Point[] getDotCoords(){
+        return dotCoords;
+    }
+    /**Set image coordinates*/
+    public void setDotCoords(Point[] coords){
+        this.dotCoords = coords;
         repaint();
     }
     
