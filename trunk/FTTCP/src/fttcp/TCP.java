@@ -19,9 +19,11 @@ public class TCP extends Thread{
     private Main m;
     private String entity;
     private String direction;
-    private static final int HEADER_SIZE = 24;
-    private static final int DATA_SIZE = 24;
-    private static final int PACKET_SIZE = TCP.HEADER_SIZE + TCP.DATA_SIZE;
+    
+    public static final int HEADER_SIZE = 24;
+    public static final int DATA_SIZE = 24;
+    public static final int PACKET_SIZE = TCP.HEADER_SIZE + TCP.DATA_SIZE;
+    
     private static final int CLOSED = 0;
     private static final int LISTEN = 1;
     private static final int SYN_RCVD = 2;
@@ -38,6 +40,7 @@ public class TCP extends Thread{
     private String sender = "x";
     private String destination = "x";
     private boolean heartbeat = false;
+    private int status = TCP.CLOSED;
     
     /**
      * Constructor
@@ -46,8 +49,16 @@ public class TCP extends Thread{
     public TCP(Main main, String e){
         m = main;
         entity =e;
+        
+        
+        
+        
+        // if a passive entity then set status from CLOSED -> LISTEN
+        
       
         
+            
+            
         // receieved - to go in 
         // send - to go out
         // next value: sender e.g. logger
@@ -114,6 +125,9 @@ public class TCP extends Thread{
                     // strip header
                     TCP.stripHeader(buffer);
                 }
+                
+                // now modify status in accordance to contents of data and current state
+                
                 
                 // send data to the correct buffer
                 sendPacket(data);   
