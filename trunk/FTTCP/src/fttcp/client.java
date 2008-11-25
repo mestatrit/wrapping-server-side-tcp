@@ -13,9 +13,11 @@ import java.io.*;
 
 public class client extends Thread{
     private Main m;
+    private GUI gui;
     
-    public client(Main main){
+    public client(Main main, GUI g){
         m = main;
+        gui = g;
     }
 
     /**
@@ -23,6 +25,7 @@ public class client extends Thread{
      */
     @Override
     public void run(){
+        gui.printToScreen("Client reporting in.");
       /*  boolean Serverreplied = true;
         do
             for (int i = 0; i<20; i++)
