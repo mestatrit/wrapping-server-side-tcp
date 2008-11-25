@@ -16,7 +16,7 @@ public class GUI extends Thread{
     
         @Override
     public void run(){
-        output.setText("Output:");
+        output.setText("Output:\n------------------------------------------------------------");
         initGUI();   
     }
     
@@ -49,7 +49,6 @@ public class GUI extends Thread{
 
         JPanel jPanelCorr = new JPanel();
         output.setPreferredSize(new Dimension(350, 500));
-        //output.setText("Output:");
         output.setEditable(false);
         jPanelCorr.add(output);
 
