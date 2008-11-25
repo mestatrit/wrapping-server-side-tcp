@@ -12,7 +12,8 @@ import java.awt.*;
  * @author James Bossingham
  */
 public class GUI extends Thread{
-    private JTextArea output = new JTextArea();;
+    private JTextArea output = new JTextArea();
+    private GUICanvas canvas;
     
         @Override
     public void run(){
@@ -44,7 +45,7 @@ public class GUI extends Thread{
         Coords[6] = new imageMap(50,310,ssw);
         Coords[7] = new imageMap(50,170,nsw);*/
         
-        GUICanvas canvas = new GUICanvas(new ImageIcon("dot.png").getImage());
+        canvas = new GUICanvas(new ImageIcon("dot.png").getImage());
         
         JFrame GUIFrame = new JFrame();
         canvas.setStretched(false);
@@ -105,6 +106,14 @@ public class GUI extends Thread{
         GUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GUIFrame.setSize(850, 700);     
         GUIFrame.setVisible(true);
+        clt2tcp();
+        
+    }
+    
+    public void clt2tcp(){
+        Point[] dotPoints = new Point[1];
+        dotPoints[0] = new Point(100,400);
+        canvas.setDotCoords(dotPoints);
         
     }
     
