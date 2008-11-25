@@ -21,11 +21,31 @@ public class GUI extends Thread{
     }
     
     private void initGUI(){
-        GUICanvas canvas = new GUICanvas(
-                new ImageIcon("comp.jpg").getImage(), 
-                new ImageIcon("serv.jpg").getImage(), 
-                new ImageIcon("TCPLayer.jpg").getImage(),
-                new ImageIcon("dot.png").getImage());
+        /*Image[] images = new Image[5];
+        images[0] = new ImageIcon("comp.jpg").getImage(); 
+        images[1] = new ImageIcon("serv.jpg").getImage(); 
+        images[2] = new ImageIcon("TCPLayer.jpg").getImage();
+        images[3] = new ImageIcon("SSW.jpg").getImage();
+        images[4] = new ImageIcon("NSW.jpg").getImage();
+        
+        byte pc = 1;
+        byte serv = 2;
+        byte tcp = 3;
+        byte ssw = 4;
+        byte nsw = 5;
+        
+        imageMap[] Coords = new imageMap[8];
+        Coords[0] = new imageMap(250,500,pc);
+        Coords[1] = new imageMap(10,20,serv);
+        Coords[2] = new imageMap(470,20,serv);
+        Coords[3] = new imageMap(40,240,tcp);
+        Coords[4] = new imageMap(450,170,tcp);
+        Coords[5] = new imageMap(250,410,tcp);
+        Coords[6] = new imageMap(50,310,ssw);
+        Coords[7] = new imageMap(50,170,nsw);*/
+        
+        GUICanvas canvas = new GUICanvas(new ImageIcon("dot.png").getImage());
+        
         JFrame GUIFrame = new JFrame();
         canvas.setStretched(false);
         canvas.setPreferredSize(new Dimension(550,500));
@@ -56,30 +76,14 @@ public class GUI extends Thread{
         GUIFrame.add(jScrollTab);
         GUIFrame.getContentPane().add(jPanelCorr, BorderLayout.EAST);
         
-        Point[] servPoints = new Point[2];
-        Point[] pcPoints = new Point[1];
-        Point[] tcpPoints = new Point[3];
-       
-        //Server Location
-        servPoints[0] = new Point(10,20);
-        //Logger Location
-        servPoints[1] = new Point(470,20);
 
-        //Client Location
-        pcPoints[0] = new Point(250,500);
-
-        tcpPoints[0] = new Point(10,170);
-        tcpPoints[1] = new Point(470,170);
-        tcpPoints[2] = new Point(250,410);
-        
-        //addStaff();
 
         Point[] dotPoints = new Point[3];
         dotPoints[0] = new Point(0,180);
         dotPoints[1] = new Point(0,200);
         dotPoints[2] = new Point(0,360);
         
-        Point[] stringPoints = new Point[3];
+        /*Point[] stringPoints = new Point[3];
         String[] strings = new String[3];
 
         stringPoints[0] = new Point(40,15);
@@ -90,12 +94,10 @@ public class GUI extends Thread{
         strings[1] = "Logger";
         strings[2] = "Client";
 
-        canvas.setTCPCoords(tcpPoints);
-        canvas.setPcCoords(pcPoints);
-        canvas.setServCoords(servPoints);
         canvas.setStringCoords(stringPoints);
-        canvas.setStrings(strings);
-        canvas.setDotCoords(dotPoints);
+        canvas.setStrings(strings);*/
+        //canvas.setDotCoords(dotPoints);
+        canvas.setBackgroundImage(new ImageIcon("background.jpg").getImage());
         
         //gui = new GUI();
         GUIFrame.setTitle("Fault Tolerant TCP");
