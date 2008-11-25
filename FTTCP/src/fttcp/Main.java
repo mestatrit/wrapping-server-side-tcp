@@ -34,6 +34,8 @@ public class Main {
         }
         //Start threads
         Main main = new Main();
+        Runnable GUI = new GUI();
+        GUI.run();
         Thread log = new logger(main);
         log.start();
         Thread ssw = new southSideWrap(main);
@@ -50,6 +52,10 @@ public class Main {
         server.start();
         Thread client = new client(main);
         client.start();
+    }
+    
+    private void GUIRun(){
+        GUI g = new GUI();
     }
     
     /**
