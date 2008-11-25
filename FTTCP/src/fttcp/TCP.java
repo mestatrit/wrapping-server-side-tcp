@@ -112,7 +112,7 @@ public class TCP extends Thread{
      */
     @Override
     public void run(){
-        
+        gui.printToScreen(entity +" TCP reporting in.");
         while (true) {
             
             byte[] buffer = readPacket();

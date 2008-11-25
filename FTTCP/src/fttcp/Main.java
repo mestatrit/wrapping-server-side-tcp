@@ -34,28 +34,24 @@ public class Main {
         }
         //Start threads
         Main main = new Main();
-        Runnable GUI = new GUI();
-        GUI.run();
-        Thread log = new logger(main);
-        log.start();
-        Thread ssw = new southSideWrap(main);
-        ssw.start();
-        Thread nsw = new northSideWrap(main);
-        nsw.start();
-        Thread tcpSrv = new TCP(main, "SRV");
-       tcpSrv.start();
-       Thread tcpClt = new TCP(main, "CLT");
-       tcpClt.start();
-       Thread tcpLog = new TCP(main, "LOG");
-       tcpLog.start();
-        Thread server = new server(main);
-        server.start();
-        Thread client = new client(main);
-        client.start();
-    }
-    
-    private void GUIRun(){
         GUI g = new GUI();
+        g.start();
+        Thread log = new logger(main, g);
+        log.start();
+        Thread ssw = new southSideWrap(main, g);
+        ssw.start();
+        Thread nsw = new northSideWrap(main, g);
+        nsw.start();
+        Thread tcpSrv = new TCP(main, "SRV", g);
+       tcpSrv.start();
+       Thread tcpClt = new TCP(main, "CLT", g);
+       tcpClt.start();
+       Thread tcpLog = new TCP(main, "LOG", g);
+       tcpLog.start();
+        Thread server = new server(main, g);
+        server.start();
+        Thread client = new client(main, g);
+        client.start();
     }
     
     /**

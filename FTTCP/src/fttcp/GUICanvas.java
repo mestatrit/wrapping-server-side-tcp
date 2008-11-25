@@ -18,24 +18,28 @@ import javax.swing.*;
 public class GUICanvas extends JPanel{
     
 /** Hold Value of property image*/
-    private Image spacer;
+    private Image pc;
     
     /** Hold Value of property image*/
-    private Image staff;
+    private Image serv;
+    
+    private Image TCP;
     
     /** Hold Value of property background image*/
     private Image backgroundImage;
     
-    private Image textBack;
+    private Image dot;
     
     /**Hold Value of property stretched*/
     private boolean stretched = true;
     
     /**Hold values of coordinates of points */
-    private Point[] spacerCoords;
+    private Point[] pcCoords;
     
     /**Hold values of coordinates of points */
-    private Point[] staffCoords;
+    private Point[] servCoords;
+    
+    private Point[] tcpCoords;
     
     private Point[] stringCoords;
     
@@ -49,13 +53,14 @@ public class GUICanvas extends JPanel{
     
     /**Construct an empty image viewer*/
     public GUICanvas(Image image){
-        this.spacer = image;
+        this.pc = image;
     }
     /**Construct an empty image viewer*/
-    public GUICanvas(Image spacer, Image staff, Image textBack){
-        this.spacer = spacer;
-        this.staff = staff;
-        this.textBack = textBack;
+    public GUICanvas(Image pc, Image serv, Image tcp, Image dot){
+        this.pc = pc;
+        this.serv = serv;
+        this.TCP = tcp;
+        this.dot = dot;
     }
     
     @Override
@@ -65,9 +70,9 @@ public class GUICanvas extends JPanel{
             g.drawImage(backgroundImage, 0, 0,getSize().width,getSize().height,this);
         }
         /*else{
-            if(spacer != null){
+            if( != null){
                 if(isStretched()){
-                    g.drawImage(spacer, xCoordinate, yCoordinate, getSize().width, getSize().height, this);
+                    g.drawImage(, xCoordinate, yCoordinate, getSize().width, getSize().height, this);
 
 import java.awt.*;
 import javax.swing.*;
@@ -76,21 +81,28 @@ public class GUICanvas {
    
 }                }
                 else{
-                    g.drawImage(spacer, xCoordinate, yCoordinate, this);
+                    g.drawImage(, xCoordinate, yCoordinate, this);
                 }
             }
         }*/
-        if(spacerCoords != null){
-            if(spacer != null){
-                for(int i=0;i<spacerCoords.length;i++){
-                    g.drawImage(spacer, spacerCoords[i].x, spacerCoords[i].y, this);
+        if(pcCoords != null){
+            if(pc != null){
+                for(int i=0;i<pcCoords.length;i++){
+                    g.drawImage(pc, pcCoords[i].x, pcCoords[i].y, this);
                 }
             }
         }
-       if(staffCoords != null){
-            if(staff != null){
-                for(int i=0;i<staffCoords.length;i++){
-                    g.drawImage(staff, staffCoords[i].x, staffCoords[i].y, this);
+       if(servCoords != null){
+            if(serv != null){
+                for(int i=0;i<servCoords.length;i++){
+                    g.drawImage(serv, servCoords[i].x, servCoords[i].y, this);
+                }
+            }
+        }
+        if(tcpCoords != null){
+            if(TCP != null){
+                for(int i=0;i<tcpCoords.length;i++){
+                    g.drawImage(TCP, tcpCoords[i].x, tcpCoords[i].y, this);
                 }
             }
         }
@@ -98,10 +110,10 @@ public class GUICanvas {
             
                 for(int i=0;i<stringCoords.length;i++){
                     if(strings[i] != null){
-                        g.drawImage(textBack, stringCoords[i].x-1, stringCoords[i].y-10, this);
+                        g.drawImage(dot, stringCoords[i].x-1, stringCoords[i].y-10, this);
                         if(strings[i].length()>1){
                             for(int j =1;j<strings[i].length();j++){
-                                g.drawImage(textBack, (stringCoords[i].x-1)+j*9, (stringCoords[i].y-10), this);
+                                g.drawImage(dot, (stringCoords[i].x-1)+j*9, (stringCoords[i].y-10), this);
                             }
                         }
                         g.drawString(strings[i], stringCoords[i].x, stringCoords[i].y);
@@ -111,13 +123,13 @@ public class GUICanvas {
 
     }
     /**Return value of property image*/
-    public Image getSpacer(){
-        return spacer;
+    public Image getPc(){
+        return pc;
     }
     
     /**Set a new value for property image*/
-    public void setSpacer(Image image){
-        this.spacer = image;
+    public void setPc(Image image){
+        this.pc = image;
         repaint();
     }
     
@@ -161,24 +173,34 @@ public class GUICanvas {
     }
     
     /**Set image coordinates*/
-    public void setSpacerCoords(Point[] coords){
-        this.spacerCoords = coords;
+    public void setPcCoords(Point[] coords){
+        this.pcCoords = coords;
         repaint();
     }
     
     /**Get image coordinates*/
-    public Point[] getSpacerCoords(){
-        return spacerCoords;
+    public Point[] getPcCoords(){
+        return pcCoords;
+    }
+    /**Set image coordinates*/
+    public void setTCPCoords(Point[] coords){
+        this.tcpCoords = coords;
+        repaint();
+    }
+    
+    /**Get image coordinates*/
+    public Point[] getTCPCoords(){
+        return tcpCoords;
     }
     
     /**Set image coordinates*/
-    public void setStaffCoords(Point[] coords){
-        this.staffCoords = coords;
+    public void setServCoords(Point[] coords){
+        this.servCoords = coords;
         repaint();
     }
     /**Get image coordinates*/
-    public Point[] getStaffCoords(){
-        return staffCoords;
+    public Point[] getServCoords(){
+        return servCoords;
     }
     /**Set String coordinates*/
     public void setStringCoords(Point[] coords){
@@ -199,18 +221,18 @@ public class GUICanvas {
     }
     /**Wipes tab*/
     public void clearTab(){
-        Point[] spacerPoints = new Point[2];
+        Point[] Points = new Point[2];
         Point[] staffPoints = new Point[1];
-        spacerPoints[0] = new Point(142,30);
-        spacerPoints[1] = new Point(142,107);
+        Points[0] = new Point(142,30);
+        Points[1] = new Point(142,107);
         staffPoints[0] = new Point(142,54);
         Point[] stringPoints = new Point[1];
         String[] newStrings = new String[1];
         stringPoints[0] = stringCoords[0];
         newStrings[0] = strings[0];
         
-        this.spacerCoords = spacerPoints;
-        this.staffCoords = staffPoints;
+        this.pcCoords = Points;
+        this.servCoords = staffPoints;
         this.stringCoords = stringPoints;
         this.strings = newStrings;
     }
