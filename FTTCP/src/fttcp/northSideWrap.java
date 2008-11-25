@@ -13,6 +13,7 @@ import java.io.*;
 
 public class northSideWrap extends Thread{
     private Main m;
+    private GUI gui;
     private String sender;
     private enum States {normal, restarting};
     private States NSWcurrentState = States.normal;
@@ -22,8 +23,9 @@ public class northSideWrap extends Thread{
     /**
      * Constructor
      */
-    public northSideWrap(Main main){
+    public northSideWrap(Main main,GUI g){
         m = main;
+        gui = g;
     }
     
     /**
@@ -31,7 +33,7 @@ public class northSideWrap extends Thread{
      */
     @Override
     public void run(){
-        
+       gui.printToScreen("NSW reporting in.");
         //while thread is running
         while(true) {
                       
