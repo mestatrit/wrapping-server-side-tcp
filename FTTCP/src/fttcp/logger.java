@@ -16,6 +16,7 @@ import java.awt.event.*;
 public class logger extends Thread{
     private Main m;
     private String sender;
+    private GUI gui;
     int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
     int initialClientSequenceNumber = 0;
     
@@ -31,8 +32,9 @@ public class logger extends Thread{
     /**
      * Constructor
      */
-    public logger(Main main){
+    public logger(Main main, GUI g){
         m = main;
+        gui = g;
     }
     
     /**
@@ -40,6 +42,7 @@ public class logger extends Thread{
      */
     @Override
     public void run(){
+        gui.printToScreen("Logger reporting in.");
        int length=100;// Need to update length!!!
        int newReadLength = 0;
        int[] readLengthArray = new int[length]; //to have the array received from the client
