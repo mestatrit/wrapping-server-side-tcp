@@ -23,16 +23,45 @@ public class client extends Thread{
      */
     @Override
     public void run(){
-        boolean Serverreplied =true;
+      /*  boolean Serverreplied = true;
         do
             for (int i = 0; i<20; i++)
             {
                 sendPacket(intToByteArr(i),m.getServerAddress());
                 System.out.println("client sending" + i);
             }
-        while (Serverreplied = true);
-     
-    }
+        while (Serverreplied = true); */
+        
+        //set initial number to send
+        int numberSend = 1;
+        
+        //client to send numbers up to 10
+        while(numberSend <= 10) {
+            
+            //convert integer to send to byte array
+            byte[] byteNumberSend = intToByteArr(numberSend);
+            
+            //send number to server
+            sendPacket(byteNumberSend, m.getServerAddress());
+            System.out.println("Client sending " + byteNumberSend);
+            
+            //while server has not replied, wait
+            while(readPacket()==null){
+               try {
+                   this.sleep(1000);
+               }
+               catch(java.lang.InterruptedException e){
+                        }
+          }
+            
+            //when server replies, increase number to send
+            numberSend++;
+            
+            }
+            
+        }
+        
+    
      /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
