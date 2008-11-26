@@ -167,7 +167,7 @@ public class TCP extends Thread{
                 FilenameFilter filter = new TCPFileFilter();
                 File f = new File(entity);
                 String[] files = f.list(filter);
-                if(files.length != 0){
+                if(files != null && files.length != 0){
                     // find out direction the TCP Layer is intercepting buffer data
                     // insteam - received (receive header)
                     // outstream - sendTo (add header)
