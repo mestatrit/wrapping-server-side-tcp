@@ -120,7 +120,7 @@ public class GUI extends Thread{
         
         isInit = true;
         
-        while(true){
+        /*while(true){
             clt2tcp();
             clt2srv();
             ssw2tcp();
@@ -136,8 +136,8 @@ public class GUI extends Thread{
             log2tcp();
             log2srv();
             srv2clt();
-            tcp2clt();*/
-        }
+            tcp2clt();
+        }*/
         
     }
     

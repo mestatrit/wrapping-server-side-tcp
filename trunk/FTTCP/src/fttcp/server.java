@@ -111,6 +111,7 @@ public class server extends Thread{
     private void sendPacket(byte[] data, short address){
         if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
+            gui.srv2nsw();
             writeFile(data,"serverBuffer/toSend.SRV.CLT.NSW");
         }
         
