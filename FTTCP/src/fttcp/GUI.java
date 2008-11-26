@@ -15,47 +15,30 @@ import java.awt.*;
  */
 public class GUI extends Thread{
     private JTextArea output = new JTextArea();
+    private JTextArea servCon = new JTextArea();
+    private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
     private int wait = 500;
+    private int lines = 0;
     private imageMap blankDot = new imageMap(0,0,(byte)-1);
+    private JScrollPane jScrollCan;
     
         @Override
     public void run(){
-        output.setText("Output:\n------------------------------------------------------------");
+        output.setText("");
+        servCon.setText("");
         initGUI();   
     }
     
     private void initGUI(){
-        /*Image[] images = new Image[5];
-        images[0] = new ImageIcon("comp.jpg").getImage(); 
-        images[1] = new ImageIcon("serv.jpg").getImage(); 
-        images[2] = new ImageIcon("TCPLayer.jpg").getImage();
-        images[3] = new ImageIcon("SSW.jpg").getImage();
-        images[4] = new ImageIcon("NSW.jpg").getImage();
-        
-        byte pc = 1;
-        byte serv = 2;
-        byte tcp = 3;
-        byte ssw = 4;
-        byte nsw = 5;
-        
-        imageMap[] Coords = new imageMap[8];
-        Coords[0] = new imageMap(250,500,pc);
-        Coords[1] = new imageMap(10,20,serv);
-        Coords[2] = new imageMap(470,20,serv);
-        Coords[3] = new imageMap(40,240,tcp);
-        Coords[4] = new imageMap(450,170,tcp);
-        Coords[5] = new imageMap(250,410,tcp);
-        Coords[6] = new imageMap(50,310,ssw);
-        Coords[7] = new imageMap(50,170,nsw);*/
         
         canvas = new GUICanvas(new ImageIcon("dot2.png").getImage(),54);
         
         JFrame GUIFrame = new JFrame();
         canvas.setStretched(false);
         canvas.setPreferredSize(new Dimension(550,500));
-        JScrollPane jScrollTab = new JScrollPane(canvas);
-        jScrollTab.getVerticalScrollBar().setUnitIncrement(30);
+        jScrollCan = new JScrollPane(canvas);
+        jScrollCan.getVerticalScrollBar().setUnitIncrement(30);
 
         JMenuBar GUIMenu = new JMenuBar();
         GUIMenu.setName("GuiMenu");
@@ -72,14 +55,33 @@ public class GUI extends Thread{
         helpMenu.setText("Help");
         GUIMenu.add(helpMenu);
 
-        JPanel jPanelCorr = new JPanel();
-        output.setPreferredSize(new Dimension(250, 500));
+        //Console on Righthand side
+        JPanel jPanelCon = new JPanel();
+        jPanelCon.setPreferredSize(new Dimension(255,690));
+        JLabel header = new JLabel();
+        header.setText("Output:");
+        jPanelCon.add(header);
+        output.setPreferredSize(new Dimension(250, 600));
         output.setEditable(false);
-        jPanelCorr.add(output);
+        output.setAutoscrolls(true);
+        JScrollPane jScrollOut = new JScrollPane(output);
+        jScrollOut.getVerticalScrollBar().setUnitIncrement(30);
+        jPanelCon.add(jScrollOut);
 
+        
+        //Server Console
+        servCon.setPreferredSize(new Dimension(100,150));
+        JScrollPane jScrollServ = new JScrollPane(servCon);
+        jScrollServ.getVerticalScrollBar().setUnitIncrement(30);
+        jScrollServ.setLocation(new Point(10,100));
+        jScrollServ.setAlignmentX(0);
+        canvas.add(jScrollServ);
+        jScrollServ.setLocation(new Point(10,100));
+        jScrollServ.setAlignmentX(0);
+        
         GUIFrame.setJMenuBar(GUIMenu);
-        GUIFrame.add(jScrollTab);
-        GUIFrame.getContentPane().add(jPanelCorr, BorderLayout.EAST);
+        GUIFrame.add(jScrollCan);
+        GUIFrame.getContentPane().add(jPanelCon, BorderLayout.EAST);
         
 
 
@@ -147,6 +149,7 @@ public class GUI extends Thread{
     
     public void tcp2log(){
         while(true){
+        
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(451,440,(byte)23);
         dotPoints[1] = new imageMap(463,460,(byte)22);
@@ -157,6 +160,7 @@ public class GUI extends Thread{
     
     private void drawVector(imageMap[] img){
         for(int i=0;i<img.length;i++){
+                printToScreen("Printing");
             canvas.setDotCoord(img[i], img[i].getImageId());
             try {
                 this.sleep(wait);
@@ -181,5 +185,13 @@ public class GUI extends Thread{
     }
     public void printToScreen(String str){
         output.append("\n" + str);
+        lines++;
+        if(lines > 36){
+            Dimension oldSize = output.getPreferredSize();
+            oldSize.setSize(oldSize.getWidth(),oldSize.getHeight()+17);
+            output.setPreferredSize(oldSize);
+            output.revalidate();
+            output.setCaretPosition(output.getDocument().getLength());
+        }
     }
 }
