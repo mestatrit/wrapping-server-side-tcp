@@ -33,21 +33,31 @@ public class GUICanvas extends JPanel{
     
     private Point[] stringCoords;
     
-    private Point[] dotCoords;
+    private imageMap[] dotCoords;
     
     private String[] strings;
     
     
     /**Construct an empty image viewer*/
-    public GUICanvas(Image[] image, imageMap[] map, Image dot){
+    public GUICanvas(Image[] image, imageMap[] map, Image dot, int size){
         this.images = image;
         this.Coords = map;
         this.dot = dot;
+        this.dotCoords = new imageMap[size];
+        byte flag = -1;
+        for (int i = 0; i<this.dotCoords.length;i++){
+            this.dotCoords[i] = new imageMap(0,0,flag);
+        }
     }
     
     /**Construct an empty image viewer*/
-    public GUICanvas(Image dot){
+    public GUICanvas(Image dot, int size){
         this.dot = dot;
+        this.dotCoords = new imageMap[size];
+        byte flag = -1;
+        for (int i = 0; i<this.dotCoords.length;i++){
+            this.dotCoords[i] = new imageMap(0,0,flag);
+        }
     }
  
     @Override
@@ -70,7 +80,9 @@ public class GUICanvas extends JPanel{
         if(dotCoords != null){
             if(dot != null){
                 for(int i=0;i<dotCoords.length;i++){
-                    g.drawImage(dot, dotCoords[i].x, dotCoords[i].y, this);
+                    if(dotCoords[i].getImageId() != -1){
+                        g.drawImage(dot, dotCoords[i].getXCoord(), dotCoords[i].getYCoord(), this);
+                    }
                 }
             }
         }
@@ -120,12 +132,18 @@ public class GUICanvas extends JPanel{
     }
 
     /**Get image coordinates*/
-    public Point[] getDotCoords(){
+    public imageMap[] getDotCoords(){
         return dotCoords;
     }
     /**Set image coordinates*/
-    public void setDotCoords(Point[] coords){
+    public void setDotCoords(imageMap[] coords){
         this.dotCoords = coords;
+        repaint();
+    }
+    
+    /**Set image coordinates*/
+    public void setDotCoord(imageMap coords,int index){
+        this.dotCoords[index] = coords;
         repaint();
     }
     

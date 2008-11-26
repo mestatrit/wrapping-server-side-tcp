@@ -4,6 +4,8 @@
  */
 
 package fttcp;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.*;
 
@@ -14,6 +16,8 @@ import java.awt.*;
 public class GUI extends Thread{
     private JTextArea output = new JTextArea();
     private GUICanvas canvas;
+    private int wait = 500;
+    private imageMap blankDot = new imageMap(0,0,(byte)-1);
     
         @Override
     public void run(){
@@ -45,7 +49,7 @@ public class GUI extends Thread{
         Coords[6] = new imageMap(50,310,ssw);
         Coords[7] = new imageMap(50,170,nsw);*/
         
-        canvas = new GUICanvas(new ImageIcon("dot.png").getImage());
+        canvas = new GUICanvas(new ImageIcon("dot2.png").getImage(),54);
         
         JFrame GUIFrame = new JFrame();
         canvas.setStretched(false);
@@ -106,17 +110,75 @@ public class GUI extends Thread{
         GUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GUIFrame.setSize(850, 700);     
         GUIFrame.setVisible(true);
-        clt2tcp();
+       tcp2log();
         
     }
     
     public void clt2tcp(){
-        Point[] dotPoints = new Point[1];
-        dotPoints[0] = new Point(100,400);
-        canvas.setDotCoords(dotPoints);
-        
+        waitForInit();
+        while(true){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(65,485,(byte)0);
+        dotPoints[1] = new imageMap(75,465,(byte)1);
+        dotPoints[2] = new imageMap(85,442,(byte)2);
+        drawVector(dotPoints);
+        }
     }
     
+    public void log2tcp(){
+        while(true){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(503,480,(byte)18);
+        dotPoints[1] = new imageMap(492,460,(byte)19);
+        dotPoints[2] = new imageMap(481,440,(byte)20);
+        drawVector(dotPoints);
+        }
+    }
+    
+    public void tcp2clt(){
+        while(true){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(115,442,(byte)5);
+        dotPoints[1] = new imageMap(106,462,(byte)4);
+        dotPoints[2] = new imageMap(97,482,(byte)3);
+        drawVector(dotPoints);
+        }
+    }
+    
+    public void tcp2log(){
+        while(true){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(451,440,(byte)23);
+        dotPoints[1] = new imageMap(463,460,(byte)22);
+        dotPoints[2] = new imageMap(473,480,(byte)21);
+        drawVector(dotPoints);
+        }
+    }
+    
+    private void drawVector(imageMap[] img){
+        for(int i=0;i<img.length;i++){
+            canvas.setDotCoord(img[i], img[i].getImageId());
+            try {
+                this.sleep(wait);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            canvas.setDotCoord(blankDot, img[i].getImageId());
+            try {
+                this.sleep(wait);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public void waitForInit(){
+        try {
+            this.sleep(wait);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public void printToScreen(String str){
         output.append("\n" + str);
     }
