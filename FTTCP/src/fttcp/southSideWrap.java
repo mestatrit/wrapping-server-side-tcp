@@ -35,9 +35,6 @@ public class southSideWrap extends Thread{
     @Override
     public void run(){
         gui.printToScreen("SSW Reporting in.");
-        gui.printToScreen("SSW flashing.");
-        gui.clt2tcp();
-        gui.printToScreen("SSW out");
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()

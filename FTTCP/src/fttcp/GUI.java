@@ -18,7 +18,7 @@ public class GUI extends Thread{
     private JTextArea servCon = new JTextArea();
     private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
-    private int wait = 500;
+    private int wait = 50;
     private int lines = 0;
     private int servLines = 0;
     private int cltLines = 0;
@@ -116,56 +116,157 @@ public class GUI extends Thread{
         GUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GUIFrame.setSize(850, 700);     
         GUIFrame.setVisible(true);
-       tcp2log();
+        while(true){
+            clt2tcp();
+            clt2srv();
+            ssw2tcp();
+            tcp2nsw();
+            nsw2srv();
+            srv2nsw();
+            nsw2tcp();
+            tcp2ssw();
+            srv2clt();
+            tcp2clt();
+            /*srv2log();
+            tcp2log();
+            log2tcp();
+            log2srv();
+            srv2clt();
+            tcp2clt();*/
+        }
         
+    }
+    
+    public void nsw2srv(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(294,82,(byte)50);
+        dotPoints[1] = new imageMap(294,62,(byte)51);
+        drawVector(dotPoints);
+    }
+    public void srv2nsw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(331,62,(byte)53);
+        dotPoints[1] = new imageMap(331,82,(byte)52);
+        drawVector(dotPoints);
+    }
+    public void tcp2nsw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(294,145,(byte)46);
+        dotPoints[1] = new imageMap(294,125,(byte)47);
+        drawVector(dotPoints);
+    }
+    public void nsw2tcp(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(331,125,(byte)49);
+        dotPoints[1] = new imageMap(331,145,(byte)48);
+        drawVector(dotPoints);
+    }
+    
+    
+    public void ssw2tcp(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(295,205,(byte)42);
+        dotPoints[1] = new imageMap(295,185,(byte)43);
+        drawVector(dotPoints);
+    }
+    public void tcp2ssw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(330,185,(byte)45);
+        dotPoints[1] = new imageMap(330,205,(byte)44);
+        drawVector(dotPoints);
     }
     
     public void clt2tcp(){
         waitForInit();
-        while(true){
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(65,485,(byte)0);
         dotPoints[1] = new imageMap(75,465,(byte)1);
         dotPoints[2] = new imageMap(85,442,(byte)2);
         drawVector(dotPoints);
-        }
     }
     
     public void log2tcp(){
-        while(true){
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(503,480,(byte)18);
         dotPoints[1] = new imageMap(492,460,(byte)19);
         dotPoints[2] = new imageMap(481,440,(byte)20);
         drawVector(dotPoints);
-        }
     }
     
     public void tcp2clt(){
-        while(true){
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(115,442,(byte)5);
         dotPoints[1] = new imageMap(106,462,(byte)4);
         dotPoints[2] = new imageMap(97,482,(byte)3);
         drawVector(dotPoints);
-        }
     }
     
     public void tcp2log(){
-        while(true){
-        
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(451,440,(byte)23);
         dotPoints[1] = new imageMap(463,460,(byte)22);
         dotPoints[2] = new imageMap(473,480,(byte)21);
         drawVector(dotPoints);
-        }
+    }
+    public void clt2srv(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[0] = new imageMap(100,400,(byte)6);
+        dotPoints[1] = new imageMap(125,383,(byte)7);
+        dotPoints[2] = new imageMap(150,366,(byte)8);
+        dotPoints[3] = new imageMap(175,349,(byte)9);
+        dotPoints[4] = new imageMap(200,332,(byte)10);
+        dotPoints[5] = new imageMap(225,315,(byte)11);
+        dotPoints[6] = new imageMap(295,300,(byte)36);
+        dotPoints[7] = new imageMap(295,275,(byte)37);
+        dotPoints[8] = new imageMap(295,250,(byte)38);
+        drawVector(dotPoints);
+    }
+    public void srv2clt(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[8] = new imageMap(134,400,(byte)12);
+        dotPoints[7] = new imageMap(159,383,(byte)13);
+        dotPoints[6] = new imageMap(184,366,(byte)14);
+        dotPoints[5] = new imageMap(209,349,(byte)15);
+        dotPoints[4] = new imageMap(234,332,(byte)16);
+        dotPoints[3] = new imageMap(259,315,(byte)17);
+        dotPoints[2] = new imageMap(330,300,(byte)39);
+        dotPoints[1] = new imageMap(330,275,(byte)40);
+        dotPoints[0] = new imageMap(330,250,(byte)41);
+        drawVector(dotPoints);
+    }
+    
+    public void log2srv(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[0] = new imageMap(472,400,(byte)24);
+        dotPoints[1] = new imageMap(459,384,(byte)25);
+        dotPoints[2] = new imageMap(446,368,(byte)26);
+        dotPoints[3] = new imageMap(433,352,(byte)27);
+        dotPoints[4] = new imageMap(420,336,(byte)28);
+        dotPoints[5] = new imageMap(405,318,(byte)29);
+        dotPoints[6] = new imageMap(295,300,(byte)36);
+        dotPoints[7] = new imageMap(295,275,(byte)37);
+        dotPoints[8] = new imageMap(295,250,(byte)38);
+        drawVector(dotPoints);
+    }
+    
+    public void srv2log(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[8] = new imageMap(442,400,(byte)30);
+        dotPoints[7] = new imageMap(430,384,(byte)31);
+        dotPoints[6] = new imageMap(418,368,(byte)32);
+        dotPoints[5] = new imageMap(406,352,(byte)33);
+        dotPoints[4] = new imageMap(394,336,(byte)34);
+        dotPoints[3] = new imageMap(382,318,(byte)35);
+        dotPoints[2] = new imageMap(330,300,(byte)39);
+        dotPoints[1] = new imageMap(330,275,(byte)40);
+        dotPoints[0] = new imageMap(330,250,(byte)41);
+        drawVector(dotPoints);
     }
     
     private void drawVector(imageMap[] img){
         for(int i=0;i<img.length;i++){
-            printToServer("Printing " +i);
-            printToClient("Printing client " +i);
+            //printToServer("Printing " +i);
+            //printToClient("Printing client " +i);
             canvas.setDotCoord(img[i], img[i].getImageId());
             try {
                 this.sleep(wait);
@@ -173,11 +274,11 @@ public class GUI extends Thread{
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             }
             canvas.setDotCoord(blankDot, img[i].getImageId());
-            try {
+            /*try {
                 this.sleep(wait);
             } catch (InterruptedException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
     }
     
@@ -212,7 +313,7 @@ public class GUI extends Thread{
         }
         else{
             //Shift all up one
-            for(int i=12;i<22;i++){
+            for(int i=13;i<22;i++){
                 strings[i-1] = strings[i];
             }
             //Add new string at bottom
