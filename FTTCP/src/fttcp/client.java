@@ -108,6 +108,7 @@ public class client extends Thread{
     private void sendPacket(byte[] data, short address){
         if(address == m.getServerAddress()){
             //Put in file called toSend.Server in client folder
+            gui.clt2tcp();
             writeFile(data,"clientBuffer/toSend.CLT.SRV.TCP");
         }
         
