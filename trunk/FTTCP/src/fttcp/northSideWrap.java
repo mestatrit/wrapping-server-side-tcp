@@ -15,6 +15,7 @@ public class northSideWrap extends Thread{
     private Main m;
     private GUI gui;
     private String sender;
+    private String destination;
     private enum States {normal, restarting};
     private States NSWcurrentState = States.normal;
     private byte readFlag = 2;
@@ -184,16 +185,20 @@ public class northSideWrap extends Thread{
                 FilenameFilter filter = new NSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
-                if(files.length != 0){
+                if(files != null && files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
                     //Delete file as its now been read
-                    boolean hadDel = (new File(files[0]).delete());
+                    fileinputstream.close();
+                    boolean hadDel = (new File("serverBuffer/"+files[0]).delete());;
                     //Find and set sender
-                    int length  = files[0].length();
-                    sender = files[0].substring(length-7,length-4);
+                    String[] info = files[0].split("[.]");
+                    if(info.length == 3 || info.length == 4){
+                        sender = info[1];
+                        destination = info[2];
+                    }
                     
                     return bytearray;
                 }
