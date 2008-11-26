@@ -20,8 +20,12 @@ public class GUI extends Thread{
     private GUICanvas canvas;
     private int wait = 500;
     private int lines = 0;
+    private int servLines = 0;
+    private int cltLines = 0;
     private imageMap blankDot = new imageMap(0,0,(byte)-1);
     private JScrollPane jScrollCan;
+    private Point[] stringPoints;
+    private String[] strings;
     
         @Override
     public void run(){
@@ -38,6 +42,7 @@ public class GUI extends Thread{
         canvas.setStretched(false);
         canvas.setPreferredSize(new Dimension(550,500));
         jScrollCan = new JScrollPane(canvas);
+        jScrollCan.setPreferredSize(new Dimension(550,500));
         jScrollCan.getVerticalScrollBar().setUnitIncrement(30);
 
         JMenuBar GUIMenu = new JMenuBar();
@@ -69,16 +74,6 @@ public class GUI extends Thread{
         jPanelCon.add(jScrollOut);
 
         
-        //Server Console
-        servCon.setPreferredSize(new Dimension(100,150));
-        JScrollPane jScrollServ = new JScrollPane(servCon);
-        jScrollServ.getVerticalScrollBar().setUnitIncrement(30);
-        jScrollServ.setLocation(new Point(10,100));
-        jScrollServ.setAlignmentX(0);
-        canvas.add(jScrollServ);
-        jScrollServ.setLocation(new Point(10,100));
-        jScrollServ.setAlignmentX(0);
-        
         GUIFrame.setJMenuBar(GUIMenu);
         GUIFrame.add(jScrollCan);
         GUIFrame.getContentPane().add(jPanelCon, BorderLayout.EAST);
@@ -90,19 +85,28 @@ public class GUI extends Thread{
         dotPoints[1] = new Point(0,200);
         dotPoints[2] = new Point(0,360);
         
-        /*Point[] stringPoints = new Point[3];
-        String[] strings = new String[3];
+        stringPoints = new Point[22];
+        strings = new String[22];
 
-        stringPoints[0] = new Point(40,15);
-        stringPoints[1] = new Point(500,15);
-        stringPoints[2] = new Point(280,620);
+        
+        //Initialise string positions
+        stringPoints[0] = new Point(10,145);
+        stringPoints[1] = new Point(180,450);
 
-        strings[0] = "Server";
-        strings[1] = "Logger";
-        strings[2] = "Client";
+        for(int i=2;i<stringPoints.length;i++){
+            strings[i] = "";
+            if(i<12){
+                stringPoints[i] = new Point(10,162+(i-2)*16);
+            }
+            else{
+                stringPoints[i] = new Point(180,310+(i-2)*16);
+            }
+        }
+        strings[0] = "Server Console:";
+        strings[1] = "Client Console:";
 
         canvas.setStringCoords(stringPoints);
-        canvas.setStrings(strings);*/
+        canvas.setStrings(strings);
         //canvas.setDotCoords(dotPoints);
         canvas.setBackgroundImage(new ImageIcon("background.jpg").getImage());
         
@@ -160,7 +164,8 @@ public class GUI extends Thread{
     
     private void drawVector(imageMap[] img){
         for(int i=0;i<img.length;i++){
-                printToScreen("Printing");
+            printToServer("Printing " +i);
+            printToClient("Printing client " +i);
             canvas.setDotCoord(img[i], img[i].getImageId());
             try {
                 this.sleep(wait);
@@ -183,6 +188,39 @@ public class GUI extends Thread{
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void printToServer(String str){
+        if(servLines<10){
+            strings[servLines+2] = str;
+            servLines++;
+        }
+        else{
+            //Shift all up one
+            for(int i=3;i<12;i++){
+                strings[i-1] = strings[i];
+            }
+            //Add new string at bottom
+            strings[11] = str;
+        }
+        canvas.setStrings(strings);
+    }
+    
+    public void printToClient(String str){
+        if(cltLines<10){
+            strings[cltLines+12] = str;
+            cltLines++;
+        }
+        else{
+            //Shift all up one
+            for(int i=12;i<22;i++){
+                strings[i-1] = strings[i];
+            }
+            //Add new string at bottom
+            strings[21] = str;
+        }
+        canvas.setStrings(strings);
+    }
+    
     public void printToScreen(String str){
         output.append("\n" + str);
         lines++;

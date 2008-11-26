@@ -64,7 +64,12 @@ public class GUICanvas extends JPanel{
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if(backgroundImage != null){
-            g.drawImage(backgroundImage, 0, 0,getSize().width,getSize().height,this);
+            if(isStretched()){
+                g.drawImage(backgroundImage, 0, 0,getSize().width,getSize().height,this);
+            }
+            else{
+                g.drawImage(backgroundImage, 0, 0,this);
+            }
         }
         try{
             if(Coords != null && images != null){
