@@ -10,12 +10,11 @@ package fttcp;
  * @author James Bossingham
  */
 import java.io.*;
-import javax.swing.*;
-import java.awt.event.*;
 
 public class logger extends Thread{
     private Main m;
     private String sender;
+    private String destination;
     private GUI gui;
     int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
     int initialClientSequenceNumber = 0;
@@ -139,16 +138,21 @@ public class logger extends Thread{
                 FilenameFilter filter = new LOGFileFilter();
                 File f = new File("loggerBuffer");
                 String[] files = f.list(filter);
-                if(files.length != 0){
+                if(files != null && files.length != 0){
                     emptyReadCounter = 0;   // Reset the consecutive read counter
                     FileInputStream fileinputstream = new FileInputStream("loggerBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
-                    boolean hadDel = (new File(files[0]).delete());
+                    fileinputstream.close();
+                    boolean hadDel = (new File("loggerBuffer/"+files[0]).delete());
                     //Find and set sender
                     int length  = files[0].length();
-                    sender = files[0].substring(length-7,length-4);
+                    String[] info = files[0].split("[.]");
+                    if(info.length == 3 || info.length == 4){
+                        sender = info[1];
+                        destination = info[2];
+                    }
                     return bytearray;
                 }
                 else{

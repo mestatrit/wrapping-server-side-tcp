@@ -194,6 +194,9 @@ public class TCP extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
+                    fileinputstream.close();
+                    //Need to delete file after reading, using line below, but with specific buffers.
+                    //boolean hadDel = (new File("serverBuffer/"+files[0]).delete());
                     return bytearray;
                 }
                 else{
