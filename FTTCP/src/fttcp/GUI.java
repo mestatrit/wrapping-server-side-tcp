@@ -26,6 +26,7 @@ public class GUI extends Thread{
     private JScrollPane jScrollCan;
     private Point[] stringPoints;
     private String[] strings;
+    private boolean isInit = false;
     
         @Override
     public void run(){
@@ -116,6 +117,9 @@ public class GUI extends Thread{
         GUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GUIFrame.setSize(850, 700);     
         GUIFrame.setVisible(true);
+        
+        isInit = true;
+        
         while(true){
             clt2tcp();
             clt2srv();
@@ -284,13 +288,16 @@ public class GUI extends Thread{
     
     public void waitForInit(){
         try {
-            this.sleep(wait);
+            while(!isInit){
+                this.sleep(wait);
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     public void printToServer(String str){
+        waitForInit();
         if(servLines<10){
             strings[servLines+2] = str;
             servLines++;
@@ -307,6 +314,7 @@ public class GUI extends Thread{
     }
     
     public void printToClient(String str){
+        waitForInit();
         if(cltLines<10){
             strings[cltLines+12] = str;
             cltLines++;
@@ -323,6 +331,7 @@ public class GUI extends Thread{
     }
     
     public void printToScreen(String str){
+        waitForInit();
         output.append("\n" + str);
         lines++;
         if(lines > 36){

@@ -36,27 +36,24 @@ public class client extends Thread{
         while (Serverreplied = true); */
         
         //set initial number to send
-        int numberSend = 1;
+        short numberSend = 1;
         
         //client to send numbers up to 10
         while(numberSend <= 10) {
             
             //convert integer to send to byte array
-            byte[] byteNumberSend = intToByteArr(numberSend);
-            
+            byte[] byteNumberSend = TCP.convertDataToByteArray(numberSend);
+            gui.printToClient("Sending " + numberSend);
             //send number to server
             sendPacket(byteNumberSend, m.getServerAddress());
-            System.out.println("Client sending " + byteNumberSend);
+            gui.printToScreen("Client sending " + numberSend);
             
             //while server has not replied, wait
-            while(readPacket()==null){
-               try {
-                   this.sleep(1000);
-               }
-               catch(java.lang.InterruptedException e){
-                        }
-          }
+            byte[] receivedPacket;
+            receivedPacket = readPacket();
             
+            
+            gui.printToClient("Received " + receivedPacket[0]);
             //when server replies, increase number to send
             numberSend++;
             
@@ -80,7 +77,8 @@ public class client extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
-                    boolean hadDel = (new File(files[0]).delete());
+                    fileinputstream.close();
+                    boolean hadDel = (new File("clientBuffer/"+files[0]).delete());
                     return bytearray;
                 }
                 else{

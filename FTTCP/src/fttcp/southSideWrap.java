@@ -35,6 +35,9 @@ public class southSideWrap extends Thread{
     @Override
     public void run(){
         gui.printToScreen("SSW Reporting in.");
+        byte[] SYNPacket = TCP.createTCPSegment();
+        TCP.setSYNFlag(true,SYNPacket);
+        writeFile(SYNPacket,"CLT.SRV.SSW");
         //repeats this forever (or until connection ended for good)
         while(true){
             //If in initial state perform intial protocol SSWintial()
@@ -54,6 +57,7 @@ public class southSideWrap extends Thread{
      * South Side Wraps intial connection protocol
      */
     private void SSWinitial(){
+        gui.printToScreen("SSW initialising");
         boolean servAckRecv = false; 
         boolean logAckRecv = false;
         byte[] servAck = null;
@@ -67,13 +71,14 @@ public class southSideWrap extends Thread{
         while(!isSYN){
             //Read Clients packet
             while (!sender.equals("CLT")){
+                gui.printToScreen("SSW Waiting to read SYN Packet");
                 clientSYN = readPacket();
             }
             //Check to see if SYN
             isSYN = isSYNPacket(clientSYN);
         }
         
-        
+        gui.printToScreen("SSW read SYN Packet");
         //Set stable_seq as clients initial seq num + 1
         clientInitSeqNum = TCP.getSequenceNumber(clientSYN);
         m.setStable_seq(clientInitSeqNum +1);
@@ -409,15 +414,16 @@ public class southSideWrap extends Thread{
                 FilenameFilter filter = new SSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
-                if(files.length != 0){
+                if(files != null && files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
-                    boolean hadDel = (new File(files[0]).delete());
+                    fileinputstream.close();
+                    boolean hadDel = (new File("serverBuffer/"+files[0]).delete());
                     //Find and set sender
                     int length  = files[0].length();
-                    String[] info = files[0].split(".");
+                    String[] info = files[0].split("[.]");
                     if(info.length == 3 || info.length == 4){
                         sender = info[1];
                         destination = info[2];

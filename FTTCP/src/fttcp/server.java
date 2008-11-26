@@ -35,12 +35,19 @@ public class server extends Thread{
         char returnLetter = 'a';
         short returnNumber = 0;
         byte[] byteReturnLetter;
-        
-        //if there is data which has been read
-        if(serverReadData != null) {
+        short readData =0;
         
         //convert data read to type short
-        short readData = TCP.convertByteArrayToShort(serverReadData, 0);
+        if(serverReadData.length == 1){
+            byte[] stuffedRD = new byte[2];
+            stuffedRD[0] = 0;
+            stuffedRD[1] = serverReadData[0];
+            readData = TCP.convertByteArrayToShort(stuffedRD, 0);
+        }
+        else{
+            readData = TCP.convertByteArrayToShort(serverReadData, 0);
+        }
+        gui.printToServer("Received " + readData);
         
         //get char representation
         returnLetter = (char)readData;
@@ -52,16 +59,10 @@ public class server extends Thread{
         byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
         
         //send packet to client
+        gui.printToServer("Sending " + (char)returnNumber);
+        gui.printToScreen("Server sending " + (char)returnNumber);
         sendPacket(byteReturnLetter, m.getClientAddress());
-        System.out.println("Server sending " + (char)returnNumber);
-     }
-        else {
-            try {
-                this.sleep(2000);
-            }
-            catch(java.lang.InterruptedException e){
-                  }
-        }
+        
     }
     }
     /**
@@ -79,7 +80,8 @@ public class server extends Thread{
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
-                    boolean hadDel = (new File(files[0]).delete());
+                    fileinputstream.close();
+                    boolean hadDel = (new File("serverBuffer/"+files[0]).delete());
                     return bytearray;
                 }
                 else{
