@@ -76,7 +76,7 @@ public class northSideWrap extends Thread{
                         readLengthArray[i]=tempReadLengthArray[i-1];
                  }
             
-                 //send readLength to logger
+                 //send readLength to logger, forward packet to server
                  sendPacket(readLengthArray, m.getLoggerAddress());
                  sendPacket(NSWreadData, m.getServerAddress());
             
@@ -255,7 +255,7 @@ public class northSideWrap extends Thread{
         }
     }
      private byte[] intToByteArr(int num){
-        byte[] byteArr = new byte[4];
+        byte[] byteArr = new byte[TCP.PACKET_SIZE];
         byteArr[3] =(byte)( num >> 24 );
         byteArr[2] =(byte)( (num << 8) >> 24 );
         byteArr[1] =(byte)( (num << 16) >> 24 );
