@@ -138,12 +138,6 @@ public class TCP extends Thread{
                 // send data to the correct buffer
                 sendPacket(data);   
             }
-            
-            try {
-                this.sleep(3000);
-            } catch (InterruptedException e) {
-                System.err.println(e);
-            }
         }
  
     }
@@ -214,6 +208,15 @@ public class TCP extends Thread{
                     
                     
                     return bytearray;
+                }
+                else{
+                    try{
+                        //Sleep for 3 seconds, then look again for file
+                        this.sleep(3000);
+                    }
+                    catch(java.lang.InterruptedException e){
+                        
+                    }
                 }
             }
         }
