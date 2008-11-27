@@ -78,7 +78,7 @@ public class northSideWrap extends Thread{
             
                  //send readLength to logger
                  sendPacket(readLengthArray, m.getLoggerAddress());
-                 snedPacket(NSWreadData, m.getServerAddress());
+                 sendPacket(NSWreadData, m.getServerAddress());
             
                  //increment unstable reads by 1
                  tempUnstableReads = m.getUnstable_reads();
