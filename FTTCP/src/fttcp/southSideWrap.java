@@ -126,7 +126,10 @@ public class southSideWrap extends Thread{
                     forwardPacket[i-1] = forwardPacket[i];
                 }
                 forwardPacket[0] = fwdCltPacketFlag;
-                byte[] fullForwardPacket = receivedPacket;
+                byte[] fullForwardPacket = new byte[receivedPacket.length];
+                for(int i=0;i<receivedPacket.length;i++){
+                    fullForwardPacket[i] = receivedPacket[i];
+                }
                 for(int i = 24;i<fullForwardPacket.length;i++){
                     fullForwardPacket[i] = forwardPacket[i-24];
                 }
