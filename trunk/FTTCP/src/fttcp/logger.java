@@ -194,12 +194,12 @@ public class logger extends Thread{
         else if(address == m.getSSWAddress()){
             //Put in file called received.TCP in client folder
             gui.log2tcp();
-            writeFile(data,"loggerBuffer/toSend.LOG.NSW.TCP");
+            writeFile(data,"loggerBuffer/toSend.LOG.SSW.TCP");
         }
         else if(address == m.getNSWAddress()){
             //Put in file called received.TCP in client folder
             gui.log2tcp();
-            writeFile(data,"loggerBuffer/toSend.LOG.SSW.TCP");
+            writeFile(data,"loggerBuffer/toSend.LOG.NSW.TCP");
         }
         
     }
