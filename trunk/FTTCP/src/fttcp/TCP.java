@@ -127,9 +127,11 @@ public class TCP extends Thread{
                 // add or strip header depending on direction data is travelling
                 if (direction.equals("toSend")) {
                     // add header
+                    data = TCP.createTCPSegment();
+                    TCP.setData(buffer,data);
                 } else {
                     // strip header
-                    TCP.stripHeader(buffer);
+                    data = TCP.stripHeader(buffer);
                 }
                 
                 // now modify status in accordance to contents of data and current state
@@ -291,7 +293,7 @@ public class TCP extends Thread{
             if (sender.equals("NSW") && destination.equals("LOG")) {
                 // TCP (in logger) reads - strips header - label for logger - loggerBuffer/received.NSW.LOG
                 gui.tcp2log();
-                writeFile(data,"serverBuffer/received.NSW.LOG");
+                writeFile(data,"loggerBuffer/received.NSW.LOG");
             }
             // Logger does stuff need to send to server so passes data to TCP - loggerBuffer/toSend.LOG.NSW.TCP
             else if (sender.equals("LOG") && destination.equals("NSW")) {
