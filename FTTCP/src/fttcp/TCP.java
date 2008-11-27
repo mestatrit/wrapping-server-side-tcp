@@ -122,16 +122,21 @@ public class TCP extends Thread{
             byte[] buffer = readPacket();
             
             if (buffer != null) {
-                byte[] data = new byte[TCP.PACKET_SIZE];
+                byte[] data = null;
                 
                 // add or strip header depending on direction data is travelling
                 if (direction.equals("toSend")) {
                     // add header
                     data = TCP.createTCPSegment();
+                    System.out.println("add header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
                     TCP.setData(buffer,data);
+                    System.out.println("add header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
                 } else {
                     // strip header
+                    //System.out.println("send "+sender+" destination "+destination);
+                    System.out.println("strip header/buffer index 0: "+buffer[0]);
                     data = TCP.stripHeader(buffer);
+                    System.out.println("strip header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
                 }
                 
                 // now modify status in accordance to contents of data and current state
@@ -394,6 +399,7 @@ public class TCP extends Thread{
        // get info from data segment index by index;
        int newDataIndex = 0;
        for (int i = TCP.DATA_SIZE; i < TCP.PACKET_SIZE; i++) {
+           //System.out.println("data length "+data.length+" seg length "+seg.length+" dataindex "+newDataIndex+" i "+i);
            data[newDataIndex] = seg[i];
            newDataIndex++;
        }
