@@ -173,7 +173,7 @@ public class TCP extends Thread{
                 
                 if (entity.equals("CLT")) {
                         entityBuffer = "clientBuffer";
-                } else {
+                } else if (entity.equals("LOG")) {
                     entityBuffer = "loggerBuffer";
                 }
                 
