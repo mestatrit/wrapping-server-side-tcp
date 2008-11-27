@@ -84,7 +84,7 @@ public class northSideWrap extends Thread{
                  
             
                  //increment unstable reads by 1
-                 gui.printToScreen("Incrementing unstable reads, now");
+                 gui.printToScreen("Incrementing unstable reads now");
                  tempUnstableReads = m.getUnstable_reads();
                   m.setUnstable_reads(tempUnstableReads + 1);
        
