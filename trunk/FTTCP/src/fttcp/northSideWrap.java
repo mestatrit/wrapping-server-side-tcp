@@ -128,7 +128,7 @@ public class northSideWrap extends Thread{
         int bytesWritten = 0;
         
         //create message telling SSW to fabricate SYN
-        byte[] fabSyn = new byte[5];
+        byte[] fabSyn = new byte[TCP.PACKET_SIZE];
         //send message to SSW
         sendPacket(fabSyn, m.getServerAddress());
         
