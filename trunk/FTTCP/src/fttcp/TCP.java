@@ -215,15 +215,6 @@ public class TCP extends Thread{
                     
                     return bytearray;
                 }
-                else{
-                    try{
-                        //Sleep for 3 seconds, then look again for file
-                        this.sleep(3000);
-                    }
-                    catch(java.lang.InterruptedException e){
-                        
-                    }
-                }
             }
         }
         catch(java.io.FileNotFoundException e){
