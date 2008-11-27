@@ -77,10 +77,14 @@ public class northSideWrap extends Thread{
                  }
             
                  //send readLength to logger, forward packet to server
+                 gui.printToScreen("NSW Sending read length to logger");
                  sendPacket(readLengthArray, m.getLoggerAddress());
+                 gui.printToScreen("NSW Sending packet to server");
                  sendPacket(NSWreadData, m.getServerAddress());
+                 
             
                  //increment unstable reads by 1
+                 gui.printToScreen("Incrementing unstable reads, now");
                  tempUnstableReads = m.getUnstable_reads();
                   m.setUnstable_reads(tempUnstableReads + 1);
        
@@ -90,6 +94,7 @@ public class northSideWrap extends Thread{
                else if (sender.equals("LOG")) {
             
                    //decrement unstable reads by 1
+                   gui.printToScreen("Got ack, decrementing unstable reads");
                    tempUnstableReads = m.getUnstable_reads();
                    m.setUnstable_reads(tempUnstableReads - 1);
             
@@ -100,7 +105,7 @@ public class northSideWrap extends Thread{
             
                    //if unstable reads exist, don't process, try again in 3 seconds
                    while (m.getUnstable_reads() > 0) {
-                
+                       gui.printToScreen("NSW Waiting for unstable reads to be 0");
                        try{
                               this.sleep(3000);
                           }
@@ -110,6 +115,7 @@ public class northSideWrap extends Thread{
               }
             
             //if no unstable reads exist, send packet
+            gui.printToScreen("NSW Sending packet to client");
             sendPacket(NSWreadData, m.getClientAddress());
                 
             
