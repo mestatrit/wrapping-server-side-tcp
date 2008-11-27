@@ -99,10 +99,34 @@ public class GUI extends Thread{
         JMenu editMenu = new JMenu();
         GUIMenu.add(fileMenu);
         editMenu.setText("Edit");
-        JMenu viewMenu = new JMenu();
+        JMenu speedMenu = new JMenu();
         GUIMenu.add(editMenu);
-        viewMenu.setText("View");
-        GUIMenu.add(viewMenu);
+        speedMenu.setText("Speed");
+        editMenu.add(speedMenu);
+        JMenuItem slowItem = new JMenuItem();
+        slowItem.setText("1000");
+        speedMenu.add(slowItem);
+        slowItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                slowItemActionPerformed(evt);
+            }
+        });
+        JMenuItem avgItem = new JMenuItem();
+        avgItem.setText("500");
+        speedMenu.add(avgItem);
+        avgItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avgItemActionPerformed(evt);
+            }
+        });
+        JMenuItem fastItem = new JMenuItem();
+        fastItem.setText("100");
+        speedMenu.add(fastItem);
+        fastItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fastItemActionPerformed(evt);
+            }
+        });
         JMenu helpMenu = new JMenu();
         helpMenu.setText("Help");
         GUIMenu.add(helpMenu);
@@ -186,6 +210,17 @@ public class GUI extends Thread{
         }*/
         
     }
+    
+    private void fastItemActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        wait = 100;
+    }   
+    
+    private void avgItemActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        wait = 500;
+    } 
+    private void slowItemActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        wait = 1000;
+    } 
     
     public void nsw2srv(){
         imageMap[] dotPoints = new imageMap[2];
