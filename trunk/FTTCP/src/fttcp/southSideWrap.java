@@ -79,13 +79,11 @@ public class southSideWrap extends Thread{
         //Set stable_seq as clients initial seq num + 1
         clientInitSeqNum = TCP.getSequenceNumber(clientSYN);
         m.setStable_seq(clientInitSeqNum +1);
-        
-        byte[] data = TCP.convertDataToByteArray(clientInitSeqNum);
-        byte[] data2 = new byte[data.length+1];
-        data2[0] = initSeqNumFlag;
-        for(int i=1;i<data2.length;i++){
-            data2[i] = data[i-1];
-        }
+        byte[] data = new byte[TCP.DATA_SIZE];
+            
+        ByteArray.setInt(clientInitSeqNum,data,1);
+        data[0] = initSeqNumFlag;
+
         gui.printToScreen("SSW: Sending intial sequence number to logger.");
         //Send logger Client Initial Seq Num
         sendPacket(data, m.getLoggerAddress());
@@ -128,8 +126,12 @@ public class southSideWrap extends Thread{
                     forwardPacket[i-1] = forwardPacket[i];
                 }
                 forwardPacket[0] = fwdCltPacketFlag;
+                byte[] fullForwardPacket = receivedPacket;
+                for(int i = 24;i<fullForwardPacket.length;i++){
+                    fullForwardPacket[i] = forwardPacket[i-24];
+                }
                 gui.printToScreen("SSW: Forwarding Packet To Logger.");
-                sendPacket(forwardPacket, m.getLoggerAddress());
+                sendPacket(fullForwardPacket, m.getLoggerAddress());
                 
                 //Subtracts delta_seq from ACK number, change packets ack#
                 int ackNumber = TCP.getAcknowledgementNumber(receivedPacket) - m.getDelta_seq();
