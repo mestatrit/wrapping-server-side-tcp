@@ -103,16 +103,15 @@ public class northSideWrap extends Thread{
                 //if write socket call
                 else if (sender.equals("SRV")) {          
             
-                   //if unstable reads exist, don't process, try again in 3 seconds
-                   /*while (m.getUnstable_reads() > 0) {
+                   //if unstable reads exist, don't process, wait for ACKs
+                   while (m.getUnstable_reads() > 0) {
                        gui.printToScreen("NSW Waiting for unstable reads to be 0");
-                       try{
-                              this.sleep(3000);
-                          }
-                          catch(java.lang.InterruptedException e){
-                              System.out.println("North Side Wrap thread interrupted");
-                          }
-              }*/
+                       //wait for ack to be received
+                       byte[] ackData = readPacket();
+                       //when received, decrease unstable reads
+                       tempUnstableReads = m.getUnstable_reads();
+                       m.setUnstable_reads(tempUnstableReads - 1);
+              }
             
             //if no unstable reads exist, send packet
 
