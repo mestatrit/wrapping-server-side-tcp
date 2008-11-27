@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 
 /**
  *
@@ -18,7 +19,7 @@ public class GUI extends Thread{
     private JTextArea servCon = new JTextArea();
     private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
-    private int wait = 50;
+    private int wait = 200;
     private int lines = 0;
     private int servLines = 0;
     private int cltLines = 0;
@@ -34,9 +35,54 @@ public class GUI extends Thread{
         servCon.setText("");
         initGUI();   
     }
+
+    public void clearBuffers() {
+        clearServerBuffer();
+        clearClientBuffer();
+        clearLoggerBuffer();
+    }
+
+    private void clearClientBuffer() {
+        File f = new File("clientBuffer");
+        String[] files = f.list();
+        if(files != null && files.length != 0){
+            for(int i=0;i<files.length;i++){
+                //Leave SVN folder
+                if(!files[i].equalsIgnoreCase(".svn")){
+                     boolean hadDel = (new File("clientBuffer/"+files[i]).delete());
+                }
+            }
+        }
+    }
+
+    private void clearLoggerBuffer() {
+        File f = new File("loggerBuffer");
+        String[] files = f.list();
+        if(files != null && files.length != 0){
+            for(int i=0;i<files.length;i++){
+                //Leave SVN folder
+                if(!files[i].equalsIgnoreCase(".svn")){
+                     boolean hadDel = (new File("loggerBuffer/"+files[i]).delete());
+                }
+            }
+        }
+    }
+
+    private void clearServerBuffer() {
+        File f = new File("serverBuffer");
+        String[] files = f.list();
+        if(files != null && files.length != 0){
+            for(int i=0;i<files.length;i++){
+                //Leave SVN folder
+                if(!files[i].equalsIgnoreCase(".svn")){
+                     boolean hadDel = (new File("serverBuffer/"+files[i]).delete());
+                }
+            }
+        }
+    }
     
     private void initGUI(){
-        
+        clearBuffers();
         canvas = new GUICanvas(new ImageIcon("dot2.png").getImage(),54);
         
         JFrame GUIFrame = new JFrame();
