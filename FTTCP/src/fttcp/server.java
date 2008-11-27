@@ -58,8 +58,10 @@ public class server extends Thread{
         returnNumber = (short)(numberRecv + 64);
         
         //convert short to byte array
-        byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
-        
+       // byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
+        byteReturnLetter = new byte[TCP.DATA_SIZE];
+            
+        ByteArray.setShort(returnNumber,byteReturnLetter,0);
         //send packet to client
         gui.printToServer("Sending " + (char)returnNumber);
         gui.printToScreen("Server sending " + (char)returnNumber);
