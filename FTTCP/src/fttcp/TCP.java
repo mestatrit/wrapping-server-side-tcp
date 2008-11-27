@@ -128,19 +128,66 @@ public class TCP extends Thread{
                 if (direction.equals("toSend")) {
                     // add header
                     data = TCP.createTCPSegment();
-                    System.out.println("add header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
+                    System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
                     TCP.setData(buffer,data);
-                    System.out.println("add header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
+                    System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
                 } else {
                     // strip header
                     //System.out.println("send "+sender+" destination "+destination);
-                    System.out.println("strip header/buffer index 0: "+buffer[0]);
+                    System.out.println("strip header/buffer index 0: "+buffer[25]);
                     data = TCP.stripHeader(buffer);
-                    System.out.println("strip header/data index 0: "+data[0]+" buffer index 0: "+buffer[0]);
+                    System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
                 }
                 
-                // now modify status in accordance to contents of data and current state
-                
+                // modify status in accordance to contents of data and current state
+                if (entity.equals("SRV")) {
+                    switch (serverTCPState) {
+                        case TCP.LISTEN:
+                            if (buffer.length == TCP.PACKET_SIZE) {
+                                // check if SYN bit set
+                                if (TCP.getSYNFlag(buffer)) {
+                                    // create new TCP seg with SYN, ACK
+                                    byte[] response = TCP.createTCPSegment();
+                                    TCP.setSYNFlag(true,response);
+                                    TCP.setACKFlag(true,response);
+
+                                    data = response; // set new seg as data to send
+
+                                    // change state
+                                    serverTCPState = TCP.SYN_RCVD;
+                                }
+                            }
+                        break;
+                        case TCP.SYN_RCVD:
+                            if (buffer.length == TCP.PACKET_SIZE) {
+                                if (TCP.getACKFlag(buffer)) {
+                                    serverTCPState = TCP.ESTABLISHED;
+                                }
+                            }
+                        break;
+                    }
+                } else if (entity.equals("CLT")) {
+                     switch (clientTCPState) {
+                         case TCP.CLOSED:
+                             if (buffer.length == TCP.DATA_SIZE) {
+                                 // set SYN flag
+                                 TCP.setSYNFlag(true,data);
+                                 clientTCPState = TCP.SYN_SENT;
+                             }
+                         break;
+                         case TCP.SYN_SENT:
+                             if (buffer.length == TCP.PACKET_SIZE) {
+                                 if (TCP.getSYNFlag(buffer) && TCP.getACKFlag(buffer)) {
+                                     // create new TCP seg ACK
+                                     byte[] response = TCP.createTCPSegment();
+                                     TCP.setACKFlag(true,response);
+                                     data = response; // set new seg as data to send
+                                     clientTCPState = TCP.ESTABLISHED;
+                                 }
+                             }
+                         break;
+                     }
+                }
                 
                 // send data to the correct buffer
                 sendPacket(data);   
