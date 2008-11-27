@@ -58,10 +58,8 @@ public class northSideWrap extends Thread{
 
         while(!m.getRestarting()) {
             
-            byte[] NSWreadData = readPacket();
-            
-            if(NSWreadData != null){
-                
+            byte[] NSWreadData = readPacket();             
+  
              //if read socket call
              if(sender.equals("CLT")) {
                  //determine read length
@@ -114,22 +112,13 @@ public class northSideWrap extends Thread{
             sendPacket(NSWreadData, m.getClientAddress());
                 
             
-        }
+           }
         
-    }
-            
-            else {
-                try {
-                    this.sleep(2000);
-                }
-                catch(java.lang.InterruptedException e){
-            }
-
-             }
-        }
-                // NSW in restarting mode
+     }
+        // NSW in restarting mode
         NSWcurrentState = States.restarting;
- }
+  }
+
        
     //operation when server is restarting
     public void NSWrestartingOperation() {

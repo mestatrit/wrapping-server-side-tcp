@@ -70,10 +70,10 @@ public class client extends Thread{
         try{
             while(true){
                 FilenameFilter filter = new CLTFileFilter();
-                File f = new File("serverBuffer");
+                File f = new File("clientBuffer");
                 String[] files = f.list(filter);
                 if(files.length != 0){
-                    FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                    FileInputStream fileinputstream = new FileInputStream("clientBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);

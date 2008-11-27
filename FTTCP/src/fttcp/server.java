@@ -27,8 +27,8 @@ public class server extends Thread{
     @Override
     public void run(){
         gui.printToScreen("Server reporting in.");
-        
         short numberRecv = 1;
+        
         while(true){
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
@@ -55,7 +55,7 @@ public class server extends Thread{
         returnLetter = (char)numberRecv; /*readData;*/
         
         //set correct ASCII representation
-        returnNumber = (short)(readData + 64);
+        returnNumber = (short)(numberRecv + 64);
         
         //convert short to byte array
         byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
@@ -64,6 +64,7 @@ public class server extends Thread{
         gui.printToServer("Sending " + (char)returnNumber);
         gui.printToScreen("Server sending " + (char)returnNumber);
         sendPacket(byteReturnLetter, m.getClientAddress());
+        numberRecv++;
         
     }
     }
