@@ -104,7 +104,7 @@ public class northSideWrap extends Thread{
                 else if (sender.equals("SRV")) {          
             
                    //if unstable reads exist, don't process, try again in 3 seconds
-                   while (m.getUnstable_reads() > 0) {
+                   /*while (m.getUnstable_reads() > 0) {
                        gui.printToScreen("NSW Waiting for unstable reads to be 0");
                        try{
                               this.sleep(3000);
@@ -112,11 +112,12 @@ public class northSideWrap extends Thread{
                           catch(java.lang.InterruptedException e){
                               System.out.println("North Side Wrap thread interrupted");
                           }
-              }
+              }*/
             
             //if no unstable reads exist, send packet
-            gui.printToScreen("NSW Sending packet to client");
+
             sendPacket(NSWreadData, m.getClientAddress());
+            gui.printToScreen("NSW Sending packet to client");
                 
             
            }
