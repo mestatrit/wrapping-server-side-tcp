@@ -50,7 +50,7 @@ public class northSideWrap extends Thread{
     
     public void NSWnormalOperation() {
 
-        byte[] readLengthArray = new byte[5];
+        byte[] readLengthArray = new byte[TCP.PACKET_SIZE];
         byte[] tempReadLengthArray;
         int readLength;
         int tempUnstableReads;
@@ -72,7 +72,7 @@ public class northSideWrap extends Thread{
                  readLengthArray[0]=readFlag;
             
                     //add readLength byte array to array with readFlag
-                 for (int i = 1; i < 5; i++){
+                 for (int i = 1; i < TCP.PACKET_SIZE; i++){
                         readLengthArray[i]=tempReadLengthArray[i-1];
                  }
             
