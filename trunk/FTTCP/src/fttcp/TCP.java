@@ -25,6 +25,7 @@ public class TCP extends Thread{
     public static final int DATA_SIZE = 24;
     public static final int PACKET_SIZE = TCP.HEADER_SIZE + TCP.DATA_SIZE;
     
+    private static final int NOT_IN_USE = -1;
     private static final int CLOSED = 0;
     private static final int LISTEN = 1;
     private static final int SYN_RCVD = 2;
@@ -42,6 +43,8 @@ public class TCP extends Thread{
     private String destination = "x";
     private boolean heartbeat = false;
     private int status = TCP.CLOSED;
+    private int serverTCPState = TCP.NOT_IN_USE; // assume tcp connection to logger already established (so only tcp connec to client)
+    private int clientTCPState = TCP.NOT_IN_USE;
     
     /**
      * Constructor
@@ -52,7 +55,8 @@ public class TCP extends Thread{
         entity =e;
         gui = g;
         
-        
+        serverTCPState = TCP.LISTEN;
+        clientTCPState = TCP.CLOSED;
         
         
         // if a passive entity then set status from CLOSED -> LISTEN
@@ -164,6 +168,15 @@ public class TCP extends Thread{
     private byte[] readPacket(){
         try{
             while(true){
+                
+                String entityBuffer = "serverBuffer";
+                
+                if (entity.equals("CLT")) {
+                        entityBuffer = "clientBuffer";
+                } else {
+                    entityBuffer = "loggerBuffer";
+                }
+                
                 FilenameFilter filter = new TCPFileFilter();
                 File f = new File(entity);
                 String[] files = f.list(filter);
@@ -184,7 +197,7 @@ public class TCP extends Thread{
                     }
                     
                     // store sender and receiver
-                    String[] info = files[0].split(".");
+                    String[] info = files[0].split("[.]");
                     if(info.length == 3 || info.length == 4){
                         sender = info[1];
                         destination = info[2];
@@ -195,8 +208,11 @@ public class TCP extends Thread{
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
                     fileinputstream.close();
-                    //Need to delete file after reading, using line below, but with specific buffers.
-                    //boolean hadDel = (new File("serverBuffer/"+files[0]).delete());
+                    
+                    boolean hadDel = (new File(entityBuffer+"/"+files[0]).delete());
+                    
+                    
+                    
                     return bytearray;
                 }
                 else{
