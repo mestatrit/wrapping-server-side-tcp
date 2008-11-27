@@ -383,8 +383,8 @@ public class TCP extends Thread{
         
         // fill seg array (the data half) with data info
         for (int i = TCP.DATA_SIZE; i < TCP.PACKET_SIZE; i++) {
-            seg[i] = data[i];
-            i++;
+            seg[i] = data[newDataIndex];
+            newDataIndex++;
         }
     }
     
@@ -395,7 +395,7 @@ public class TCP extends Thread{
        int newDataIndex = 0;
        for (int i = TCP.DATA_SIZE; i < TCP.PACKET_SIZE; i++) {
            data[newDataIndex] = seg[i];
-           i++;
+           newDataIndex++;
        }
        
        return data;

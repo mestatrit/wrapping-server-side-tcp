@@ -16,7 +16,7 @@ public class southSideWrap extends Thread{
     
     //Variable declaration
     private enum States { intial,normal,restarting};
-    private States SSWcurrentState = States.intial;
+    private States SSWcurrentState = States.normal;
     private Main m;
     private byte initSeqNumFlag = 3;
     private byte fwdCltPacketFlag = 4;

@@ -4,6 +4,7 @@
  */
 
 package fttcp;
+import org.knopflerfish.util.ByteArray;
 
 /**
  *
@@ -42,10 +43,13 @@ public class client extends Thread{
         while(numberSend <= 10) {
             
             //convert integer to send to byte array
-            byte[] byteNumberSend = TCP.convertDataToByteArray(numberSend);
+            byte[] data = new byte[TCP.DATA_SIZE];
+            
+            ByteArray.setShort(numberSend,data,0);
+            
             gui.printToClient("Sending " + numberSend);
             //send number to server
-            sendPacket(byteNumberSend, m.getServerAddress());
+            sendPacket(data, m.getServerAddress());
             gui.printToScreen("Client sending " + numberSend);
             
             //while server has not replied, wait
