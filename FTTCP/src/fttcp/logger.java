@@ -229,7 +229,7 @@ public class logger extends Thread{
         byte[] empty = new byte[1];
         empty[0] = 0;
         if(e == entity.NSW){
-            writeFile(empty, "loggerBuffer/sendAck.NSW.LOG.TCP");
+            writeFile(empty, "serverBuffer/sendAck.NSW.LOG.TCP");
         }
         else if(e == entity.SSW){
             writeFile(empty, "loggerBuffer/sendAck.SSW.LOG.TCP");
