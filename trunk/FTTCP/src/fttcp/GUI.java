@@ -4,6 +4,7 @@
  */
 
 package fttcp;
+import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -101,6 +102,14 @@ public class GUI extends Thread{
         editMenu.setText("Edit");
         JMenu speedMenu = new JMenu();
         GUIMenu.add(editMenu);
+        JMenuItem killServer = new JMenuItem();
+        killServer.setText("Kill Server");
+        editMenu.add(killServer);
+        killServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                killServerActionPerformed(evt);
+            }
+        });
         speedMenu.setText("Speed");
         editMenu.add(speedMenu);
         JMenuItem slowItem = new JMenuItem();
@@ -222,6 +231,10 @@ public class GUI extends Thread{
         wait = 1000;
     } 
     
+    private void killServerActionPerformed(ActionEvent evt) {
+        printToScreen("Killing Server...");
+        printToScreen("...Not Really...Needs Implementing!");
+    }
     public void nsw2srv(){
         imageMap[] dotPoints = new imageMap[2];
         dotPoints[0] = new imageMap(294,82,(byte)50);
