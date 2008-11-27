@@ -85,14 +85,14 @@ public class TCP extends Thread{
         
         // E.G.    Client and Server
         
-        // Client - send message to TCP ultimately Server - clientBuffer/sendTo.CLT.SRV.TCP
+        // Client - send message to TCP ultimately Server - clientBuffer/toSend.CLT.SRV.TCP
         // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
         // SSW (in server) plays with it sends to logger gets ack then marks for TCP - serverBuffer/received.CLT.SRV.TCP
         // TCP (in server) strips header and marks for NSW (ultimately server) - serverBuffer/received.CLT.SRV.NSW
         // * NSW (in server) passes info to server app - serverBuffer/received.CLT.SRV
-        // * App client message (send first to NSW) serverBuffer/sendTo.SRV.CLT.NSW
-        // NSW (in server) send data to TCP serverBuffer/sendTo.SRV.CLT.TCP
-        // TCP (in server) adds header mark for SSW - serverBuffer/sendTo.SRV.CLT.SSW
+        // * App client message (send first to NSW) serverBuffer/toSend.SRV.CLT.NSW
+        // NSW (in server) send data to TCP serverBuffer/toSend.SRV.CLT.TCP
+        // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
         // SSW (in server) sends stuff to logger gets ack does stuff mark for client TCP - clientBuffer/received.SRV.CLT.TCP
         // TCP (in client) strips header and marks for client - clientBuffer/received.SRV.CLT
         
@@ -100,12 +100,12 @@ public class TCP extends Thread{
         
         // SSW (in server) sends message to logger (first stop tcp) - loggerBuffer/receieved.SSW.LOG.TCP
         // TCP (in logger) strips header and makes available for logger - loggerBuffer/receieved.SSW.LOG
-        // Logger sends ack (first to TCP) loggerBuffer/sendTo.LOG.SSW.TCP
+        // Logger sends ack (first to TCP) loggerBuffer/toSend.LOG.SSW.TCP
         // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
         
         // E.G. Heartbeat to Logger
         
-        // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/sendToHeartbeat.SRV.LOG.TCP
+        // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/toSendHeartbeat.SRV.LOG.TCP
         // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receievedHeartbeat.SRV.LOG.TCP
         // TCP (in logger) strips data and makes available to logger - loggerBuffer/receievedHeartbeat.SRV.LOG
         
@@ -125,7 +125,7 @@ public class TCP extends Thread{
                 byte[] data = new byte[TCP.PACKET_SIZE];
                 
                 // add or strip header depending on direction data is travelling
-                if (direction.equals("sendTo")) {
+                if (direction.equals("toSend")) {
                     // add header
                 } else {
                     // strip header
@@ -183,11 +183,11 @@ public class TCP extends Thread{
                 if(files != null && files.length != 0){
                     // find out direction the TCP Layer is intercepting buffer data
                     // insteam - received (receive header)
-                    // outstream - sendTo (add header)
+                    // outstream - toSend (add header)
                     if (files[0].startsWith("received")) 
                         direction = "received";
                     else
-                        direction = "sendTo";
+                        direction = "toSend";
                     
                     // check whether heartbeat signal (or not
                     if (files[0].indexOf("heartbeat",0) == -1) {
@@ -261,15 +261,15 @@ public class TCP extends Thread{
                 gui.tcp2nsw();
                 writeFile(data,"serverBuffer/received.CLT.SRV.NSW");
             }
-            // NSW (in server) send data to TCP serverBuffer/sendTo.SRV.CLT.TCP
+            // NSW (in server) send data to TCP serverBuffer/toSend.SRV.CLT.TCP
             else if (sender.equals("SRV") && destination.equals("CLT")) {
-                // TCP (in server) adds header mark for SSW - serverBuffer/sendTo.SRV.CLT.SSW
+                // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
                 gui.tcp2ssw();
-                writeFile(data,"serverBuffer/sendTo.SRV.CLT.SSW");
+                writeFile(data,"serverBuffer/toSend.SRV.CLT.SSW");
             }  
             // handling heartbeat
             
-            // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/sendToHeartbeat.SRV.LOG.TCP
+            // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/toSendHeartbeat.SRV.LOG.TCP
             else if (sender.equals("SRV") && destination.equals("LOG")) {
                 // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
                 gui.tcp2ssw();
@@ -280,7 +280,7 @@ public class TCP extends Thread{
             
             
         } else if (entity.equals("CLT")) {
-            // Client - send message to TCP ultimately Server - clientBuffer/sendTo.CLT.SRV.TCP
+            // Client - send message to TCP ultimately Server - clientBuffer/toSend.CLT.SRV.TCP
             if (sender.equals("CLT") && destination.equals("SRV")) {
                 // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
                 gui.clt2srv();
@@ -312,7 +312,7 @@ public class TCP extends Thread{
                 gui.tcp2log();
                 writeFile(data,"loggerBuffer/received.SSW.LOG");
             }
-            // Logger sends ack (first to TCP) loggerBuffer/sendTo.LOG.SSW.TCP
+            // Logger sends ack (first to TCP) loggerBuffer/toSend.LOG.SSW.TCP
             else if (sender.equals("LOG") && destination.equals("SSW")) {
                 // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
                 gui.log2srv();
