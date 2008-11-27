@@ -27,6 +27,8 @@ public class server extends Thread{
     @Override
     public void run(){
         gui.printToScreen("Server reporting in.");
+        
+        short numberRecv = 1;
         while(true){
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
@@ -50,7 +52,7 @@ public class server extends Thread{
         gui.printToServer("Received " + readData);
         
         //get char representation
-        returnLetter = (char)readData;
+        returnLetter = (char)numberRecv; /*readData;*/
         
         //set correct ASCII representation
         returnNumber = (short)(readData + 64);
