@@ -197,7 +197,7 @@ public class TCP extends Thread{
                         destination = info[2];
                     }
                     
-                    FileInputStream fileinputstream = new FileInputStream(entity+"/"+files[0]);
+                    FileInputStream fileinputstream = new FileInputStream(entityBuffer+"/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
                     fileinputstream.read(bytearray);
