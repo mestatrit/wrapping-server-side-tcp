@@ -23,43 +23,74 @@ public class Main {
     private short loggerAddress = 2;
     private short NSWAddress = 3;
     private short SSWAddress = 4;
+    //private Main main;
+    private Thread server;
+    private GUI g;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        byte[] test = new byte[5];
+         byte[] test = new byte[5];
         for(byte i=0;i<test.length;i++){
             test[i] = i;
         }
         //Start threads
         Main main = new Main();
-        GUI g = new GUI();
-        g.start();
-        Thread log = new logger(main, g);
+        main.setGui(new GUI(main));
+        main.getGui().start();
+        Thread log = new logger(main, main.getGui());
         log.start();
-        Thread ssw = new southSideWrap(main, g);
+        Thread ssw = new southSideWrap(main, main.getGui());
         ssw.start();
-        Thread nsw = new northSideWrap(main, g);
+        Thread nsw = new northSideWrap(main, main.getGui());
         nsw.start();
-        Thread tcpSrv = new TCP(main, "SRV", g);
+        Thread tcpSrv = new TCP(main, "SRV", main.getGui());
        tcpSrv.start();
-       Thread tcpClt = new TCP(main, "CLT", g);
+       Thread tcpClt = new TCP(main, "CLT", main.getGui());
        tcpClt.start();
-       Thread tcpLog = new TCP(main, "LOG", g);
+       Thread tcpLog = new TCP(main, "LOG", main.getGui());
        tcpLog.start();
-        Thread server = new server(main, g);
-        server.start();
-        Thread client = new client(main, g);
+        main.setServer(new server(main, main.getGui()));
+        Thread client = new client(main, main.getGui());
         client.start();
     }
     
+    public void main(){
+               
+    }
+    
+    public void KillServer()
+    {
+        server.stop();
+    }
+    public void RestartServer()
+    {
+       server = new server(this, getGui());
+       server.start();
+    }
     /**
      * Gets restarting
      * @return boolean restarting
      */
     public boolean getRestarting(){
         return restarting;
+    }
+    
+    public void setServer(Thread t){
+        server = t;
+        server.start();
+    }
+    
+    public Thread getServer(){
+        return server;
+    }
+    
+    public void setGui(GUI gui){
+        g = gui;
+    }
+    public GUI getGui(){
+       return g;
     }
     /**
      * Gets restarting
