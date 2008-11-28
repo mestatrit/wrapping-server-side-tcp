@@ -160,7 +160,9 @@ public class logger extends Thread{
                                 sendPacket(catchupData, m.getServerAddress());
                             }
                             
+                            this.setServerAlive(true);
                             heartbeatThread.setServerAlive(true);
+                            
                         }
                    }
                    catch(Exception e){
