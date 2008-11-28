@@ -21,6 +21,7 @@ public class GUI extends Thread{
     private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
     private int wait = 200;
+
     private int lines = 0;
     private int servLines = 0;
     private int cltLines = 0;
@@ -84,7 +85,7 @@ public class GUI extends Thread{
     
     private void initGUI(){
         clearBuffers();
-        canvas = new GUICanvas(new ImageIcon("dot2.png").getImage(),54);
+        canvas = new GUICanvas(new ImageIcon("dot2.png").getImage(),new ImageIcon("dot3.png").getImage(),54);
         
         JFrame GUIFrame = new JFrame();
         canvas.setStretched(false);
@@ -360,6 +361,103 @@ public class GUI extends Thread{
         dotPoints[0] = new imageMap(330,250,(byte)41);
         drawVector(dotPoints);
     }
+    
+ public void hnsw2srv(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(294,82,(byte)50);
+        dotPoints[1] = new imageMap(294,62,(byte)51);
+        drawHVector(dotPoints);
+    }
+    public void hsrv2nsw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(331,62,(byte)53);
+        dotPoints[1] = new imageMap(331,82,(byte)52);
+        drawHVector(dotPoints);
+    }
+    public void htcp2nsw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(294,145,(byte)46);
+        dotPoints[1] = new imageMap(294,125,(byte)47);
+        drawHVector(dotPoints);
+    }
+    public void hnsw2tcp(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(331,125,(byte)49);
+        dotPoints[1] = new imageMap(331,145,(byte)48);
+        drawHVector(dotPoints);
+    }
+    
+    
+    public void hssw2tcp(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(295,205,(byte)42);
+        dotPoints[1] = new imageMap(295,185,(byte)43);
+        drawHVector(dotPoints);
+    }
+    public void htcp2ssw(){
+        imageMap[] dotPoints = new imageMap[2];
+        dotPoints[0] = new imageMap(330,185,(byte)45);
+        dotPoints[1] = new imageMap(330,205,(byte)44);
+        drawHVector(dotPoints);
+    }
+    
+    public void hlog2tcp(){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(503,480,(byte)18);
+        dotPoints[1] = new imageMap(492,460,(byte)19);
+        dotPoints[2] = new imageMap(481,440,(byte)20);
+        drawHVector(dotPoints);
+    }
+    
+    
+    public void htcp2log(){
+        imageMap[] dotPoints = new imageMap[3];
+        dotPoints[0] = new imageMap(451,440,(byte)23);
+        dotPoints[1] = new imageMap(463,460,(byte)22);
+        dotPoints[2] = new imageMap(473,480,(byte)21);
+        drawHVector(dotPoints);
+    }
+
+
+    public void hlog2srv(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[0] = new imageMap(472,400,(byte)24);
+        dotPoints[1] = new imageMap(459,384,(byte)25);
+        dotPoints[2] = new imageMap(446,368,(byte)26);
+        dotPoints[3] = new imageMap(433,352,(byte)27);
+        dotPoints[4] = new imageMap(420,336,(byte)28);
+        dotPoints[5] = new imageMap(405,318,(byte)29);
+        dotPoints[6] = new imageMap(295,300,(byte)36);
+        dotPoints[7] = new imageMap(295,275,(byte)37);
+        dotPoints[8] = new imageMap(295,250,(byte)38);
+        drawHVector(dotPoints);
+    }
+    
+    public void hsrv2log(){
+        imageMap[] dotPoints = new imageMap[9];
+        dotPoints[8] = new imageMap(442,400,(byte)30);
+        dotPoints[7] = new imageMap(430,384,(byte)31);
+        dotPoints[6] = new imageMap(418,368,(byte)32);
+        dotPoints[5] = new imageMap(406,352,(byte)33);
+        dotPoints[4] = new imageMap(394,336,(byte)34);
+        dotPoints[3] = new imageMap(382,318,(byte)35);
+        dotPoints[2] = new imageMap(330,300,(byte)39);
+        dotPoints[1] = new imageMap(330,275,(byte)40);
+        dotPoints[0] = new imageMap(330,250,(byte)41);
+        drawHVector(dotPoints);
+    }
+    
+      private void drawHVector(imageMap[] img){
+        for(int i=0;i<img.length;i++){
+            canvas.setDot2Coord(img[i], img[i].getImageId());
+            try {
+                this.sleep(wait);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            canvas.setDot2Coord(blankDot, img[i].getImageId());
+        }
+    }  
     
     private void drawVector(imageMap[] img){
         for(int i=0;i<img.length;i++){
