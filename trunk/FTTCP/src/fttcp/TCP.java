@@ -45,6 +45,7 @@ public class TCP extends Thread{
     private int status = TCP.CLOSED;
     private int serverTCPState = TCP.NOT_IN_USE; // assume tcp connection to logger already established (so only tcp connec to client)
     private int clientTCPState = TCP.NOT_IN_USE;
+    private byte[] initialDataFromClient = null;
     
     /**
      * Constructor
@@ -129,9 +130,11 @@ public class TCP extends Thread{
                     // add header
                     data = TCP.createTCPSegment();
                     System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
+                    
                     TCP.setData(buffer,data);
                     System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
                 } else {
+                    
                     // strip header
                     //System.out.println("send "+sender+" destination "+destination);
                     System.out.println("strip header/buffer index 0: "+buffer[25]);
@@ -173,6 +176,8 @@ public class TCP extends Thread{
                                  // set SYN flag
                                  TCP.setSYNFlag(true,data);
                                  clientTCPState = TCP.SYN_SENT;
+                                 // store data from client to send when connection established
+                                 initialDataFromClient = buffer; 
                              }
                          break;
                          case TCP.SYN_SENT:
@@ -183,6 +188,16 @@ public class TCP extends Thread{
                                      TCP.setACKFlag(true,response);
                                      data = response; // set new seg as data to send
                                      clientTCPState = TCP.ESTABLISHED;
+                                     
+                                     sendPacket(data);
+                                     
+                                    // create seg from initial data
+                                      byte[] dataToSend = TCP.createTCPSegment();
+                                      TCP.setData(initialDataFromClient,dataToSend);
+                                      sendPacket(dataToSend); 
+                                      initialDataFromClient = null;
+                                     
+                                     
                                  }
                              }
                          break;
