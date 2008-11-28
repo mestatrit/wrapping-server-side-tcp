@@ -111,6 +111,14 @@ public class GUI extends Thread{
                 killServerActionPerformed(evt);
             }
         });
+        JMenuItem restartServer = new JMenuItem();
+        restartServer.setText("Restart Server");
+        editMenu.add(restartServer);
+        restartServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                restartServerActionPerformed(evt);
+            }
+        });
         speedMenu.setText("Speed");
         editMenu.add(speedMenu);
         JMenuItem slowItem = new JMenuItem();
@@ -238,6 +246,11 @@ public class GUI extends Thread{
         printToScreen("Killing Server...");
         printToScreen("...Not Really...Needs Implementing!");
     }
+    
+    private void restartServerActionPerformed(ActionEvent evt){
+        
+    }
+    
     public void nsw2srv(){
         imageMap[] dotPoints = new imageMap[2];
         dotPoints[0] = new imageMap(294,82,(byte)50);
