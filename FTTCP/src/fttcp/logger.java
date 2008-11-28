@@ -64,6 +64,13 @@ public class logger extends Thread{
        
        
       do{
+            /*need to send data to server when server restores 
+            
+            
+            
+            
+            */     
+                
            //perform the code below until it is said to stop (program finishes)
            try{
                temp = readPacket();
@@ -71,12 +78,14 @@ public class logger extends Thread{
            catch(Exception e){}
            
            if(heartbeatThread.getServerAlive() == true){
+               gui.printToScreen("Confirmed Server is alive");
+               
                // BEHAVIOUR UNDER NORMAL OPERATION
               
                // TODO: Update sender before it is accessed.
                
                if(sender=="NSW"){
-                    
+                    gui.printToScreen("Data comes from North Side Wrapper");
                    // Only ever recieve read lengths from NSW, but check flag type anyway.
                    if(temp[0] == readLengthFlag){
                        // Convert to int everything except flag in order to get readlength.
@@ -87,7 +96,7 @@ public class logger extends Thread{
                    }
                        
                }else if(sender == "SSW"){
-                   
+                   gui.printToScreen("Data comes from South Side Wrapper");
                     if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
                         // Store initial client sequence number
                         initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);
@@ -105,6 +114,8 @@ public class logger extends Thread{
                }
         }
         else if(heartbeatThread.getServerAlive() == false){
+                gui.printToScreen("Confirmed Server is dead");
+                gui.printToScreen("Interacting with client...");
                // Server has failed. 
                
                do{
@@ -121,6 +132,9 @@ public class logger extends Thread{
 
                    
                }while(heartbeatThread.getServerAlive() == false);
+                
+          
+                
         }
            
 
@@ -226,13 +240,13 @@ public class logger extends Thread{
     
     public void sendACK(entity e){
         /* This may need parameters showing WHO the ACK is meant for (i.e. SSW or NSW) */
-        byte[] empty = new byte[1];
+        byte[] empty = new byte[TCP.DATA_SIZE];
         empty[0] = 0;
         if(e == entity.NSW){
-            writeFile(empty, "serverBuffer/sendAck.NSW.LOG.TCP");
+            writeFile(empty, "loggerBuffer/toSend.LOG.NSW.TCP");
         }
         else if(e == entity.SSW){
-            writeFile(empty, "loggerBuffer/sendAck.SSW.LOG.TCP");
+            writeFile(empty, "loggerBuffer/toSend.LOG.SSW.TCP");
         }        
     } 
     
