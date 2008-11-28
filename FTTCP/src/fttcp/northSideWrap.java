@@ -7,7 +7,7 @@ package fttcp;
 
 /**
  *
- * @author James Malone Bossingham
+ * @author James Bossingham
  */
 import java.io.*;
 
@@ -57,7 +57,7 @@ public class northSideWrap extends Thread{
         
 
         while(!m.getRestarting()) {
-            
+            gui.printToScreen("NSW waiting for another packet");
             byte[] NSWreadData = readPacket();             
   
              //if read socket call
@@ -104,14 +104,14 @@ public class northSideWrap extends Thread{
                 else if (sender.equals("SRV")) {          
             
                    //if unstable reads exist, don't process, wait for ACKs
-                   while (m.getUnstable_reads() > 0) {
+                  /* while (m.getUnstable_reads() > 0) {
                        gui.printToScreen("NSW Waiting for unstable reads to be 0");
                        //wait for ack to be received
                        byte[] ackData = readPacket();
                        //when received, decrease unstable reads
                        tempUnstableReads = m.getUnstable_reads();
                        m.setUnstable_reads(tempUnstableReads - 1);
-              }
+              }*/
             
             //if no unstable reads exist, send packet
 
