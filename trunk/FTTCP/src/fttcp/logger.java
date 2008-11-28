@@ -73,7 +73,7 @@ public class logger extends Thread{
                
                // BEHAVIOUR UNDER NORMAL OPERATION
                
-               if(sender=="NSW"){
+               if(sender.equals("NSW")){
                    gui.printToScreen("LOG Data comes from North Side Wrapper");
                    // Only ever recieve read lengths from NSW, but check flag type anyway.
                    if(temp[0] == readLengthFlag){
@@ -277,6 +277,7 @@ public class logger extends Thread{
         empty[0] = 0;
         if(e == entity.NSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.NSW.TCP");
+            gui.printToScreen("Logger sending ACK to NSW");
         }
         else if(e == entity.SSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.SSW.TCP");
