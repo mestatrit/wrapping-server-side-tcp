@@ -25,7 +25,7 @@ public class logger extends Thread{
     private byte fwdClientPktFlag = 4;
     private byte[] temp = new byte[TCP.DATA_SIZE];
     Heartbeat heartbeatThread = new Heartbeat(m, this);
-    private boolean serverAlive = false;
+    private boolean serverAlive = true;
    
     byte[][] ClientData = new byte[TCP.DATA_SIZE][24];
     int clientDataCounter = 0;
@@ -72,17 +72,17 @@ public class logger extends Thread{
                gui.printToScreen("Log Confirmed Server is alive");
                
                // BEHAVIOUR UNDER NORMAL OPERATION
-              
-               // TODO: Update sender before it is accessed.
                
                if(sender=="NSW"){
-                    gui.printToScreen("LOG Data comes from North Side Wrapper");
+                   gui.printToScreen("LOG Data comes from North Side Wrapper");
                    // Only ever recieve read lengths from NSW, but check flag type anyway.
                    if(temp[0] == readLengthFlag){
+                       gui.printToScreen("LOG NSW data was a read length. Storing and ACKing.");
                        // Convert to int everything except flag in order to get readlength.
                        newReadLength = TCP.convertByteArrayToInt(temp, 1);
                        readLengthArray[readLengthCounter] = newReadLength;  // Store read length.            
                        sendACK(entity.NSW);   // Supply an acknowledgement
+                       gui.printToScreen("LOG Have sent ACK to NSW.");
                        readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
                    }
                        
