@@ -86,7 +86,7 @@ public class logger extends Thread{
                        readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
                    }
                        
-               }else if(sender == "SSW"){
+               }else if(sender.equals("SSW")){
                    gui.printToScreen("LOG Data comes from South Side Wrapper");
                     if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
                         // Store initial client sequence number
@@ -103,7 +103,7 @@ public class logger extends Thread{
                         clientDataCounter++;
                     }
                }
-               else if(sender == "SRV"){
+               else if(sender.equals("SRV")){
                    heartbeatThread.setServerAlive(true);          
                }
         }        
@@ -121,11 +121,11 @@ public class logger extends Thread{
                    try{
                         temp = readPacket();
                         // There must have been something in the buffer, or else try would have failed and gone to catch        
-                        if(sender=="NSW"){
+                        if(sender.equals("NSW")){
                             // This should not occur. Ignore any messages from the NSW?
                             System.out.println("Server is down, but still receiving data from NSW. Error!");
                         }
-                        else if(sender == "SSW"){
+                        else if(sender.equals("SSW")){
                             
                             // New client data to be stored.
                             gui.printToScreen("LOG Data comes from South Side Wrapper");
@@ -145,7 +145,7 @@ public class logger extends Thread{
                             }
                             
                         }
-                        else if(sender == "SRV"){
+                        else if(sender.equals("SRV")){
                             // Server is alive again. Begin resending of data.
                             
                             // For each packet of client data..
