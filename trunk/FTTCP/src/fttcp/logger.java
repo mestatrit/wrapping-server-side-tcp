@@ -91,6 +91,8 @@ public class logger extends Thread{
                     if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
                         // Store initial client sequence number
                         initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);
+                        gui.printToScreen("LOG stored initial Seq number. ACKing SSW.");
+                        sendACK(entity.SSW);
                     }
                     else if(temp[0] == 4){  // If the incoming data is forwarded client data..
                         // It is data from the client which must be stored.
@@ -99,6 +101,7 @@ public class logger extends Thread{
                         for(int i = 1; i < temp.length; i++){
                             ClientData[i][clientDataCounter] = temp[i];
                         }
+                        gui.printToScreen("LOG is now sending ACK to SSW.");
                         sendACK(entity.SSW);
                         clientDataCounter++;
                     }
