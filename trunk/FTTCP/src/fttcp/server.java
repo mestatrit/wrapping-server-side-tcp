@@ -28,8 +28,11 @@ public class server extends Thread{
     public void run(){
         gui.printToScreen("Server reporting in.");
         short numberRecv = 1;
+        byte[] heartbeatByte=new byte[TCP.DATA_SIZE];
+        heartbeatByte[0] = 1;
         
         while(true){
+            sendPacket(heartbeatByte,m.getLoggerAddress());
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
        
@@ -118,6 +121,12 @@ public class server extends Thread{
             //Put in file called received.TCP in client folder
             gui.srv2nsw();
             writeFile(data,"serverBuffer/toSend.SRV.CLT.NSW");
+        }
+        else if(address == m.getLoggerAddress()){
+            //Put in file called received.TCP in client folder
+            gui.hsrv2nsw();
+            gui.hnsw2tcp();
+            writeFile(data,"serverBuffer/toSend.SRV.LOG.TCP");
         }
         
     }
