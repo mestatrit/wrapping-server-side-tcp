@@ -201,16 +201,18 @@ public class GUI extends Thread{
         isInit = true;
         
         /*while(true){
-            clt2tcp();
-            clt2srv();
-            ssw2tcp();
-            tcp2nsw();
-            nsw2srv();
-            srv2nsw();
-            nsw2tcp();
-            tcp2ssw();
-            srv2clt();
-            tcp2clt();
+            //hclt2tcp();
+            //hclt2srv();
+            //hssw2tcp();
+            //htcp2nsw();
+            //hnsw2srv();
+            hsrv2nsw();
+            hnsw2tcp();
+            htcp2ssw();
+            hsrv2log();
+            htcp2log();
+           // hsrv2clt();
+            //htcp2clt();
             /*srv2log();
             tcp2log();
             log2tcp();
@@ -362,24 +364,14 @@ public class GUI extends Thread{
         drawVector(dotPoints);
     }
     
- public void hnsw2srv(){
-        imageMap[] dotPoints = new imageMap[2];
-        dotPoints[0] = new imageMap(294,82,(byte)50);
-        dotPoints[1] = new imageMap(294,62,(byte)51);
-        drawHVector(dotPoints);
-    }
+
     public void hsrv2nsw(){
         imageMap[] dotPoints = new imageMap[2];
         dotPoints[0] = new imageMap(331,62,(byte)53);
         dotPoints[1] = new imageMap(331,82,(byte)52);
         drawHVector(dotPoints);
     }
-    public void htcp2nsw(){
-        imageMap[] dotPoints = new imageMap[2];
-        dotPoints[0] = new imageMap(294,145,(byte)46);
-        dotPoints[1] = new imageMap(294,125,(byte)47);
-        drawHVector(dotPoints);
-    }
+
     public void hnsw2tcp(){
         imageMap[] dotPoints = new imageMap[2];
         dotPoints[0] = new imageMap(331,125,(byte)49);
@@ -387,49 +379,19 @@ public class GUI extends Thread{
         drawHVector(dotPoints);
     }
     
-    
-    public void hssw2tcp(){
-        imageMap[] dotPoints = new imageMap[2];
-        dotPoints[0] = new imageMap(295,205,(byte)42);
-        dotPoints[1] = new imageMap(295,185,(byte)43);
-        drawHVector(dotPoints);
-    }
+
     public void htcp2ssw(){
         imageMap[] dotPoints = new imageMap[2];
         dotPoints[0] = new imageMap(330,185,(byte)45);
         dotPoints[1] = new imageMap(330,205,(byte)44);
         drawHVector(dotPoints);
     }
-    
-    public void hlog2tcp(){
-        imageMap[] dotPoints = new imageMap[3];
-        dotPoints[0] = new imageMap(503,480,(byte)18);
-        dotPoints[1] = new imageMap(492,460,(byte)19);
-        dotPoints[2] = new imageMap(481,440,(byte)20);
-        drawHVector(dotPoints);
-    }
-    
-    
+     
     public void htcp2log(){
         imageMap[] dotPoints = new imageMap[3];
         dotPoints[0] = new imageMap(451,440,(byte)23);
         dotPoints[1] = new imageMap(463,460,(byte)22);
         dotPoints[2] = new imageMap(473,480,(byte)21);
-        drawHVector(dotPoints);
-    }
-
-
-    public void hlog2srv(){
-        imageMap[] dotPoints = new imageMap[9];
-        dotPoints[0] = new imageMap(472,400,(byte)24);
-        dotPoints[1] = new imageMap(459,384,(byte)25);
-        dotPoints[2] = new imageMap(446,368,(byte)26);
-        dotPoints[3] = new imageMap(433,352,(byte)27);
-        dotPoints[4] = new imageMap(420,336,(byte)28);
-        dotPoints[5] = new imageMap(405,318,(byte)29);
-        dotPoints[6] = new imageMap(295,300,(byte)36);
-        dotPoints[7] = new imageMap(295,275,(byte)37);
-        dotPoints[8] = new imageMap(295,250,(byte)38);
         drawHVector(dotPoints);
     }
     
