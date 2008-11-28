@@ -26,6 +26,8 @@ public class GUICanvas extends JPanel{
     
     private Image dot;
     
+    private Image dot2;
+    
     /**Hold Value of property stretched*/
     private boolean stretched = true;
     
@@ -34,6 +36,8 @@ public class GUICanvas extends JPanel{
     private Point[] stringCoords;
     
     private imageMap[] dotCoords;
+    
+    private imageMap[] dot2Coords;
     
     private String[] strings;
     
@@ -51,9 +55,11 @@ public class GUICanvas extends JPanel{
     }
     
     /**Construct an empty image viewer*/
-    public GUICanvas(Image dot, int size){
+    public GUICanvas(Image dot, Image dot2, int size){
         this.dot = dot;
+        this.dot2 = dot2;
         this.dotCoords = new imageMap[size];
+        this.dot2Coords = new imageMap[size];
         byte flag = -1;
         for (int i = 0; i<this.dotCoords.length;i++){
             this.dotCoords[i] = new imageMap(0,0,flag);
@@ -87,6 +93,15 @@ public class GUICanvas extends JPanel{
                 for(int i=0;i<dotCoords.length;i++){
                     if(dotCoords[i].getImageId() != -1){
                         g.drawImage(dot, dotCoords[i].getXCoord(), dotCoords[i].getYCoord(), this);
+                    }
+                }
+            }
+        }
+        if(dot2Coords != null){
+            if(dot2 != null){
+                for(int i=0;i<dot2Coords.length;i++){
+                    if(dot2Coords[i].getImageId() != -1){
+                        g.drawImage(dot2, dot2Coords[i].getXCoord(), dot2Coords[i].getYCoord(), this);
                     }
                 }
             }
@@ -149,6 +164,22 @@ public class GUICanvas extends JPanel{
     /**Set image coordinates*/
     public void setDotCoord(imageMap coords,int index){
         this.dotCoords[index] = coords;
+        repaint();
+    }
+    
+    /**Get image coordinates*/
+    public imageMap[] getDot2Coords(){
+        return dot2Coords;
+    }
+    /**Set image coordinates*/
+    public void setDot2Coords(imageMap[] coords){
+        this.dot2Coords = coords;
+        repaint();
+    }
+    
+    /**Set image coordinates*/
+    public void setDot2Coord(imageMap coords,int index){
+        this.dot2Coords[index] = coords;
         repaint();
     }
     
