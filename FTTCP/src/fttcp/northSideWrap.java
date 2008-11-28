@@ -94,7 +94,7 @@ public class northSideWrap extends Thread{
                else if (sender.equals("LOG")) {
             
                    //decrement unstable reads by 1
-                   gui.printToScreen("Got ack, decrementing unstable reads");
+                   gui.printToScreen("NSW Got ack, decrementing unstable reads");
                    tempUnstableReads = m.getUnstable_reads();
                    m.setUnstable_reads(tempUnstableReads - 1);
             
