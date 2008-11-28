@@ -26,14 +26,16 @@ public class Heartbeat extends Thread {
     private String sender;
     int emptyReadCounter = 0;   
     private boolean serverAlive = false;
+    logger thisLogger;
+    
     
     private byte heartbeatFlag = 1;
     
     /** Creates a new instance of Heartbeat */
-    public Heartbeat(Main main) {
-    m = main;
+    public Heartbeat(Main main, logger newLogger) {
+        m = main;
+        thisLogger = newLogger;
     }
-    
     
     public void run(){
         checkHeartBeat();
@@ -46,26 +48,25 @@ public class Heartbeat extends Thread {
        byte[] temp = new byte[length];
        int count=0;
        boolean finished=false;
-       
 
-           do{
-               try{
-                   temp = readHeartbeat(); 
-                   if (temp[0] == heartbeatFlag){
-                       setServerAlive(true);
-                   }
-                   else{
-                        setServerAlive(false);
-                   }
-                   this.sleep(2000);
-               }
-               catch(Exception e){
-                    setServerAlive(false);
-                    try{
-                        this.sleep(2000);
-                    }
-                    catch(Exception f){}
-               }
+         do{
+           
+            try{
+                this.sleep(2000);
+            }catch(Exception e){}
+            
+            if(serverAlive=true){
+               
+               thisLogger.setServerAlive(true);
+               setServerAlive(false);
+               
+               
+            }else if(serverAlive=false){
+                
+               thisLogger.setServerAlive(false); 
+               thisLogger.clientInteraction();
+               
+            }
 
            
         }while(finished = false);  
