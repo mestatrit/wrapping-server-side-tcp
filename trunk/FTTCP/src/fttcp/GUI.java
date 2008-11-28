@@ -20,6 +20,7 @@ public class GUI extends Thread{
     private JTextArea servCon = new JTextArea();
     private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
+    private Main m;
     private int wait = 200;
 
     private int lines = 0;
@@ -31,6 +32,10 @@ public class GUI extends Thread{
     private String[] strings;
     private boolean isInit = false;
     
+    
+    public GUI(Main main){
+        m = main;
+    }
         @Override
     public void run(){
         output.setText("");
@@ -243,12 +248,15 @@ public class GUI extends Thread{
     } 
     
     private void killServerActionPerformed(ActionEvent evt) {
-        printToScreen("Killing Server...");
-        printToScreen("...Not Really...Needs Implementing!");
+        m.KillServer();
+        clearServerBuffer();
+        printToScreen("Server Killed");
     }
     
     private void restartServerActionPerformed(ActionEvent evt){
-        
+
+        m.RestartServer();
+        printToScreen("Restarting Server");
     }
     
     public void nsw2srv(){
