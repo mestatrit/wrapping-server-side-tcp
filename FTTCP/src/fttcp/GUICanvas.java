@@ -52,6 +52,9 @@ public class GUICanvas extends JPanel{
         for (int i = 0; i<this.dotCoords.length;i++){
             this.dotCoords[i] = new imageMap(0,0,flag);
         }
+        for (int i = 0; i<this.dot2Coords.length;i++){
+            this.dot2Coords[i] = new imageMap(0,0,flag);
+        }
     }
     
     /**Construct an empty image viewer*/
@@ -63,6 +66,9 @@ public class GUICanvas extends JPanel{
         byte flag = -1;
         for (int i = 0; i<this.dotCoords.length;i++){
             this.dotCoords[i] = new imageMap(0,0,flag);
+        }
+        for (int i = 0; i<this.dot2Coords.length;i++){
+            this.dot2Coords[i] = new imageMap(0,0,flag);
         }
     }
  
