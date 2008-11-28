@@ -68,7 +68,7 @@ public class logger extends Thread{
            }
            catch(Exception e){}
       
-           if(heartbeatThread.getServerAlive() == true){
+           if(this.serverAlive == true){
                gui.printToScreen("Log Confirmed Server is alive");
                
                // BEHAVIOUR UNDER NORMAL OPERATION
