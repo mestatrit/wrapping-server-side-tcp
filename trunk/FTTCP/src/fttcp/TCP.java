@@ -335,8 +335,8 @@ public class TCP extends Thread{
             // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/toSendHeartbeat.SRV.LOG.TCP
             else if (sender.equals("SRV") && destination.equals("LOG")) {
                 // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
-                gui.tcp2ssw();
-                gui.srv2log();
+                gui.htcp2ssw();
+                gui.hsrv2log();
                 writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG.TCP");
             }
             
