@@ -53,7 +53,7 @@ public class client extends Thread{
             gui.printToScreen("Client sending " + numberSend);
             
             //while server has not replied, wait
-            gui.printToScreen("Waiting for server to reply");  
+            gui.printToScreen("CLT: Waiting for server to reply");  
             byte[] receivedPacket;
             receivedPacket = readPacket();
            
