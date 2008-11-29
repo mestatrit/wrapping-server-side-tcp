@@ -46,6 +46,7 @@ public class TCP extends Thread{
     private int serverTCPState = TCP.NOT_IN_USE; // assume tcp connection to logger already established (so only tcp connec to client)
     private int clientTCPState = TCP.NOT_IN_USE;
     private byte[] initialDataFromClient = null;
+    private boolean send = true;
     
     /**
      * Constructor
@@ -120,7 +121,7 @@ public class TCP extends Thread{
         gui.printToScreen("TCP " +entity +" reporting in.");
         
         while (true) {
-            
+            send = true;
             byte[] buffer = readPacket();
             if (buffer != null) {
                 byte[] data = null;
@@ -162,7 +163,8 @@ public class TCP extends Thread{
                                     TCP.setACKFlag(true,response);
                                     gui.printToScreen("TCP " +entity +": Creating/Sending response.");
                                     data = response; // set new seg as data to send
-
+                                    send = false;
+                                    sendPacket(data,m.getClientAddress(), true);
                                     // change state
                                     serverTCPState = TCP.SYN_RCVD;
                                 }
@@ -173,6 +175,8 @@ public class TCP extends Thread{
                                 if (TCP.getACKFlag(buffer)) {
                                     gui.printToScreen("TCP " +entity +": Connection established.");
                                     serverTCPState = TCP.ESTABLISHED;
+                                    //Dont forward on
+                                    send = false;
                                 }
                             }
                         break;
@@ -192,19 +196,29 @@ public class TCP extends Thread{
                          case TCP.SYN_SENT:
                              if (buffer.length == TCP.PACKET_SIZE) {
                                  if (TCP.getSYNFlag(buffer) && TCP.getACKFlag(buffer)) {
+                                     send = false;
                                      // create new TCP seg ACK
                                      byte[] response = TCP.createTCPSegment();
                                      TCP.setACKFlag(true,response);
                                      data = response; // set new seg as data to send
                                      clientTCPState = TCP.ESTABLISHED;
                                      gui.printToScreen("TCP " +entity +": Connection established, sending ACK.");
-                                     sendPacket(data);
+                                     sendPacket(data, m.getServerAddress(), true);
                                      
                                     // create seg from initial data
                                       byte[] dataToSend = TCP.createTCPSegment();
                                       TCP.setData(initialDataFromClient,dataToSend);
+                                      
+                                      //TO BE REMOVED, HERE TO MAKE SURE LOG ACK ARRIVES BEFORE THIS PACKET
+                                      try{
+                                            //Sleep for 3 seconds, then look again for file
+                                            this.sleep(3000);
+                                        }
+                                        catch(java.lang.InterruptedException e){
+
+                                        }
                                       gui.printToScreen("TCP " +entity +": Sending original client packet.");
-                                      sendPacket(dataToSend); 
+                                      sendPacket(dataToSend, m.getServerAddress(), false); 
                                       initialDataFromClient = null;
                                      
                                      
@@ -213,9 +227,11 @@ public class TCP extends Thread{
                          break;
                      }
                 }
-                gui.printToScreen("TCP " +entity +": Sending packet.");
-                // send data to the correct buffer
-                sendPacket(data);   
+                if(send){
+                    gui.printToScreen("TCP " +entity +": Sending packet.");
+                    // send data to the correct buffer
+                    sendPacket(data);
+                }
             }
         }
  
@@ -306,7 +322,23 @@ public class TCP extends Thread{
             return null;
         } 
     }
-    
+     
+    private void sendPacket(byte[] data, short address, boolean tcp){
+        if(address == m.getClientAddress()){
+            gui.tcp2ssw();
+            gui.srv2clt();
+            writeFile(data, "clientBuffer/received.TCP.TCP.TCP");
+        }
+        else if(address == m.getServerAddress() && tcp){
+            gui.clt2srv();
+            gui.ssw2tcp();
+            writeFile(data, "serverBuffer/received.TCP.TCP.TCP");
+        }
+        else if(address == m.getServerAddress() && !tcp){
+            gui.clt2srv();
+            writeFile(data, "serverBuffer/received.CLT.SRV.SSW");
+        }
+    }
     /**
      * Send packet to address
      * @param object Packet to be sent
