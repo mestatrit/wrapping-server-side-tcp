@@ -69,29 +69,29 @@ public class logger extends Thread{
            catch(Exception e){}
       
            if(this.serverAlive == true){
-               gui.printToScreen("Log Confirmed Server is alive");
+               gui.printToScreen("LOG: Confirmed Server is alive");
                
                // BEHAVIOUR UNDER NORMAL OPERATION
                
                if(sender.equals("NSW")){
-                   gui.printToScreen("LOG Data comes from North Side Wrapper");
+                   gui.printToScreen("LOG: Data comes from North Side Wrapper");
                    // Only ever recieve read lengths from NSW, but check flag type anyway.
                    if(temp[0] == readLengthFlag){
-                       gui.printToScreen("LOG NSW data was a read length. Storing and ACKing.");
+                       gui.printToScreen("LOG: NSW data was a read length. Storing and ACKing.");
                        // Convert to int everything except flag in order to get readlength.
                        newReadLength = TCP.convertByteArrayToInt(temp, 1);
                        readLengthArray[readLengthCounter] = newReadLength;  // Store read length.            
                        sendACK(entity.NSW);   // Supply an acknowledgement
-                       gui.printToScreen("LOG Have sent ACK to NSW.");
+                       gui.printToScreen("LOG: Have sent ACK to NSW.");
                        readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
                    }
                        
                }else if(sender.equals("SSW")){
-                   gui.printToScreen("LOG Data comes from South Side Wrapper");
+                   gui.printToScreen("LOG: Data comes from South Side Wrapper");
                     if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
                         // Store initial client sequence number
                         initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);
-                        gui.printToScreen("LOG stored initial Seq number. ACKing SSW.");
+                        gui.printToScreen("LOG: Stored initial Seq number. ACKing SSW.");
                         sendACK(entity.SSW);
                     }
                     else if(temp[0] == 4){  // If the incoming data is forwarded client data..
@@ -101,7 +101,7 @@ public class logger extends Thread{
                         for(int i = 1; i < temp.length; i++){
                             ClientData[i][clientDataCounter] = temp[i];
                         }
-                        gui.printToScreen("LOG is now sending ACK to SSW.");
+                        gui.printToScreen("LOG: Is now sending ACK to SSW.");
                         sendACK(entity.SSW);
                         clientDataCounter++;
                     }
@@ -116,8 +116,8 @@ public class logger extends Thread{
    
     }
     public void clientInteraction(){
-        gui.printToScreen("LOG Confirmed Server is dead");
-                gui.printToScreen("LOG Interacting with client...");
+        gui.printToScreen("LOG: Confirmed Server is dead");
+                gui.printToScreen("LOG: Interacting with client...");
                 
                  do{
                    // Check for client data from the NSW
@@ -131,7 +131,7 @@ public class logger extends Thread{
                         else if(sender.equals("SSW")){
                             
                             // New client data to be stored.
-                            gui.printToScreen("LOG Data comes from South Side Wrapper");
+                            gui.printToScreen("LOG: Data comes from South Side Wrapper");
                             if(temp[0] == 3){   // If the incoming data is the initial sequence number (during startup)..
                                 // Store initial client sequence number
                                 initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);
@@ -280,7 +280,7 @@ public class logger extends Thread{
         empty[0] = 0;
         if(e == entity.NSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.NSW.TCP");
-            gui.printToScreen("Logger sending ACK to NSW");
+            gui.printToScreen("LOG: Sending ACK to NSW");
         }
         else if(e == entity.SSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.SSW.TCP");

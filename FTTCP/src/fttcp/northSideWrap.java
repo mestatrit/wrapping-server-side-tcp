@@ -57,7 +57,7 @@ public class northSideWrap extends Thread{
         
 
         while(!m.getRestarting()) {
-            gui.printToScreen("NSW waiting for another packet");
+            gui.printToScreen("NSW: Waiting for another packet");
             byte[] NSWreadData = readPacket();             
   
              //if read socket call
@@ -77,14 +77,14 @@ public class northSideWrap extends Thread{
                  }
             
                  //send readLength to logger, forward packet to server
-                 gui.printToScreen("NSW Sending read length to logger");
+                 gui.printToScreen("NSW: Sending read length to logger");
                  sendPacket(readLengthArray, m.getLoggerAddress());
-                 gui.printToScreen("NSW Sending packet to server");
+                 gui.printToScreen("NSW: Sending packet to server");
                  sendPacket(NSWreadData, m.getServerAddress());
                  
             
                  //increment unstable reads by 1
-                 gui.printToScreen("Incrementing unstable reads now");
+                 gui.printToScreen("NSW: Incrementing unstable reads now");
                  tempUnstableReads = m.getUnstable_reads();
                   m.setUnstable_reads(tempUnstableReads + 1);
        
@@ -94,7 +94,7 @@ public class northSideWrap extends Thread{
                else if (sender.equals("LOG")) {
             
                    //decrement unstable reads by 1
-                   gui.printToScreen("NSW Got ack, decrementing unstable reads");
+                   gui.printToScreen("NSW: Got ack, decrementing unstable reads");
                    tempUnstableReads = m.getUnstable_reads();
                    m.setUnstable_reads(tempUnstableReads - 1);
             
@@ -105,19 +105,19 @@ public class northSideWrap extends Thread{
             
                    //if unstable reads exist, don't process, wait for ACKs
                    while (m.getUnstable_reads() > 0) {
-                       gui.printToScreen("NSW Waiting for unstable reads to be 0");
+                       gui.printToScreen("NSW: Waiting for unstable reads to be 0");
                        //wait for ack to be received
                        byte[] ackData = readPacket();
                        //when received, decrease unstable reads
                        tempUnstableReads = m.getUnstable_reads();
                        m.setUnstable_reads(tempUnstableReads - 1);
-                       gui.printToScreen("Received ACK, unstable reads now 0");
+                       gui.printToScreen("NSW: Received ACK, unstable reads now 0");
               }
             
             //if no unstable reads exist, send packet
 
             sendPacket(NSWreadData, m.getClientAddress());
-            gui.printToScreen("NSW Sending packet to client");
+            gui.printToScreen("NSW: Sending packet to client");
                 
             
            }
