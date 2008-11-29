@@ -79,14 +79,16 @@ public class southSideWrap extends Thread{
         //Set stable_seq as clients initial seq num + 1
         clientInitSeqNum = TCP.getSequenceNumber(clientSYN);
         m.setStable_seq(clientInitSeqNum +1);
+        byte[] packet = new byte[TCP.PACKET_SIZE];
         byte[] data = new byte[TCP.DATA_SIZE];
             
         ByteArray.setInt(clientInitSeqNum,data,1);
         data[0] = initSeqNumFlag;
-
+        TCP.setData(data, packet);
+        
         gui.printToScreen("SSW: Sending intial sequence number to logger.");
         //Send logger Client Initial Seq Num
-        sendPacket(data, m.getLoggerAddress());
+        sendPacket(packet, m.getLoggerAddress());
         gui.printToScreen("SSW: Sending packet to server.");
         //Send SYN packet to server
         sendPacket(clientSYN,m.getServerAddress());
@@ -96,10 +98,15 @@ public class southSideWrap extends Thread{
             gui.printToScreen("SSW: Waiting for server and logger ACKs.");
             byte[] received = readPacket();
             if (sender.equals("LOG")){
-                logAckRecv = TCP.getACKFlag(received);
+                byte[] receivedData = TCP.getData(received);
+                if(receivedData[0] == 0){
+                    gui.printToScreen("SSW: Received LOG ACK.");
+                    logAckRecv = true;
+                }
             }
             else if(sender.equals("SRV")){
                 servAck = received;
+                gui.printToScreen("SSW: Received SRV ACK.");
                 servAckRecv = TCP.getACKFlag(received);
             }
         }
