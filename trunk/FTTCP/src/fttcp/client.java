@@ -50,7 +50,7 @@ public class client extends Thread{
             gui.printToClient("Sending " + numberSend);
             //send number to server
             sendPacket(data, m.getServerAddress());
-            gui.printToScreen("Client sending " + numberSend);
+            gui.printToScreen("CLT: Sending " + numberSend);
             
             //while server has not replied, wait
             gui.printToScreen("CLT: Waiting for server to reply");  
@@ -59,6 +59,7 @@ public class client extends Thread{
            
             
             gui.printToClient("Received " + receivedPacket[0]);
+            gui.printToScreen("CLT: Received " + receivedPacket[0]);
             //when server replies, increase number to send
             numberSend++;
             

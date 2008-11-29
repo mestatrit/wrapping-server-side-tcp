@@ -53,6 +53,7 @@ public class server extends Thread{
             readData = TCP.convertByteArrayToShort(serverReadData, 0);
         }
         gui.printToServer("Received " + readData);
+        gui.printToScreen("SRV: Received " + readData);
         
         //get char representation
         returnLetter = (char)numberRecv; /*readData;*/
@@ -67,7 +68,7 @@ public class server extends Thread{
         ByteArray.setShort(returnNumber,byteReturnLetter,0);
         //send packet to client
         gui.printToServer("Sending " + (char)returnNumber);
-        gui.printToScreen("Server sending " + (char)returnNumber);
+        gui.printToScreen("SRV: Sending " + (char)returnNumber);
         sendPacket(byteReturnLetter, m.getClientAddress());
         numberRecv++;
         
