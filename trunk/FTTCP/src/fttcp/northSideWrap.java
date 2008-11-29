@@ -232,7 +232,7 @@ public class northSideWrap extends Thread{
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
             gui.nsw2tcp();
-            writeFile(data,"serverBuffer/toSend.NSW.CLT.TCP");
+            writeFile(data,"serverBuffer/toSend.SRV.CLT.TCP");
         }
         else if(address == m.getLoggerAddress()){
             //Put in file called received.TCP in logger folder

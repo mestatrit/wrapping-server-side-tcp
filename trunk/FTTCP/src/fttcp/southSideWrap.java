@@ -123,8 +123,8 @@ public class southSideWrap extends Thread{
      * South Side Wraps normal operation protocol
      */
     private void SSWnormalOpp(){
+        gui.printToScreen("SSW: Normal Operation.");
         while(!m.getRestarting()){
-            gui.printToScreen("SSW: Normal Operation.");
             byte[] receivedPacket = readPacket();
             if (sender.equals("CLT")){
                 gui.printToScreen("SSW: Received Client Packet.");
@@ -172,17 +172,13 @@ public class southSideWrap extends Thread{
                 
                 //Change advertised window size by adding ack#-stable_seq
                 //Convert int to short
-                int intWindowSize = TCP.getWindowSize(receivedPacket) + TCP.getAcknowledgementNumber(receivedPacket) - m.getStable_seq();
+                //UNCOMMENT WHEN WINDOW SIZE/ACK NUMBER IMPLEMENTED
+                /*int intWindowSize = TCP.getWindowSize(receivedPacket) + TCP.getAcknowledgementNumber(receivedPacket) - m.getStable_seq();
                 //int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + m.getStable_seq();
                 short windowSize = ByteArray.getShort(TCP.convertDataToByteArray(intWindowSize),0);
 
-                /*byte[] intArr = intToByteArr(intWindowSize);
-                byte[] shortArr = new byte[2];
-                shortArr[0] = intArr[0];
-                shortArr[1] = intArr[1];
-                short windowSize = byteArrayToShort(shortArr,0);*/
                 //Set window size
-                TCP.setWindowSize(windowSize,receivedPacket);
+                TCP.setWindowSize(windowSize,receivedPacket);*/
                 //receivedPacket = setWindowSize(receivedPacket,windowSize);
                 
                 //Recompute Checksum

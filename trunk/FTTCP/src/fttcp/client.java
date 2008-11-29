@@ -57,8 +57,8 @@ public class client extends Thread{
             byte[] receivedPacket;
             receivedPacket = readPacket();
            
-            
-            gui.printToClient("Received " + receivedPacket[0]);
+            int receivedChar = ByteArray.getShort(receivedPacket, 0);
+            gui.printToClient("Received " + (char) receivedChar);
             gui.printToScreen("CLT: Received " + receivedPacket[0]);
             //when server replies, increase number to send
             numberSend++;
