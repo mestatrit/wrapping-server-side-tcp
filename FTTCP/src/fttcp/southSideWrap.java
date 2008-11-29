@@ -94,7 +94,8 @@ public class southSideWrap extends Thread{
         sendPacket(clientSYN,m.getServerAddress());
         
         //While both packets aren't received, wait for them
-        while(!servAckRecv || !logAckRecv){
+        //UNCOMMENT STUFF WHEN SERV ACKS PACKETS
+        while(/*!servAckRecv || */!logAckRecv){
             gui.printToScreen("SSW: Waiting for server and logger ACKs.");
             byte[] received = readPacket();
             if (sender.equals("LOG")){
@@ -104,15 +105,15 @@ public class southSideWrap extends Thread{
                     logAckRecv = true;
                 }
             }
-            else if(sender.equals("SRV")){
+            /*else if(sender.equals("SRV")){
                 servAck = received;
                 gui.printToScreen("SSW: Received SRV ACK.");
                 servAckRecv = TCP.getACKFlag(received);
-            }
+            }*/
         }
         gui.printToScreen("SSW: Sending servers ACK to client.");
         //Send Servers ACK to client
-        sendPacket(servAck,m.getClientAddress());
+        /*sendPacket(servAck,m.getClientAddress());*/
         
         //Set currentState to normal
         SSWcurrentState = States.normal;
