@@ -117,29 +117,35 @@ public class TCP extends Thread{
      */
     @Override
     public void run(){
-        gui.printToScreen(entity +" TCP reporting in.");
+        gui.printToScreen("TCP " +entity +" reporting in.");
+        
         while (true) {
             
             byte[] buffer = readPacket();
-            
             if (buffer != null) {
                 byte[] data = null;
                 
                 // add or strip header depending on direction data is travelling
                 if (direction.equals("toSend")) {
                     // add header
+                    gui.printToScreen("TCP " +entity +": Read packet, adding header.");
                     data = TCP.createTCPSegment();
                     System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
                     
                     TCP.setData(buffer,data);
                     System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
                 } else {
-                    
+                    try{
                     // strip header
                     //System.out.println("send "+sender+" destination "+destination);
-                    System.out.println("strip header/buffer index 0: "+buffer[25]);
-                    data = TCP.stripHeader(buffer);
-                    System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
+                        gui.printToScreen("TCP " +entity +": Read packet, stripping header.");
+                        System.out.println("strip header/buffer index 0: "+buffer[25]);
+                        data = TCP.stripHeader(buffer);
+                        System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
+                    }
+                    catch(Exception e){
+                        gui.printToScreen("TCP: ERROR in " + entity + ": " + e);
+                    }
                 }
                 
                 // modify status in accordance to contents of data and current state
@@ -149,11 +155,12 @@ public class TCP extends Thread{
                             if (buffer.length == TCP.PACKET_SIZE) {
                                 // check if SYN bit set
                                 if (TCP.getSYNFlag(buffer)) {
+                                    gui.printToScreen("TCP " +entity +": Received SYN Packet");
                                     // create new TCP seg with SYN, ACK
                                     byte[] response = TCP.createTCPSegment();
                                     TCP.setSYNFlag(true,response);
                                     TCP.setACKFlag(true,response);
-
+                                    gui.printToScreen("TCP " +entity +": Creating/Sending response.");
                                     data = response; // set new seg as data to send
 
                                     // change state
@@ -164,6 +171,7 @@ public class TCP extends Thread{
                         case TCP.SYN_RCVD:
                             if (buffer.length == TCP.PACKET_SIZE) {
                                 if (TCP.getACKFlag(buffer)) {
+                                    gui.printToScreen("TCP " +entity +": Connection established.");
                                     serverTCPState = TCP.ESTABLISHED;
                                 }
                             }
@@ -176,6 +184,7 @@ public class TCP extends Thread{
                                  // set SYN flag
                                  TCP.setSYNFlag(true,data);
                                  clientTCPState = TCP.SYN_SENT;
+                                 gui.printToScreen("TCP " +entity +": Connection closed, sending SYN packet.");
                                  // store data from client to send when connection established
                                  initialDataFromClient = buffer; 
                              }
@@ -188,12 +197,13 @@ public class TCP extends Thread{
                                      TCP.setACKFlag(true,response);
                                      data = response; // set new seg as data to send
                                      clientTCPState = TCP.ESTABLISHED;
-                                     
+                                     gui.printToScreen("TCP " +entity +": Connection established, sending ACK.");
                                      sendPacket(data);
                                      
                                     // create seg from initial data
                                       byte[] dataToSend = TCP.createTCPSegment();
                                       TCP.setData(initialDataFromClient,dataToSend);
+                                      gui.printToScreen("TCP " +entity +": Sending original client packet.");
                                       sendPacket(dataToSend); 
                                       initialDataFromClient = null;
                                      
@@ -203,7 +213,7 @@ public class TCP extends Thread{
                          break;
                      }
                 }
-                
+                gui.printToScreen("TCP " +entity +": Sending packet.");
                 // send data to the correct buffer
                 sendPacket(data);   
             }
