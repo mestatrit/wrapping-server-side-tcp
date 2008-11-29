@@ -211,8 +211,8 @@ public class TCP extends Thread{
                                       
                                       //TO BE REMOVED, HERE TO MAKE SURE LOG ACK ARRIVES BEFORE THIS PACKET
                                       try{
-                                            //Sleep for 3 seconds, then look again for file
-                                            this.sleep(3000);
+                                            //Sleep for 5 seconds
+                                            this.sleep(5000);
                                         }
                                         catch(java.lang.InterruptedException e){
 
