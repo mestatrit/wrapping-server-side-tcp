@@ -18,6 +18,10 @@ public class logger extends Thread{
     private GUI gui;
     int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
     int initialClientSequenceNumber = 0;
+    int length=TCP.DATA_SIZE;// Need to update length!!!
+       int newReadLength = 0;
+       int[] readLengthArray = new int[length]; //to have the array received from the client
+          boolean finished=false;
     
     private byte heartbeatFlag = 1;
     private byte readLengthFlag = 2;
@@ -31,7 +35,7 @@ public class logger extends Thread{
     int clientDataCounter = 0;
     int readLengthCounter=0;
     
-    private enum entity {SSW,NSW};
+    private enum entity {SSW,NSW,SRV};
     Thread WrappersThread= new Thread();
     Thread bufferChecker= new Thread();
     /**
@@ -48,17 +52,16 @@ public class logger extends Thread{
     @Override
     public void run(){
         gui.printToScreen("Logger reporting in.");
-       int length=TCP.DATA_SIZE;// Need to update length!!!
-       int newReadLength = 0;
-       int[] readLengthArray = new int[length]; //to have the array received from the client
        
-       boolean finished=false;
+       
+    
 
        // Start-up   
        // Create instance of Heartbeat
        
-       heartbeatThread.run();
-      
+       heartbeatThread.start();
+  
+  
       do{
             /*need to send data to server when server restores */     
                 
@@ -107,17 +110,20 @@ public class logger extends Thread{
                     }
                }
                else if(sender.equals("SRV")){
-                   heartbeatThread.setServerAlive(true);          
+                   System.out.println("LOG: Detected an unknown packet.");
+                   if(temp[0] == 1){
+                       System.out.println("LOG: Packet is a heartbeat. Calling beat();");
+                        heartbeatThread.beat();          
+                   }
                }
         }        
-
-       
       }while(!finished);
-   
-    }
+}
+    
     public void clientInteraction(){
         gui.printToScreen("LOG: Confirmed Server is dead");
                 gui.printToScreen("LOG: Interacting with client...");
+                this.serverAlive = false;
                 
                  do{
                    // Check for client data from the NSW
@@ -150,7 +156,7 @@ public class logger extends Thread{
                         }
                         else if(sender.equals("SRV")){
                             // Server is alive again. Begin resending of data.
-                            m.setRestarting(true);                            
+                            m.setRestarting(true); 
                             
                             // For each packet of client data..
                             for(int i = 0; i < clientDataCounter; i++){
@@ -166,7 +172,11 @@ public class logger extends Thread{
                             
                             this.setServerAlive(true);
                             heartbeatThread.setServerAlive(true);
-                            
+                            heartbeatThread.setInteractingWithClient();
+                            if(temp[0] == 1){
+                           System.out.println("LOG: Packet is a heartbeat. Calling beat();");
+                            heartbeatThread.beat();
+                            }                            
                         }
                    }
                    catch(Exception e){
