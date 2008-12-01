@@ -24,7 +24,7 @@ public class Main {
     private short NSWAddress = 3;
     private short SSWAddress = 4;
     //private Main main;
-    private Thread server;
+    private server serv;
     private GUI g;
     
     /**
@@ -62,12 +62,13 @@ public class Main {
     
     public void KillServer()
     {
-        server.stop();
+        serv.killServerHeartbeat();
+        serv.stop();
     }
     public void RestartServer()
     {
-       server = new server(this, getGui());
-       server.start();
+       serv = new server(this, getGui());
+       serv.start();
     }
     /**
      * Gets restarting
@@ -77,13 +78,13 @@ public class Main {
         return restarting;
     }
     
-    public void setServer(Thread t){
-        server = t;
-        server.start();
+    public void setServer(server t){
+        serv = t;
+        serv.start();
     }
     
-    public Thread getServer(){
-        return server;
+    public server getServer(){
+        return serv;
     }
     
     public void setGui(GUI gui){
