@@ -10,6 +10,7 @@ package fttcp;
  * @author James Bossingham
  */
 import java.io.*;
+import org.knopflerfish.util.ByteArray;
 
 public class logger extends Thread{
     private Main m;
@@ -20,7 +21,7 @@ public class logger extends Thread{
     int initialClientSequenceNumber = 0;
     int length=TCP.DATA_SIZE;// Need to update length!!!
        int newReadLength = 0;
-       int[] readLengthArray = new int[length]; //to have the array received from the client
+       int[] readLengthArray = new int[1000]; //to have the array received from the client
           boolean finished=false;
     
     private byte heartbeatFlag = 1;
@@ -98,15 +99,21 @@ public class logger extends Thread{
                         sendACK(entity.SSW);
                     }
                     else if(temp[0] == 4){  // If the incoming data is forwarded client data..
+                       
+                        int receivedInt = ByteArray.getShort(temp, 1);
+                        System.out.println("LOGGER: Stored " +  receivedInt);
+                       
                         // It is data from the client which must be stored.
                         ClientData[0][clientDataCounter] = (byte)(initialClientSequenceNumber + clientDataCounter);
-                        // Copy each position in temp, into the new array.
+                        // Copy each position in temp, into the new array. 
+                        
                         for(int i = 1; i < temp.length; i++){
                             ClientData[i][clientDataCounter] = temp[i];
                         }
                         gui.printToScreen("LOG: Is now sending ACK to SSW.");
                         sendACK(entity.SSW);
                         clientDataCounter++;
+                        System.out.println("LOGGER: Client data counter is: " + clientDataCounter);
                     }
                }
                else if(sender.equals("SRV")){
