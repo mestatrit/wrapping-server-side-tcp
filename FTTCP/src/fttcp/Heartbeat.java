@@ -25,9 +25,10 @@ public class Heartbeat extends Thread {
     private Main m;
     private String sender;
     int emptyReadCounter = 0;   
-    private boolean serverAlive = false;
+    private boolean serverAlive = true;
     logger thisLogger;
-    
+    private boolean currentBeat = true;
+    private boolean interactingWithClient = false;
     
     private byte heartbeatFlag = 1;
     
@@ -43,33 +44,55 @@ public class Heartbeat extends Thread {
     
     
     public void checkHeartBeat(){
-       int length=100;
+       int length=TCP.DATA_SIZE;
        byte[][] readlength= new byte[length][length]; //to have the array received from the client
        byte[] temp = new byte[length];
        int count=0;
        boolean finished=false;
-
+       
+       
+       System.out.println("HEARTBEAT IS RUNNING");
          do{
            
             try{
-                this.sleep(2000);
+                this.sleep(20000);
+                
             }catch(Exception e){}
             
-            if(serverAlive=true){
+            if(this.currentBeat == true){
+                // A heartbeat must have arrived from the logger (i.e. from the server).
+                System.out.println("HEARTBEAT: Woke up. Current beat is TRUE. Server is alive.");
+                thisLogger.setServerAlive(true);
+                this.currentBeat = false;
+            }
+            else{
+                // No beat arrived during sleeping.
+                System.out.println("HEARTBEAT: No beat arrived, setting serverAlive to false.");
+                thisLogger.setServerAlive(false);
+                if(interactingWithClient == false){
+                    thisLogger.clientInteraction();
+                    interactingWithClient = true;
+                }
+            }
+            
+            
+            
+            /*if(serverAlive==true){
                
                thisLogger.setServerAlive(true);
-               setServerAlive(false);
+               setServerAlive(true);
+               thisLogger.ServerUp();
                
                
-            }else if(serverAlive=false){
+            }else if(serverAlive==false){
                 
                thisLogger.setServerAlive(false); 
                thisLogger.clientInteraction();
                
-            }
+            }*/
 
            
-        }while(finished = false);  
+        }while(finished == false);  
     }
     
     
@@ -82,6 +105,9 @@ public class Heartbeat extends Thread {
         serverAlive = temp;
     }
        
+    public void setInteractingWithClient(){
+        this.interactingWithClient = false;
+    }
     
     private byte[] readHeartbeat(){
         try{
@@ -107,5 +133,10 @@ public class Heartbeat extends Thread {
         catch(java.io.IOException e){
             return null;
         } 
+    }
+    
+    public void beat(){
+        System.out.println("HEARTBEAT: Logger received heatbeat. Set currentBeat to TRUE.");
+        this.currentBeat = true;
     }
 }
