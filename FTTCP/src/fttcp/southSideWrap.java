@@ -130,9 +130,12 @@ public class southSideWrap extends Thread{
                 gui.printToScreen("SSW: Received Client Packet.");
                 //Forward packet to logger
                 byte[] forwardPacket = TCP.getData(receivedPacket);
-                for (int i = forwardPacket.length-1;i>1;i--){
+                /*for (int i = forwardPacket.length-1;i>1;i--){
                     forwardPacket[i-1] = forwardPacket[i];
-                }
+                }*/
+                forwardPacket[3] = forwardPacket[2];
+                forwardPacket[2] = forwardPacket[1];
+                forwardPacket[1] = forwardPacket [0];
                 forwardPacket[0] = fwdCltPacketFlag;
                 byte[] fullForwardPacket = new byte[receivedPacket.length];
                 for(int i=0;i<receivedPacket.length;i++){
