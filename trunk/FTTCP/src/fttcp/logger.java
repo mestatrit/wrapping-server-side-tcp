@@ -71,7 +71,6 @@ public class logger extends Thread{
                temp = readPacket();
                
                 int receivedInteger = ByteArray.getShort(temp, 1);
-                System.out.println("LOGGER: Received byte... " +  receivedInteger);
            }
            catch(Exception e){}
       
@@ -122,8 +121,7 @@ public class logger extends Thread{
                else if(sender.equals("SRV")){
                    System.out.println("LOG: Detected an unknown packet.");
                    if(temp[0] == 1){
-                       System.out.println("LOG: Packet is a heartbeat. Calling beat();");
-                        heartbeatThread.beat();          
+                       heartbeatThread.beat();          
                    }
                }
         }        
@@ -165,6 +163,7 @@ public class logger extends Thread{
                             
                         }
                         else if(sender.equals("SRV")){
+                            System.out.println("LOGGER: Packet arrived from server. Server has restarted.");
                             // Server is alive again. Begin resending of data.
                             m.setRestarting(true); 
                             
@@ -177,6 +176,10 @@ public class logger extends Thread{
                                 for(int j = 0; j < TCP.DATA_SIZE; j++){
                                     catchupData[j] = ClientData[j][i];
                                 }
+                                
+                                int receivedInt = ByteArray.getShort(catchupData, 1);
+                                System.out.println("LOGGER: Retrieved " +  receivedInt);
+                                
                                 // Send the packet to the server.
                                 sendPacket(catchupData, m.getServerAddress());
                             }
@@ -187,9 +190,9 @@ public class logger extends Thread{
                             heartbeatThread.setServerAlive(true);
                             heartbeatThread.setInteractingWithClient();
                             if(temp[0] == 1){
-                           System.out.println("LOG: Packet is a heartbeat. Calling beat();");
-                            heartbeatThread.beat();
-                            }                            
+                                heartbeatThread.beat();
+                            }
+                            m.setRestarting(false);
                         }
                    }
                    catch(Exception e){
