@@ -31,7 +31,7 @@ public class logger extends Thread{
     Heartbeat heartbeatThread = new Heartbeat(m, this);
     private boolean serverAlive = true;
    
-    byte[][] ClientData = new byte[TCP.DATA_SIZE][24];
+    byte[][] ClientData = new byte[TCP.DATA_SIZE][1000];
     int clientDataCounter = 0;
     int readLengthCounter=0;
     
@@ -160,6 +160,7 @@ public class logger extends Thread{
                             
                             // For each packet of client data..
                             for(int i = 0; i < clientDataCounter; i++){
+                                System.out.println("LOG: Server is restarting. Sending an item of data to Server.");
                                 // Create a new byte array to send to server.
                                 byte[] catchupData = new byte[TCP.DATA_SIZE];
                                 // For each position in the byte array, collect it's value from ClientData[][]
@@ -169,6 +170,8 @@ public class logger extends Thread{
                                 // Send the packet to the server.
                                 sendPacket(catchupData, m.getServerAddress());
                             }
+                            
+                            System.out.println("LOGGER: Finished sending client data to restarting server.");
                             
                             this.setServerAlive(true);
                             heartbeatThread.setServerAlive(true);
