@@ -69,6 +69,9 @@ public class logger extends Thread{
            //perform the code below until it is said to stop (program finishes)
            try{
                temp = readPacket();
+               
+                int receivedInteger = ByteArray.getShort(temp, 1);
+                System.out.println("LOGGER: Received byte... " +  receivedInteger);
            }
            catch(Exception e){}
       
@@ -106,7 +109,7 @@ public class logger extends Thread{
                         // It is data from the client which must be stored.
                         ClientData[0][clientDataCounter] = (byte)(initialClientSequenceNumber + clientDataCounter);
                         // Copy each position in temp, into the new array. 
-                        
+                         
                         for(int i = 1; i < temp.length; i++){
                             ClientData[i][clientDataCounter] = temp[i];
                         }
