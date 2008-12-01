@@ -21,7 +21,7 @@ public class GUI extends Thread{
     private JTextArea cltCon = new JTextArea();
     private GUICanvas canvas;
     private Main m;
-    private int wait = 200;
+    private int wait = 50;
     private boolean isLocked = false;
     private int lines = 0;
     private int servLines = 0;
@@ -156,11 +156,11 @@ public class GUI extends Thread{
 
         //Console on Righthand side
         JPanel jPanelCon = new JPanel();
-        jPanelCon.setPreferredSize(new Dimension(325,690));
+        jPanelCon.setPreferredSize(new Dimension(425,690));
         JLabel header = new JLabel();
         header.setText("Output:");
         jPanelCon.add(header);
-        output.setPreferredSize(new Dimension(320, 600));
+        output.setPreferredSize(new Dimension(420, 600));
         output.setEditable(false);
         output.setAutoscrolls(true);
         JScrollPane jScrollOut = new JScrollPane(output);
@@ -208,7 +208,7 @@ public class GUI extends Thread{
         GUIFrame.setTitle("Fault Tolerant TCP");
         GUIFrame.setLocation(0, 0);
         GUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GUIFrame.setSize(920, 700);     
+        GUIFrame.setSize(1020, 700);     
         GUIFrame.setVisible(true);
         
         isInit = true;
