@@ -210,11 +210,13 @@ public class southSideWrap extends Thread{
                 TCP.setSYNFlag(true, SYNPacket);
                 TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
                 sendPacket(SYNPacket,m.getServerAddress());
+                byte[] receivedPacket2 = null;
                 while(!sender.equals("SRV")){
                     //Capture SRV's responding ACK
-                    byte[] receivedPacket2 = readPacket();
+                    receivedPacket2 = readPacket();
                 }
                 //Reply with fake corresponding ACK
+                m.setDelta_seq(m.getDelta_seq() -TCP.getSequenceNumber(receivedPacket2));
                 byte[] ACKPacket = TCP.createTCPSegment();
                 TCP.setACKFlag(true,ACKPacket);
                 sendPacket(ACKPacket,m.getServerAddress());
