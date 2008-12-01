@@ -430,7 +430,12 @@ public class TCP extends Thread{
                 gui.htcp2log();
                 writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG");
             }
-            
+            else if  (sender.equals("LOG") && destination.equals("SRV")) {
+                // TCP (in logger) strips data and makes available to logger - loggerBuffer/receivedHeartbeat.SRV.LOG
+                gui.log2srv();
+                gui.ssw2tcp();
+                writeFile(data,"serverBuffer/received.LOG.SRV.TCP");
+            }
             
 
         } 
