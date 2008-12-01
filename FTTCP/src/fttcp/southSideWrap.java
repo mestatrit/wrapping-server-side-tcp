@@ -201,24 +201,35 @@ public class southSideWrap extends Thread{
             byte[] closedWindowPacket = TCP.createTCPSegment();
             TCP.setWindowSize(closedWindow, closedWindowPacket);
             sendPacket(closedWindowPacket, m.getClientAddress());
+            
+            byte[] receivedPacket = tryReadPacket();
+            
+            if(sender.equals("NSW") && receivedPacket != null){
+                //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
+                byte[] SYNPacket = TCP.createTCPSegment();
+                TCP.setSYNFlag(true, SYNPacket);
+                TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
+                sendPacket(SYNPacket,m.getServerAddress());
+                while(!sender.equals("SRV")){
+                    //Capture SRV's responding ACK
+                    byte[] receivedPacket2 = readPacket();
+                }
+                //Reply with fake corresponding ACK
+                byte[] ACKPacket = TCP.createTCPSegment();
+                TCP.setACKFlag(true,ACKPacket);
+                sendPacket(ACKPacket,m.getServerAddress());
+
+                
+            }
+            try{
+                //Sleep for 1 seconds
+                this.sleep(1000);
+            }
+            catch(java.lang.InterruptedException e){
+
+            }
+            
         }
-        while(!sender.equals("NSW")){
-            byte[] receivedPacket = readPacket();
-        }
-        //Fabricate SYN Packet that has the initial sequence# of stable_seq, send this to servers TCP layer
-        byte[] SYNPacket = TCP.createTCPSegment();
-        TCP.setSYNFlag(true, SYNPacket);
-        TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
-        sendPacket(SYNPacket,m.getServerAddress());
-        while(!sender.equals("SRV")){
-            //Capture SRV's responding ACK
-            byte[] receivedPacket = readPacket();
-        }
-        //Reply with fake corresponding ACK
-        byte[] ACKPacket = TCP.createTCPSegment();
-        TCP.setACKFlag(true,ACKPacket);
-        sendPacket(ACKPacket,m.getServerAddress());
-  
         SSWcurrentState = States.normal;
     }
     
@@ -230,7 +241,7 @@ public class southSideWrap extends Thread{
      * @return Object New packet with correct ChecksumgetAcknowledgementNumber
      */
     private byte[] recomputeChecksum(byte[] received){
-        //IMPLEMENT
+       
         return received;
     }
     
@@ -254,6 +265,37 @@ public class southSideWrap extends Thread{
         return isAckPacket;
     }
     
+    
+    private byte[] tryReadPacket(){
+        try{
+            FilenameFilter filter = new SSWFileFilter();
+            File f = new File("serverBuffer");
+            String[] files = f.list(filter);
+            if(files != null && files.length != 0){
+                FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
+                int numberBytes = fileinputstream.available();
+                byte[] bytearray = new byte[numberBytes];
+                fileinputstream.read(bytearray);
+                fileinputstream.close();
+                boolean hadDel = (new File("serverBuffer/"+files[0]).delete());
+                //Find and set sender
+                int length  = files[0].length();
+                String[] info = files[0].split("[.]");
+                if(info.length == 3 || info.length == 4){
+                    sender = info[1];
+                    destination = info[2];
+                }
+                return bytearray;
+            }
+            else {return null;}
+        }
+        catch(java.io.FileNotFoundException e){
+            return null;
+        } 
+        catch(java.io.IOException e){
+            return null;
+        } 
+    }
     /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
