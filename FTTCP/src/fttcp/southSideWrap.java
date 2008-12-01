@@ -159,7 +159,7 @@ public class southSideWrap extends Thread{
                 gui.printToScreen("SSW: Received Logger Packet.");
                 //If ack is for client data packet with seq# from sn->sn+l, and 
                 //sn+l+1 > stable_seq, set stable_seq to sn+l+1
-                
+                m.setStable_seq(TCP.getAcknowledgementNumber(receivedPacket));
             }
             else if (sender.equals("SRV")){
                 gui.printToScreen("SSW: Received Packet From Server.");
