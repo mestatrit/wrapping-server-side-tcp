@@ -172,7 +172,7 @@ public class southSideWrap extends Thread{
                 
                 //Change advertised window size by adding ack#-stable_seq
                 //Convert int to short
-                //UNCOMMENT WHEN WINDOW SIZE/ACK NUMBER IMPLEMENTED
+                //NOT NEEDED AS WE ARE USING FIXED WINDOWS!
                 /*int intWindowSize = TCP.getWindowSize(receivedPacket) + TCP.getAcknowledgementNumber(receivedPacket) - m.getStable_seq();
                 //int intWindowSize = getWindowSize(receivedPacket) + getAckNumber(receivedPacket) + m.getStable_seq();
                 short windowSize = ByteArray.getShort(TCP.convertDataToByteArray(intWindowSize),0);
