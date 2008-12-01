@@ -150,6 +150,7 @@ public class logger extends Thread{
                         }
                         else if(sender.equals("SRV")){
                             // Server is alive again. Begin resending of data.
+                            m.setRestarting(true);                            
                             
                             // For each packet of client data..
                             for(int i = 0; i < clientDataCounter; i++){
