@@ -40,8 +40,7 @@ public class client extends Thread{
         short numberSend = 1;
         
         //client to send numbers up to 10
-        while(numberSend <= 1000){
-            
+        while(numberSend <= 1000) {
             //convert integer to send to byte array
             byte[] data = new byte[TCP.DATA_SIZE];
             
