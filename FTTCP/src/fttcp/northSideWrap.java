@@ -142,30 +142,31 @@ public class northSideWrap extends Thread{
         //while server is recovering
         while(m.getRestarting()) {
             
-         //if it's a read socket call
-         if(sender.equals("LOG")) {
-                // NSW replies data read from logger
-                sendPacket(NSWreadData, m.getServerAddress());
-              }
-        
+             //if it's a read socket call
+            if(sender.equals("LOG")) {
+                    // NSW replies data read from logger
+                    sendPacket(NSWreadData, m.getServerAddress());
+                  }
+
               //if it's a write socket call
-              else if (sender.equals("SRV")) {
-                    // NSW keeps track of bytes written.
-                    bytesWritten = bytesWritten + NSWreadData.length;
-            
-                    //if data has previous been written
-                    if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
-            
-                       //discard the data (just return successful write)
-                 }
-            
-                    //if it's new data
-                 else {
-                        //all recovering data been replayed, resume normal operation
-                        sendPacket(NSWreadData, m.getClientAddress());
-                        m.setRestarting(false);
-                
-                 }
+            else if (sender.equals("SRV")) {
+                // NSW keeps track of bytes written.
+                bytesWritten = bytesWritten + NSWreadData.length;
+
+                //if data has previous been written
+                if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
+
+                   //discard the data (just return successful write)
+                }
+
+                //if it's new data
+                else {
+                    //all recovering data been replayed, resume normal operation
+                    //May not need to send this - needs testing
+                    sendPacket(NSWreadData, m.getClientAddress());
+                    m.setRestarting(false);
+
+                }
           }
       }   
         // go back to normal operation
