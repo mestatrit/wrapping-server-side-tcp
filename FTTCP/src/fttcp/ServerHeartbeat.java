@@ -29,12 +29,13 @@ public class ServerHeartbeat extends Thread {
      public void run(){
         
          while(true){
+             
+              s.sendHeartbeat();
+             
              try{
                 this.sleep(15000);
                 
             }catch(Exception e){}
-             
-             s.sendHeartbeat();
              
          }
          
