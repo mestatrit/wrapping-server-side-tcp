@@ -64,6 +64,8 @@ public class logger extends Thread{
   
   
       do{
+           
+           System.out.println("LOGGER: Normal Operation Loop beginning again (not necessarily normal operation).");
             /*need to send data to server when server restores */     
                 
            //perform the code below until it is said to stop (program finishes)
@@ -124,18 +126,23 @@ public class logger extends Thread{
                        heartbeatThread.beat();          
                    }
                }
-        }        
+               
+            }
+           else{
+                   try{
+                       this.sleep(500);
+                   }
+                   catch(Exception e){}
+                   
+               }
       }while(!finished);
-}
+    }
     
     public void clientInteraction(){
         gui.printToScreen("LOG: Confirmed Server is dead");
                 gui.printToScreen("LOG: Interacting with client...");
                 this.serverAlive = false;
-                
-                // Server is alive again. Begin resending of data.
-                m.setRestarting(true); 
-                
+                      
                  do{
                    // Check for client data from the NSW
                    try{
@@ -166,6 +173,10 @@ public class logger extends Thread{
                             
                         }
                         else if(sender.equals("SRV")){
+                            
+                            // Server is dead.
+                            m.setRestarting(true); 
+                            
                             System.out.println("LOGGER: Packet arrived from server. Server has restarted.");
                             
                             // For each packet of client data..
