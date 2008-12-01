@@ -15,6 +15,7 @@ import org.knopflerfish.util.ByteArray;
 public class server extends Thread{
     private Main m;
     private GUI gui;
+    ServerHeartbeat serverHeartbeatThread = new ServerHeartbeat(m, this);
     
     public server(Main main, GUI g){
         m = main;
@@ -28,15 +29,19 @@ public class server extends Thread{
     public void run(){
         gui.printToScreen("Server reporting in.");
         short numberRecv = 1;
-        byte[] heartbeatByte=new byte[TCP.DATA_SIZE];
-        heartbeatByte[0] = 1;
+        
+        
+        // Begin serverHeartbeat here.
+        serverHeartbeatThread.start();
+        
         
         while(true){
-            sendPacket(heartbeatByte,m.getLoggerAddress());
+            
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
-       
+       System.out.println("SERVER: Trying to readPacket().");
         byte[] serverReadData = readPacket();
+        System.out.println("SERVER: has readPacket().");
         char returnLetter = 'a';
         short returnNumber = 0;
         byte[] byteReturnLetter;
@@ -71,6 +76,8 @@ public class server extends Thread{
         gui.printToScreen("SRV: Sending " + (char)returnNumber);
         sendPacket(byteReturnLetter, m.getClientAddress());
         numberRecv++;
+       
+        System.out.println("SERVER LOOP HAS FINISHED EXECUTING. ABOUT TO REPEAT.");
         
     }
     }
@@ -159,4 +166,17 @@ public class server extends Thread{
         byteArr[0] =(byte)( (num << 24) >> 24 );
         return byteArr;
     }
+     
+    public void sendHeartbeat(){
+        
+        byte[] heartbeatByte=new byte[TCP.DATA_SIZE];
+        heartbeatByte[0] = 1;
+        
+        sendPacket(heartbeatByte,m.getLoggerAddress());
+    } 
+     
+    public void killServerHeartbeat(){
+        serverHeartbeatThread.stop();
+    }
+    
 }
