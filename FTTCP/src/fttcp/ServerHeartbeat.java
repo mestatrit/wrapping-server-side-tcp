@@ -30,7 +30,7 @@ public class ServerHeartbeat extends Thread {
         
          while(true){
              try{
-                this.sleep(5000);
+                this.sleep(15000);
                 
             }catch(Exception e){}
              
