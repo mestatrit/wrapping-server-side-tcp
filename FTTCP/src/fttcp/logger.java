@@ -133,6 +133,9 @@ public class logger extends Thread{
                 gui.printToScreen("LOG: Interacting with client...");
                 this.serverAlive = false;
                 
+                // Server is alive again. Begin resending of data.
+                m.setRestarting(true); 
+                
                  do{
                    // Check for client data from the NSW
                    try{
@@ -164,8 +167,6 @@ public class logger extends Thread{
                         }
                         else if(sender.equals("SRV")){
                             System.out.println("LOGGER: Packet arrived from server. Server has restarted.");
-                            // Server is alive again. Begin resending of data.
-                            m.setRestarting(true); 
                             
                             // For each packet of client data..
                             for(int i = 0; i < clientDataCounter; i++){
