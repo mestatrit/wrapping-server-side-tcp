@@ -131,7 +131,8 @@ public class northSideWrap extends Thread{
     //operation when server is restarting
     public void NSWrestartingOperation() {
         
-        byte[] NSWreadData = readPacket();
+        gui.printToScreen("NSW entering RESTART mode");
+
         int bytesWritten = 0;
         
         //create message telling SSW to fabricate SYN
@@ -141,6 +142,8 @@ public class northSideWrap extends Thread{
         
         //while server is recovering
         while(m.getRestarting()) {
+            
+            byte[] NSWreadData = readPacket();
             
              //if it's a read socket call
             if(sender.equals("LOG")) {
@@ -154,21 +157,22 @@ public class northSideWrap extends Thread{
                 bytesWritten = bytesWritten + NSWreadData.length;
 
                 //if data has previous been written
-                if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
+                //if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
 
                    //discard the data (just return successful write)
-                }
+             //   }
 
                 //if it's new data
-                else {
+              //  else {
                     //all recovering data been replayed, resume normal operation
                     //May not need to send this - needs testing
-                    sendPacket(NSWreadData, m.getClientAddress());
-                    m.setRestarting(false);
+                   // sendPacket(NSWreadData, m.getClientAddress());
+                  //  m.setRestarting(false);
 
                 }
-          }
-      }   
+          
+        }
+        
         // go back to normal operation
         NSWcurrentState = States.normal;
   }
