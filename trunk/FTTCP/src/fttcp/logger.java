@@ -147,7 +147,7 @@ public class logger extends Thread{
 
          do{
             
-            gui.printToScreen("Server is dead.."); 
+            gui.printToScreen("LOGGER: Server is dead.."); 
            
            // Check for client data from the NSW
            try{
