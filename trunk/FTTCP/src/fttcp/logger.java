@@ -21,12 +21,15 @@ public class logger extends Thread{
     Heartbeat heartbeatThread = new Heartbeat(m, this); // Creates an instance of of Heartbeat so that the logger can detect heartbeats from the server.
     boolean finished=false; // Used in the shutdown behaviour of the logger.
     
-    int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
-    int initialClientSequenceNumber = 0;    // Stores the client's initial sequence number, given by the client at the beginning of a transaction.
+    //TODO: REMOVE?*** int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
     private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp[] holds incoming packet that has been read by readPacket.
+    int initialClientSequenceNumber = 0;    // Stores the client's initial sequence number, given by the client at the beginning of a transaction.
     int length=1000;    // Length is used to supply the maximum number of packets of client data (or read lengths) by defining the number of rows in an array.
+    byte[][] ClientData = new byte[TCP.DATA_SIZE][1000];    // Two dimensional array to store multiple byte arrays of client data (i.e. multiple packets).
     int newReadLength = 0;  // Stores newest read length, as supplied by the North Side Wrap.
     int[] readLengthArray = new int[length]; // An array to store sequence of readlengths supplied by the NSW.
+    int clientDataCounter = 0;  // Counts how many items of clientData have been stored.
+    int readLengthCounter=0;    // Counts how many individual readLengths have been stored.
     
     // The following are flag codes, appearing in the first position of an incoming packet (byte array). 
     // Refer to here to determine what each flag is.
@@ -35,17 +38,12 @@ public class logger extends Thread{
     private byte initClientSeqNumber = 3;
     private byte fwdClientPktFlag = 4;
     
-    
-    
-    private boolean serverAlive = true;
+    private boolean serverAlive = true; // Indicates whether the logger thinks the server is ALIVE of DEAD. Determines whether logger's normal operation loop is performed.
    
-    byte[][] ClientData = new byte[TCP.DATA_SIZE][1000];
-    int clientDataCounter = 0;
-    int readLengthCounter=0;
-    
     private enum entity {SSW,NSW,SRV};
     Thread WrappersThread= new Thread();
     Thread bufferChecker= new Thread();
+    
     /**
      * Constructor
      */
@@ -59,29 +57,25 @@ public class logger extends Thread{
      */
     @Override
     public void run(){
+        // Start-up  
         gui.printToScreen("Logger reporting in.");
-      
-
-       // Start-up   
-       // Create instance of Heartbeat
-       
+    
+       // Begin running an instance of heartbeatThread to begin detecting heartbeats from server.
        heartbeatThread.start();
   
-  
+      // Begin a loop that will not stop until finished==true. Therefore the logger will only stop when the program is finished.
       do{
            
            System.out.println("LOGGER: Normal Operation Loop beginning again (not necessarily normal operation).");
-            /*need to send data to server when server restores */     
-                
-           //perform the code below until it is said to stop (program finishes)
-           try{
-               temp = readPacket();
+           
+           // Only attempt to read packets (and perform actions based upon them) if the server is currently alive.
+           if(this.serverAlive == true){
                
-                int receivedInteger = ByteArray.getShort(temp, 1);
+           try{
+               temp = readPacket();     // Attempt to read a packet.
            }
            catch(Exception e){}
-      
-           if(this.serverAlive == true){
+                
                gui.printToScreen("LOG: Confirmed Server is alive");
                
                // BEHAVIOUR UNDER NORMAL OPERATION
@@ -233,7 +227,7 @@ public class logger extends Thread{
                 File f = new File("loggerBuffer");
                 String[] files = f.list(filter);
                 if(files != null && files.length != 0){
-                    emptyReadCounter = 0;   // Reset the consecutive read counter
+                    // TODO: REMOVE? ***emptyReadCounter = 0;   // Reset the consecutive read counter
                     FileInputStream fileinputstream = new FileInputStream("loggerBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
                     byte[] bytearray = new byte[numberBytes];
@@ -253,7 +247,7 @@ public class logger extends Thread{
                     try{
                         //Sleep for 3 seconds, then look again for file
                         this.sleep(3000);
-                        emptyReadCounter++;     // Increment counter - another empty read has occured.
+                        // TODO: REMOVE? **** emptyReadCounter++;     // Increment counter - another empty read has occured.
                     }
                     catch(java.lang.InterruptedException e){
                         
