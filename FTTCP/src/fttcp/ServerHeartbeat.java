@@ -29,7 +29,7 @@ public class ServerHeartbeat extends Thread {
      public void run(){
         
          while(true){
-             
+             System.out.println("SERVERHEARTBEAT: will sent heartbaet and sleep");
               s.sendHeartbeat();
              
              try{
