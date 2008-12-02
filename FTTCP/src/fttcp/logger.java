@@ -140,7 +140,7 @@ public class logger extends Thread{
     public void clientInteraction(){
         gui.printToScreen("LOG: Confirmed Server is dead");
                 gui.printToScreen("LOG: Interacting with client...");
-                
+                gui.clearServerBuffer();
                 this.serverAlive = false;
                       
                  do{
@@ -176,6 +176,7 @@ public class logger extends Thread{
                             
                             m.setUnstable_reads(0);
                             // Server is dead.
+                            gui.printToScreen("LOG Setting RESTARTING to TRUE");
                             m.setRestarting(true); 
                             
                             System.out.println("LOGGER: Packet arrived from server. Server has restarted.");
@@ -186,11 +187,11 @@ public class logger extends Thread{
                                 // Create a new byte array to send to server.
                                 byte[] catchupData = new byte[TCP.DATA_SIZE];
                                 // For each position in the byte array, collect it's value from ClientData[][]
-                                for(int j = 0; j < TCP.DATA_SIZE; j++){
-                                    catchupData[j] = ClientData[j][i];
+                                for(int j = 1; j < TCP.DATA_SIZE; j++){
+                                    catchupData[j-1] = ClientData[j][i];
                                 }
                                 
-                                int receivedInt = ByteArray.getShort(catchupData, 1);
+                                int receivedInt = ByteArray.getShort(catchupData, 0);
                                 System.out.println("LOGGER: Retrieved " +  receivedInt);
                                 
                                 // Send the packet to the server.
