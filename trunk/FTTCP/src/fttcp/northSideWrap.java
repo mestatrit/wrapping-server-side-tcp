@@ -139,10 +139,10 @@ public class northSideWrap extends Thread{
 
         int bytesWritten = 0;
         
-        //create message telling SSW to fabricate SYN
+        /*//create message telling SSW to fabricate SYN
         byte[] fabSyn = new byte[TCP.PACKET_SIZE];
         //send message to SSW
-        sendPacket(fabSyn, m.getServerAddress());
+        sendPacket(fabSyn, m.getServerAddress());*/
         
         //while server is recovering
         while(m.getRestarting()) {
@@ -153,6 +153,7 @@ public class northSideWrap extends Thread{
             if(sender.equals("LOG")) {
                     // NSW replies data read from logger
                     sendPacket(NSWreadData, m.getServerAddress());
+                    gui.printToScreen("NSW: SENDING OLD DATA TO SERVER");
                     messagesRead--;
                     if(messagesRead==0) {
                         lastRound = true;
@@ -162,6 +163,7 @@ public class northSideWrap extends Thread{
 
               //if it's a write socket call
             else if (sender.equals("SRV")) {
+                gui.printToScreen("NSW: DISCARDING OLD DATA");
                 // NSW keeps track of bytes written.
                 bytesWritten = bytesWritten + NSWreadData.length;
                 
@@ -184,6 +186,7 @@ public class northSideWrap extends Thread{
             if(lastRound){
                 readPacket(false);
                 m.setRestarting(false);
+                gui.printToScreen("NSW: RESTARTING NOW FALSE");
                 lastRound = false;
             }
           
