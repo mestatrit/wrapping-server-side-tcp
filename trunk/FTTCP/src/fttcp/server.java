@@ -32,6 +32,7 @@ public class server extends Thread{
         
         
         // Begin serverHeartbeat here.
+               System.out.println("SERVER: Server Heartbeat begins.");
         serverHeartbeatThread.start();
         
         
@@ -39,9 +40,8 @@ public class server extends Thread{
             
            /* sendPacket(readPacket(),m.getClientAddress());
             System.out.println("server sending" + readPacket());*/
-       System.out.println("SERVER: Trying to readPacket().");
+
         byte[] serverReadData = readPacket();
-        System.out.println("SERVER: has readPacket().");
         char returnLetter = 'a';
         short returnNumber = 0;
         byte[] byteReturnLetter;
@@ -177,6 +177,7 @@ public class server extends Thread{
      
     public void killServerHeartbeat(){
         serverHeartbeatThread.stop();
+        System.out.println("SERVER :killServerHeartbeat() is called");
     }
     
 }
