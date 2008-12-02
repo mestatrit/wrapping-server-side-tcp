@@ -64,7 +64,8 @@ public class northSideWrap extends Thread{
             byte[] NSWreadData = readPacket(true);             
   
              //if read socket call
-             if(sender.equals("CLT")) {
+             if(NSWreadData!=null && sender.equals("CLT")) {
+               
                  //determine read length
                  readLength = NSWreadData.length;
            
@@ -95,7 +96,7 @@ public class northSideWrap extends Thread{
                }
         
                 //if sender is logger
-               else if (sender.equals("LOG")) {
+               else if (NSWreadData!=null && sender.equals("LOG")) {
             
                    //decrement unstable reads by 1
                    gui.printToScreen("NSW: Got ack, decrementing unstable reads");
@@ -105,7 +106,7 @@ public class northSideWrap extends Thread{
                }
         
                 //if write socket call
-                else if (sender.equals("SRV")) {          
+                else if (NSWreadData!=null && sender.equals("SRV")) {          
             
                    //if unstable reads exist, don't process, wait for ACKs
                    while (m.getUnstable_reads() > 0) {
@@ -120,8 +121,11 @@ public class northSideWrap extends Thread{
             
             //if no unstable reads exist, send packet
 
-            sendPacket(NSWreadData, m.getClientAddress());
-            gui.printToScreen("NSW: Sending packet to client");
+            if(NSWreadData != null) {
+                       sendPacket(NSWreadData, m.getClientAddress());            
+                       gui.printToScreen("NSW: Sending packet to client");
+            }
+
                 
             
            }
