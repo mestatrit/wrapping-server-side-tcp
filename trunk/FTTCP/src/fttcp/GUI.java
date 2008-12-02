@@ -4,6 +4,7 @@
  */
 
 package fttcp;
+import com.sun.net.ssl.internal.ssl.Debug;
 import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,7 @@ public class GUI extends Thread{
     private Point[] stringPoints;
     private String[] strings;
     private boolean isInit = false;
+    private JCheckBoxMenuItem debug;
     
     
     public GUI(Main main){
@@ -150,6 +152,10 @@ public class GUI extends Thread{
                 fastItemActionPerformed(evt);
             }
         });
+        debug = new JCheckBoxMenuItem("Debug Mode");
+        debug.setText("Debug Mode");
+        debug.setState(false);
+        editMenu.add(debug);
         JMenu helpMenu = new JMenu();
         helpMenu.setText("Help");
         GUIMenu.add(helpMenu);
@@ -522,6 +528,9 @@ public class GUI extends Thread{
     public void printToScreen(String str){
         waitForInit();
         waitForLock();
+        if(debug.getState()){
+            System.out.println(str);
+        }
         output.append("\n" + str);
         lines++;
         if(lines > 36){
