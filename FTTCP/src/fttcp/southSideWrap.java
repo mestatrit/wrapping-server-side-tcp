@@ -69,7 +69,7 @@ public class southSideWrap extends Thread{
             //Read Clients packet
             while (!sender.equals("CLT")){
                 gui.printToScreen("SSW Waiting to read SYN Packet");
-                clientSYN = readPacket();
+                clientSYN = readPacket(false);
             }
             //Check to see if SYN
             isSYN = isSYNPacket(clientSYN);
@@ -97,7 +97,7 @@ public class southSideWrap extends Thread{
         //UNCOMMENT STUFF WHEN SERV ACKS PACKETS
         while(/*!servAckRecv || */!logAckRecv){
             gui.printToScreen("SSW: Waiting for server and logger ACKs.");
-            byte[] received = readPacket();
+            byte[] received = readPacket(false);
             if (sender.equals("LOG")){
                 byte[] receivedData = TCP.getData(received);
                 if(receivedData[0] == 0){
@@ -124,8 +124,9 @@ public class southSideWrap extends Thread{
      */
     private void SSWnormalOpp(){
         gui.printToScreen("SSW: Normal Operation.");
+        byte[] receivedPacket = readPacket(true);
         while(!m.getRestarting()){
-            byte[] receivedPacket = readPacket();
+            
             if (sender.equals("CLT")){
                 gui.printToScreen("SSW: Received Client Packet.");
                 //Forward packet to logger
@@ -190,6 +191,7 @@ public class southSideWrap extends Thread{
                 //Send to client (IP)
                 sendPacket(receivedPacket, m.getClientAddress());
             }
+            receivedPacket = readPacket(true);
         }
         SSWcurrentState = States.restarting;
     }
@@ -216,7 +218,7 @@ public class southSideWrap extends Thread{
                 byte[] receivedPacket2 = null;
                 while(!sender.equals("SRV")){
                     //Capture SRV's responding ACK
-                    receivedPacket2 = readPacket();
+                    receivedPacket2 = readPacket(false);
                 }
                 //Reply with fake corresponding ACK
                 m.setDelta_seq(m.getDelta_seq() -TCP.getSequenceNumber(receivedPacket2));
@@ -305,9 +307,9 @@ public class southSideWrap extends Thread{
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
-    private byte[] readPacket(){
+    private byte[] readPacket(boolean useRestarting){
         try{
-            while(true){
+            while((useRestarting && !m.getRestarting()) || !useRestarting){
                 FilenameFilter filter = new SSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
@@ -337,6 +339,7 @@ public class southSideWrap extends Thread{
                     }
                 }
             }
+            return null;
         }
         catch(java.io.FileNotFoundException e){
             return null;
