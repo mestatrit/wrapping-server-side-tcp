@@ -205,9 +205,11 @@ public class logger extends Thread{
                         }
                         
                         // Print retrieved data.
-                        int receivedInt = ByteArray.getShort(catchupData, 0);
-                        System.out.println("LOGGER: Retrieved " +  receivedInt);
-
+                        int retrievedInt = ByteArray.getShort(catchupData, 0);
+                        System.out.println("LOGGER: Retrieved " +  retrievedInt);
+                        
+                        gui.printToScreen("LOGGER: Sending OLD data to server: " + retrievedInt);
+                        
                         // Send the packet to the server.
                         sendPacket(catchupData, m.getServerAddress());
                     }
