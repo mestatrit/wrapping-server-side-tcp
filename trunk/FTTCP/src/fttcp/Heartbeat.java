@@ -72,11 +72,11 @@ public class Heartbeat extends Thread {
                     // No beat arrived during sleeping.
                     System.out.println("HEARTBEAT: No beat arrived, setting serverAlive to false.");
                     thisLogger.setServerAlive(false);
+                    this.detectBeats = false;
                     if(interactingWithClient == false){
                         thisLogger.clientInteraction();
                         interactingWithClient = true;
                     }
-                    this.detectBeats = false;
                 }
            }
         }while(finished == false);  
