@@ -11,7 +11,8 @@ import java.io.*;
  */
 class SRVFileFilter implements FilenameFilter {
     public boolean accept(File dir, String name) {
-        return name.toLowerCase().endsWith(".srv");
+        boolean accept = name.toLowerCase().endsWith(".srv") || name.toLowerCase().matches("received[.]log[.]srv.*");
+        return accept;
     }
     
     public String getDescription() {

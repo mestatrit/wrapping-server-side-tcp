@@ -20,6 +20,7 @@ public class TCP extends Thread{
     private GUI gui;
     private String entity;
     private String direction;
+    private String extraInfo;
     
     public static final int HEADER_SIZE = 24;
     public static final int DATA_SIZE = 24;
@@ -287,9 +288,17 @@ public class TCP extends Thread{
                     
                     // store sender and receiver
                     String[] info = files[0].split("[.]");
-                    if(info.length == 3 || info.length == 4){
+                    //if(info.length == 3 || info.length == 4){
                         sender = info[1];
                         destination = info[2];
+                    //}
+                        
+                        //This is to allow extra strings after file name.
+                    if(files.length == 5){
+                            extraInfo = files[4];
+                    }
+                    else{
+                            extraInfo = null;
                     }
                     
                     FileInputStream fileinputstream = new FileInputStream(entityBuffer+"/"+files[0]);
@@ -384,7 +393,14 @@ public class TCP extends Thread{
             else if (sender.equals("LOG") && destination.equals("SRV")) {
                 // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
                 gui.tcp2nsw();
-                writeFile(data,"serverBuffer/received.LOG.SRV.NSW");
+                if(extraInfo != null){
+                    String path = "serverBuffer/received.LOG.SRV.NSW." + extraInfo; 
+                    writeFile(data,path);
+                }
+                else{
+                    writeFile(data,"serverBuffer/received.LOG.SRV.NSW");
+                }
+                
             }  
             
             

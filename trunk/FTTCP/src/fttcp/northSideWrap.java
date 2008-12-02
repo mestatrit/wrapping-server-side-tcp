@@ -16,6 +16,7 @@ public class northSideWrap extends Thread{
     private GUI gui;
     private String sender;
     private String destination;
+    private String extraInfo;
     private enum States {normal, restarting};
     private States NSWcurrentState = States.normal;
     private byte readFlag = 2;
@@ -227,9 +228,14 @@ public class northSideWrap extends Thread{
                     boolean hadDel = (new File("serverBuffer/"+files[0]).delete());;
                     //Find and set sender
                     String[] info = files[0].split("[.]");
-                    if(info.length == 3 || info.length == 4){
+                    
                         sender = info[1];
                         destination = info[2];
+                    if(files.length == 5){
+                            extraInfo = files[4];
+                    }
+                    else{
+                            extraInfo = null;
                     }
                     
                     return bytearray;
@@ -263,7 +269,13 @@ public class northSideWrap extends Thread{
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
             gui.nsw2srv();
-            writeFile(data,"serverBuffer/received.NSW.SRV");
+            if(extraInfo != null){
+                String path = "serverBuffer/received.NSW.SRV." + extraInfo;
+                writeFile(data, path);
+            }
+            else{
+                writeFile(data,"serverBuffer/received.NSW.SRV");
+            }
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder

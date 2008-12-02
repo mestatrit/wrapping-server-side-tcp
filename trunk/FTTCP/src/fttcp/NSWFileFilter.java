@@ -11,7 +11,8 @@ import java.io.*;
  */
 class NSWFileFilter implements FilenameFilter {
     public boolean accept(File dir, String name) {
-        return name.toLowerCase().endsWith(".nsw");
+        boolean accept = name.toLowerCase().endsWith(".nsw") || name.toLowerCase().matches("received[.]log[.]srv[.]nsw.*");
+        return accept;
     }
     
     public String getDescription() {
