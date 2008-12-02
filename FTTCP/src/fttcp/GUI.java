@@ -249,7 +249,8 @@ public class GUI extends Thread{
     
     private void killServerActionPerformed(ActionEvent evt) {
         m.KillServer();
-        clearServerBuffer();
+
+        
         canvas.setBackgroundImage(new ImageIcon("backgroundKilled.jpg").getImage());
         printToScreen("Server Killed");
     }
