@@ -122,15 +122,16 @@ public class logger extends Thread{
                    }
                }
                
-            }
+           }
            else{    // If server is not alive, sleep before checking again.
                    System.out.println("Logger: Normal operation loop is not running (server is not alive)");
+                   gui.printToScreen("Server is dead.."); 
                    try{
                        this.sleep(1000);
                    }
                    catch(Exception e){}
                    
-               }
+           }
       }while(!finished);
     }
     
@@ -146,7 +147,7 @@ public class logger extends Thread{
 
          do{
             
-           gui.printToScreen("Server is dead.."); 
+            gui.printToScreen("Server is dead.."); 
            
            // Check for client data from the NSW
            try{
