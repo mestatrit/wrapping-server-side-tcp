@@ -32,8 +32,8 @@ public class logger extends Thread{
     private byte initClientSeqNumber = 3;
     private byte fwdClientPktFlag = 4;
     
-    private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp
-    Heartbeat heartbeatThread = new Heartbeat(m, this);
+    private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp[] holds incoming packet that has been read by readPacket.
+    Heartbeat heartbeatThread = new Heartbeat(m, this); //
     private boolean serverAlive = true;
    
     byte[][] ClientData = new byte[TCP.DATA_SIZE][1000];
@@ -143,6 +143,7 @@ public class logger extends Thread{
     public void clientInteraction(){
         gui.printToScreen("LOG: Confirmed Server is dead");
                 gui.printToScreen("LOG: Interacting with client...");
+                
                 this.serverAlive = false;
                       
                  do{
@@ -176,6 +177,7 @@ public class logger extends Thread{
                         }
                         else if(sender.equals("SRV")){
                             
+                            m.setUnstable_reads(0);
                             // Server is dead.
                             m.setRestarting(true); 
                             
