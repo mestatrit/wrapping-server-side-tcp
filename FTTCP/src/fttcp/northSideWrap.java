@@ -143,7 +143,7 @@ public class northSideWrap extends Thread{
         gui.printToScreen("NSW entering RESTART mode");
 
         int bytesWritten = 0;
-        
+        int tempMessagesRead = messagesRead;
         /*//create message telling SSW to fabricate SYN
         byte[] fabSyn = new byte[TCP.PACKET_SIZE];
         //send message to SSW
@@ -159,8 +159,8 @@ public class northSideWrap extends Thread{
                     // NSW replies data read from logger
                     sendPacket(NSWreadData, m.getServerAddress());
                     gui.printToScreen("NSW: SENDING OLD DATA TO SERVER");
-                    messagesRead--;
-                    if(messagesRead==1) {
+                    tempMessagesRead--;
+                    if(tempMessagesRead==1) {
                         lastRound = true;
                     }
                     
