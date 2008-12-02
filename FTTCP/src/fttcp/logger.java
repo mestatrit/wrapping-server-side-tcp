@@ -214,7 +214,7 @@ public class logger extends Thread{
                         sendPacket(catchupData, m.getServerAddress());
                         
                         try{
-                            this.sleep(5000);
+                            this.sleep(8000);
                         }
                         catch(Exception e){}
                         
