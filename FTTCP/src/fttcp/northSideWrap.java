@@ -61,7 +61,7 @@ public class northSideWrap extends Thread{
 
         while(!m.getRestarting()) {
             gui.printToScreen("NSW: Waiting for another packet");
-            byte[] NSWreadData = readPacket();             
+            byte[] NSWreadData = readPacket(true);             
   
              //if read socket call
              if(sender.equals("CLT")) {
@@ -111,7 +111,7 @@ public class northSideWrap extends Thread{
                    while (m.getUnstable_reads() > 0) {
                        gui.printToScreen("NSW: Waiting for unstable reads to be 0");
                        //wait for ack to be received
-                       byte[] ackData = readPacket();
+                       byte[] ackData = readPacket(true);
                        //when received, decrease unstable reads
                        tempUnstableReads = m.getUnstable_reads();
                        m.setUnstable_reads(tempUnstableReads - 1);
@@ -147,7 +147,7 @@ public class northSideWrap extends Thread{
         //while server is recovering
         while(m.getRestarting()) {
             
-            byte[] NSWreadData = readPacket();
+            byte[] NSWreadData = readPacket(false);
             
              //if it's a read socket call
             if(sender.equals("LOG")) {
@@ -182,7 +182,7 @@ public class northSideWrap extends Thread{
                 }
             
             if(lastRound){
-                readPacket();
+                readPacket(false);
                 m.setRestarting(false);
                 lastRound = false;
             }
@@ -197,9 +197,9 @@ public class northSideWrap extends Thread{
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
-    private byte[] readPacket(){
+    private byte[] readPacket(boolean useRestarting){
         try{
-            while(true){
+            while((useRestarting && !m.getRestarting()) || !useRestarting){
                 FilenameFilter filter = new NSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
@@ -230,6 +230,7 @@ public class northSideWrap extends Thread{
                     }
                 }
             }
+            return null;
         }
         catch(java.io.FileNotFoundException e){
             return null;
