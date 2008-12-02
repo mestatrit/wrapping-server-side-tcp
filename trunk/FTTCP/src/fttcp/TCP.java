@@ -131,18 +131,18 @@ public class TCP extends Thread{
                     // add header
                     gui.printToScreen("TCP " +entity +": Read packet, adding header.");
                     data = TCP.createTCPSegment();
-                    System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
+                    //System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
                     
                     TCP.setData(buffer,data);
-                    System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
+                    //System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
                 } else {
                     try{
                     // strip header
                     //System.out.println("send "+sender+" destination "+destination);
                         gui.printToScreen("TCP " +entity +": Read packet, stripping header.");
-                        System.out.println("strip header/buffer index 0: "+buffer[25]);
+                        //System.out.println("strip header/buffer index 0: "+buffer[25]);
                         data = TCP.stripHeader(buffer);
-                        System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
+                        //System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
                     }
                     catch(Exception e){
                         gui.printToScreen("TCP: ERROR in " + entity + ": " + e);
