@@ -224,6 +224,8 @@ public class logger extends Thread{
                     if(temp[0] == 1){
                         heartbeatThread.beat();
                     }
+                    
+                    this.serverAlive = true;
                 }
            }
            catch(Exception e){
