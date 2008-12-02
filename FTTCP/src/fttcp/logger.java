@@ -17,6 +17,7 @@ public class logger extends Thread{
     private Main m;     // The instance of Main that initiated this instance of logger.
     private String sender;  // This is used to determine the sender (SRV, NSW, SSW) of an incoming packet.
     private String destination; 
+    private String appendedString; //This is used to give unique filenames to prevent overwriting
     private GUI gui;    // The instance of the user interface, stored so that it can be utilised by the logger (for animations).
     Heartbeat heartbeatThread = new Heartbeat(m, this); // Creates an instance of of Heartbeat so that the logger can detect heartbeats from the server.
     boolean finished=false; // Used in the shutdown behaviour of the logger.
@@ -210,13 +211,15 @@ public class logger extends Thread{
                         
                         gui.printToScreen("LOGGER: Sending OLD data to server: " + retrievedInt);
                         
+                        appendedString = Integer.toString(retrievedInt) ; //Unique name
                         // Send the packet to the server.
                         sendPacket(catchupData, m.getServerAddress());
+                        appendedString = null;
                         
-                        try{
+                        /*try{
                             this.sleep(8000);
                         }
-                        catch(Exception e){}
+                        catch(Exception e){}*/
                         
                     }
 
@@ -298,7 +301,14 @@ public class logger extends Thread{
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
             gui.log2tcp();
-            writeFile(data,"loggerBuffer/toSend.LOG.SRV.TCP");
+            if(appendedString != null){
+                String path = "loggerBuffer/toSend.LOG.SRV.TCP." + appendedString;
+                writeFile(data,path);
+            }
+            else{
+                writeFile(data,"loggerBuffer/toSend.LOG.SRV.TCP");
+            }
+            
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder

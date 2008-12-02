@@ -91,6 +91,7 @@ public class server extends Thread{
                 FilenameFilter filter = new SRVFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
+                java.util.Arrays.sort(files);
                 if(files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
