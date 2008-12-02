@@ -1,6 +1,7 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * The logger applies fault-tolerance by storing all data passed from the client to the server. If the server crashes then
+ * the logger continues to store subsequent client data. Once the server has restarted, the logger sends all stored client
+ * data on to the server until it has none left, at which point normal operation resumes.
  */
 
 package fttcp;
@@ -13,22 +14,25 @@ import java.io.*;
 import org.knopflerfish.util.ByteArray;
 
 public class logger extends Thread{
-    private Main m;
-    private String sender;
-    private String destination;
-    private GUI gui;
-    int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
-    int initialClientSequenceNumber = 0;
-    int length=TCP.DATA_SIZE;// Need to update length!!!
-       int newReadLength = 0;
-       int[] readLengthArray = new int[1000]; //to have the array received from the client
-          boolean finished=false;
+    private Main m;     // The instance of Main that initiated this instance of logger.
+    private String sender;  // This is used to determine the sender (SRV, NSW, SSW) of an incoming packet.
+    private String destination; 
+    private GUI gui;    // The instance of the user interface, stored so that it can be utilised by the logger (for animations).
+    //TODO: REMOVE *** int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
+    int initialClientSequenceNumber = 0;    // Stores the client's initial sequence number, given by the client at the beginning of a transaction.
+    int length=1000;    // Length is used to supply the maximum number of packets of client data (or read lengths) by defining the number of rows in an array.
+    int newReadLength = 0;  // Stores newest read length, as supplied by the North Side Wrap.
+    int[] readLengthArray = new int[length]; // An array to store sequence of readlengths supplied by the NSW.
+    boolean finished=false; // Used in the shutdown behaviour of the logger.
     
+    // The following are flag codes, appearing in the first position of an incoming packet (byte array). 
+    // Refer to here to determine what each flag is.
     private byte heartbeatFlag = 1;
     private byte readLengthFlag = 2;
     private byte initClientSeqNumber = 3;
     private byte fwdClientPktFlag = 4;
-    private byte[] temp = new byte[TCP.DATA_SIZE];
+    
+    private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp
     Heartbeat heartbeatThread = new Heartbeat(m, this);
     private boolean serverAlive = true;
    
@@ -53,9 +57,7 @@ public class logger extends Thread{
     @Override
     public void run(){
         gui.printToScreen("Logger reporting in.");
-       
-       
-    
+      
 
        // Start-up   
        // Create instance of Heartbeat
@@ -204,7 +206,6 @@ public class logger extends Thread{
                             if(temp[0] == 1){
                                 heartbeatThread.beat();
                             }
-                            m.setRestarting(false);
                         }
                    }
                    catch(Exception e){
