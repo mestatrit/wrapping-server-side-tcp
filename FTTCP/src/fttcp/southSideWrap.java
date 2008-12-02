@@ -201,10 +201,12 @@ public class southSideWrap extends Thread{
      */
     private void SSWrestarting(){
         short closedWindow = 0;
+        gui.printToScreen("SSW: Now in restarting mode.");
         while(m.getRestarting()){
             //Send Closed window packets to client to keep connection alive
             byte[] closedWindowPacket = TCP.createTCPSegment();
             TCP.setWindowSize(closedWindow, closedWindowPacket);
+            gui.printToScreen("SSW: Sending closed window to client.");
             sendPacket(closedWindowPacket, m.getClientAddress());
             
             byte[] receivedPacket = tryReadPacket();
@@ -214,6 +216,7 @@ public class southSideWrap extends Thread{
                 byte[] SYNPacket = TCP.createTCPSegment();
                 TCP.setSYNFlag(true, SYNPacket);
                 TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
+                gui.printToScreen("SSW: Sending fake SYN to server.");
                 sendPacket(SYNPacket,m.getServerAddress());
                 byte[] receivedPacket2 = null;
                 while(!sender.equals("SRV")){
@@ -224,13 +227,14 @@ public class southSideWrap extends Thread{
                 m.setDelta_seq(m.getDelta_seq() -TCP.getSequenceNumber(receivedPacket2));
                 byte[] ACKPacket = TCP.createTCPSegment();
                 TCP.setACKFlag(true,ACKPacket);
+                gui.printToScreen("SSW: Sending fake ACK to server.");
                 sendPacket(ACKPacket,m.getServerAddress());
 
                 
             }
             try{
                 //Sleep for 1 seconds
-                this.sleep(1000);
+                this.sleep(3000);
             }
             catch(java.lang.InterruptedException e){
 

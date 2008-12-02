@@ -56,15 +56,17 @@ public class client extends Thread{
             byte[] receivedPacket;
             receivedPacket = readPacket();
            
-            int receivedChar = ByteArray.getShort(receivedPacket, 0);
-            gui.printToClient("Received " + (char) receivedChar);
-            gui.printToScreen("CLT: Received " + (char) receivedChar);
-            //when server replies, increase number to send
-            numberSend++;
-            
+            //IF LOOP TO BE REMOVED WHEN TCP FULLY(ISH) IMPLEMENTED
+            if(receivedPacket[1] != 0){         
+                int receivedChar = ByteArray.getShort(receivedPacket, 0);
+                gui.printToClient("Received " + (char) receivedChar);
+                gui.printToScreen("CLT: Received " + (char) receivedChar);
+                //when server replies, increase number to send
+                numberSend++;
             }
-            
         }
+            
+    }
         
     
      /**
