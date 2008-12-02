@@ -226,7 +226,8 @@ public class logger extends Thread{
                     // Switch normal operation back on.
                     this.setServerAlive(true);
                     heartbeatThread.setServerAlive(true);
-                    heartbeatThread.setInteractingWithClient();
+                    heartbeatThread.setInteractingWithClient(false);
+                    heartbeatThread.setDetectBeats(true);
                     
                     // If the packet from the server was a heartbeat, let the heartbeatThread know.
                     if(temp[0] == 1){
