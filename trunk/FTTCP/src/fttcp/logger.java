@@ -210,8 +210,12 @@ public class logger extends Thread{
                         System.out.println("LOGGER: Retrieved " +  retrievedInt);
                         
                         gui.printToScreen("LOGGER: Sending OLD data to server: " + retrievedInt);
-                        
-                        appendedString = Integer.toString(retrievedInt) ; //Unique name
+                        if(retrievedInt <10){
+                            appendedString = "0" + Integer.toString(retrievedInt) ; //Unique name
+                        }
+                        else{
+                            appendedString = Integer.toString(retrievedInt) ; //Unique name
+                        }
                         // Send the packet to the server.
                         sendPacket(catchupData, m.getServerAddress());
                         appendedString = null;
@@ -275,7 +279,7 @@ public class logger extends Thread{
                 else{
                     try{
                         //Sleep for 3 seconds, then look again for file
-                        this.sleep(3000);
+                        this.sleep(1000);
                     }
                     catch(java.lang.InterruptedException e){
                         
