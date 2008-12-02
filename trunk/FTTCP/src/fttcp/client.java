@@ -16,6 +16,9 @@ public class client extends Thread{
     private Main m;
     private GUI gui;
     
+    //TO BE REMOVED WHEN TCP FULLY IMPLEMENTED!!
+    private boolean dataAckRec = true;
+    
     public client(Main main, GUI g){
         m = main;
         gui = g;
@@ -57,13 +60,19 @@ public class client extends Thread{
             receivedPacket = readPacket();
            
             //IF LOOP TO BE REMOVED WHEN TCP FULLY(ISH) IMPLEMENTED
-            if(receivedPacket[1] != 0){         
+           // if(receivedPacket[1] != 0){         
                 int receivedChar = ByteArray.getShort(receivedPacket, 0);
                 gui.printToClient("Received " + (char) receivedChar);
                 gui.printToScreen("CLT: Received " + (char) receivedChar);
                 //when server replies, increase number to send
                 numberSend++;
-            }
+                dataAckRec = true;
+            //}
+            
+            //else if(dataAckRec){
+                //numberSend++;
+                //dataAckRec = false;
+           // }
         }
             
     }

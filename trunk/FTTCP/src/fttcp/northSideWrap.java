@@ -159,7 +159,7 @@ public class northSideWrap extends Thread{
                     sendPacket(NSWreadData, m.getServerAddress());
                     gui.printToScreen("NSW: SENDING OLD DATA TO SERVER");
                     messagesRead--;
-                    if(messagesRead==0) {
+                    if(messagesRead==1) {
                         lastRound = true;
                     }
                     
@@ -187,11 +187,18 @@ public class northSideWrap extends Thread{
 
                 }
             
-            if(lastRound){
-                readPacket(false);
-                m.setRestarting(false);
-                gui.printToScreen("NSW: RESTARTING NOW FALSE");
-                lastRound = false;
+            while(lastRound){
+                NSWreadData = readPacket(false);
+                
+                 if(sender.equals("LOG")) {
+                    // NSW replies data read from logger
+                    sendPacket(NSWreadData, m.getServerAddress());
+                    gui.printToScreen("NSW sending last packet to SRV");
+                    m.setRestarting(false);
+                    gui.printToScreen("NSW: RESTARTING NOW FALSE");
+                    lastRound = false;
+                 }
+
             }
           
         }

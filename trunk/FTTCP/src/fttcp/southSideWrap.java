@@ -207,7 +207,8 @@ public class southSideWrap extends Thread{
             byte[] closedWindowPacket = TCP.createTCPSegment();
             TCP.setWindowSize(closedWindow, closedWindowPacket);
             gui.printToScreen("SSW: Sending closed window to client.");
-            sendPacket(closedWindowPacket, m.getClientAddress());
+            //WILL ENABLE THIS WHEN TCP IMPLEMENTED
+            //sendPacket(closedWindowPacket, m.getClientAddress());
             
             byte[] receivedPacket = tryReadPacket();
             
@@ -234,7 +235,7 @@ public class southSideWrap extends Thread{
             }
             try{
                 //Sleep for 1 seconds
-                this.sleep(3000);
+                this.sleep(10000);
             }
             catch(java.lang.InterruptedException e){
 
