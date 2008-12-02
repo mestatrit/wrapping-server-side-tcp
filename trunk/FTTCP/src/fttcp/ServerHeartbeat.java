@@ -33,7 +33,7 @@ public class ServerHeartbeat extends Thread {
               s.sendHeartbeat();
              
              try{
-                this.sleep(15000);
+                this.sleep(8000);
                 
             }catch(Exception e){}
              

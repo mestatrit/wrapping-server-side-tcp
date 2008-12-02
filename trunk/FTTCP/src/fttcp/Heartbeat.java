@@ -126,7 +126,6 @@ public class Heartbeat extends Thread {
     public void beat(){
         System.out.println("HEARTBEAT: Logger received heatbeat. Set currentBeat to TRUE.");
         this.currentBeat = true;
-        thisLogger.setServerAlive(true);
     }
     
     public void setInteractingWithClient(boolean newBoolean){

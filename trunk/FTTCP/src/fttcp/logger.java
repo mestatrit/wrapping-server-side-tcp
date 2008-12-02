@@ -125,7 +125,7 @@ public class logger extends Thread{
            }
            else{    // If server is not alive, sleep before checking again.
                    System.out.println("Logger: Normal operation loop is not running (server is not alive)");
-                   gui.printToScreen("Server is dead.."); 
+                   gui.printToScreen("LOGGER: Normal operation loop..Server is dead.."); 
                    try{
                        this.sleep(1000);
                    }
@@ -229,9 +229,9 @@ public class logger extends Thread{
                     }
                     
                     // Switch normal operation back on.
-                    this.setServerAlive(true);
-                    heartbeatThread.setServerAlive(true);
                     heartbeatThread.setInteractingWithClient(false);
+                    // this.setServerAlive(true);
+                    heartbeatThread.setServerAlive(true);
                     heartbeatThread.setDetectBeats(true);
                 }
            }
