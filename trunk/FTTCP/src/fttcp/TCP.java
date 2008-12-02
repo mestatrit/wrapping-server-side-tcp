@@ -381,6 +381,11 @@ public class TCP extends Thread{
                 gui.hsrv2log();
                 writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG.TCP");
             }
+            else if (sender.equals("LOG") && destination.equals("SRV")) {
+                // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
+                gui.tcp2nsw();
+                writeFile(data,"serverBuffer/received.LOG.SRV.NSW");
+            }  
             
             
             
