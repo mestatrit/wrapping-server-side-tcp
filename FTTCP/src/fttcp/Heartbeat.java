@@ -46,11 +46,7 @@ public class Heartbeat extends Thread {
     
     
     public void checkHeartBeat(){
-       // TODO: Redundant? int length=TCP.DATA_SIZE;
-       // TODO Redundant? byte[][] readlength= new byte[length][length]; //to have the array received from the client
-       // TODO: Redundant? byte[] temp = new byte[length];
-       //TODO: Redundant? int count=0;
-      
+       
        System.out.println("HEARTBEAT IS RUNNING");
        
        // Repeat the following behaviour until the program is over (finished == true)
@@ -69,18 +65,20 @@ public class Heartbeat extends Thread {
                 if(this.currentBeat == true){
                     // A heartbeat must have arrived from the logger (i.e. from the server).
                     System.out.println("HEARTBEAT: Woke up. Current beat is TRUE. Server is alive.");
-                    thisLogger.setServerAlive(true);    // Indicate to the logger that the server is alive.
+                    thisLogger.setOperatingNormally(true);
+                   // thisLogger.setServerAlive(true);    // Indicate to the logger that the server is alive.
                     this.currentBeat = false;   // Set currentBeat to false in order to wait for the next heartbeat.
                 }
                 else{
                     // No beat arrived during sleeping.
                     System.out.println("HEARTBEAT: No beat arrived, setting serverAlive to false.");
-                    thisLogger.setServerAlive(false);   // Indicate to the logger that the server has died and normal operation should cease.
-                    if(interactingWithClient == false){     // Only interact with the client if clientInteraction isn't already running.
-                        thisLogger.clientInteraction();     // Call a method on the logger to handle operation while the server is dead as well as handle restarting.
+                    thisLogger.setOperatingNormally(false);
+                    //thisLogger.setServerAlive(false);   // Indicate to the logger that the server has died and normal operation should cease.
+                    //if(interactingWithClient == false){     // Only interact with the client if clientInteraction isn't already running.
+                     //   thisLogger.clientInteraction();     // Call a method on the logger to handle operation while the server is dead as well as handle restarting.
                         this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger.
-                        this.interactingWithClient = true;       // Indicate that clientInteraction has been called.
-                    }
+                    //    this.interactingWithClient = true;       // Indicate that clientInteraction has been called.
+                    //}
                 }
            }
         }while(finished == false);    
