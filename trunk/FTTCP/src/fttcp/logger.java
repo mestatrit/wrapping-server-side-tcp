@@ -212,6 +212,12 @@ public class logger extends Thread{
                         
                         // Send the packet to the server.
                         sendPacket(catchupData, m.getServerAddress());
+                        
+                        try{
+                            this.sleep(5000);
+                        }
+                        catch(Exception e){}
+                        
                     }
 
                     System.out.println("LOGGER: Finished sending client data to restarting server.");
