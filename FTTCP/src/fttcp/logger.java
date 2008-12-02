@@ -18,12 +18,15 @@ public class logger extends Thread{
     private String sender;  // This is used to determine the sender (SRV, NSW, SSW) of an incoming packet.
     private String destination; 
     private GUI gui;    // The instance of the user interface, stored so that it can be utilised by the logger (for animations).
-    //TODO: REMOVE *** int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
+    Heartbeat heartbeatThread = new Heartbeat(m, this); // Creates an instance of of Heartbeat so that the logger can detect heartbeats from the server.
+    boolean finished=false; // Used in the shutdown behaviour of the logger.
+    
+    int emptyReadCounter = 0;   // For counting how many consecutive times a read has been performed when nothing has been available to read.
     int initialClientSequenceNumber = 0;    // Stores the client's initial sequence number, given by the client at the beginning of a transaction.
+    private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp[] holds incoming packet that has been read by readPacket.
     int length=1000;    // Length is used to supply the maximum number of packets of client data (or read lengths) by defining the number of rows in an array.
     int newReadLength = 0;  // Stores newest read length, as supplied by the North Side Wrap.
     int[] readLengthArray = new int[length]; // An array to store sequence of readlengths supplied by the NSW.
-    boolean finished=false; // Used in the shutdown behaviour of the logger.
     
     // The following are flag codes, appearing in the first position of an incoming packet (byte array). 
     // Refer to here to determine what each flag is.
@@ -32,8 +35,8 @@ public class logger extends Thread{
     private byte initClientSeqNumber = 3;
     private byte fwdClientPktFlag = 4;
     
-    private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp[] holds incoming packet that has been read by readPacket.
-    Heartbeat heartbeatThread = new Heartbeat(m, this); //
+    
+    
     private boolean serverAlive = true;
    
     byte[][] ClientData = new byte[TCP.DATA_SIZE][1000];
