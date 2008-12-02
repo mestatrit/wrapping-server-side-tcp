@@ -319,7 +319,7 @@ public class TCP extends Thread{
                 else{
                     try{
                         //Sleep for 3 seconds, then look again for file
-                        this.sleep(3000);
+                        this.sleep(1000);
                     }
                     catch(java.lang.InterruptedException e){
                         

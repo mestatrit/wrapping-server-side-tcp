@@ -12,6 +12,7 @@ package fttcp;
 import java.io.*;
 import org.knopflerfish.util.ByteArray;
 
+
 public class server extends Thread{
     private Main m;
     private GUI gui;
@@ -92,6 +93,9 @@ public class server extends Thread{
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
                 java.util.Arrays.sort(files);
+                
+                
+                
                 if(files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
@@ -104,7 +108,7 @@ public class server extends Thread{
                 else{
                     try{
                         //Sleep for 3 seconds, then look again for file
-                        this.sleep(3000);
+                        this.sleep(1000);
                     }
                     catch(java.lang.InterruptedException e){
                         
