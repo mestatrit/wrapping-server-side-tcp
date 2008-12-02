@@ -17,10 +17,11 @@ public class logger extends Thread{
     private Main m;     // The instance of Main that initiated this instance of logger.
     private String sender;  // This is used to determine the sender (SRV, NSW, SSW) of an incoming packet.
     private String destination; 
-    private String appendedString; //This is used to give unique filenames to prevent overwriting
     private GUI gui;    // The instance of the user interface, stored so that it can be utilised by the logger (for animations).
     Heartbeat heartbeatThread = new Heartbeat(m, this); // Creates an instance of of Heartbeat so that the logger can detect heartbeats from the server.
     boolean finished=false; // Used in the shutdown behaviour of the logger.
+    boolean operatingNormally = true;
+    private String appendedString = null;
     
     private byte[] temp = new byte[TCP.DATA_SIZE];  // Temp[] holds incoming packet that has been read by readPacket.
     int initialClientSequenceNumber = 0;    // Stores the client's initial sequence number, given by the client at the beginning of a transaction.
@@ -63,96 +64,96 @@ public class logger extends Thread{
        // Begin running an instance of heartbeatThread to begin detecting heartbeats from server.
        heartbeatThread.start();
   
-      // Begin a loop that will not stop until finished==true. Therefore the logger will only stop when the program is finished.
-      do{
+       
+       
+       while(!finished){
            
-           /* BEHAVIOUR UNDER NORMAL OPERATION */
-           
-           // Only attempt to read packets (and perform actions based upon them) if the server is currently alive.
-           if(this.serverAlive == true){
+           while(this.operatingNormally){
                
-           try{
-               temp = readPacket();     // Attempt to read a packet.
-           }
-           catch(Exception e){}
-               
-               if(sender.equals("NSW")){    // If the arriving packet was received from the North Side Wrap..
-                   
-                   // Check first position in packet's byte array, to ensure packet contains a readLength
-                   if(temp[0] == readLengthFlag){
-                       gui.printToScreen("LOGGER: Received a read length from NSW. Storing and ACKing.");
-                       // Convert to int everything except flag in order to get readlength.
-                       newReadLength = TCP.convertByteArrayToInt(temp, 1);  // Convert readLength to its storable form.
-                       readLengthArray[readLengthCounter] = newReadLength;  // Store read length.            
-                       sendACK(entity.NSW);   // Supply an acknowledgement
-                       readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
-                   }
-                   
-               }else if(sender.equals("SSW")){  // Else, If the arriving packet was received from the South Side Wrap..
-                   
-                    if(temp[0] == 3){   // Check packet flag, and if it is an initialClientSequenceNumber flag..
-                        // Store initial client sequence number
-                        initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);   // Convert sequence number to its storable form.
-                        gui.printToScreen("LOGGER: Received and stored initial Seq number. ACKing SSW.");
-                        sendACK(entity.SSW);    // Supply an acknowledgement.
-                    }
-                    else if(temp[0] == 4){  // Check packet flag, and if it is forwarded client data..
-                       
-                        int receivedInt = ByteArray.getShort(temp, 1);  // Convert client data to a printable form.
-                        gui.printToScreen("LOGGER: Received and stored client data: " +  receivedInt);
-                       
-                        /* Begin storing client data packet's payload*/
-                        
-                        // Store packet's sequence number.
-                        ClientData[0][clientDataCounter] = (byte)(initialClientSequenceNumber + clientDataCounter);
-                        
-                        // Loop through the packet (temp[]) copying it into the ClientData array.
-                        for(int i = 1; i < temp.length; i++){
-                            ClientData[i][clientDataCounter] = temp[i];
-                        }
-                        
-                        sendACK(entity.SSW);    // Supply an acknowledgement.
-                        clientDataCounter++;    // Indicate that another item of client data has been stored.
-                        gui.printToScreen("LOGGER: Now has " + clientDataCounter + " items of client data stored.");
-                    }
-               }
-               else if(sender.equals("SRV")){
-                   if(temp[0] == 1){
-                       gui.printToScreen("LOGGER: Received a heartbeat from the server. Server is ALIVE.");
-                       heartbeatThread.beat();  // Let heartbeatThread know that a heartbeat has just been received.       
-                   }
-               }
-               
-           }
-           else{    // If server is not alive, sleep before checking again.
-                   System.out.println("Logger: Normal operation loop is not running (server is not alive)");
-                   gui.printToScreen("LOGGER: Normal operation loop..Server is dead.."); 
-                   try{
-                       this.sleep(1000);
-                   }
-                   catch(Exception e){}
-                   
-           }
-      }while(!finished);
-    }
-    
-    /**
-     * clientInteraction is a method called by the heartbeatThread once the server has timed out and normal operation has been halted.
-     */
-    public void clientInteraction(){
-        gui.printToScreen("LOGGER: Confirmed Server is dead.");
-        gui.printToScreen("LOGGER: Interacting with client...");
-        gui.clearServerBuffer();
-        
-        this.serverAlive = false;
+                /* Normal Operation Behaviour */
 
-         do{
-            
-            gui.printToScreen("LOGGER: Server is dead.."); 
+                // Only attempt to read packets (and perform actions based upon them) if the server is currently alive.
+               //if(this.serverAlive == true){
+
+               try{
+                   temp = readPacket(true);     // Attempt to read a packet.
+               }
+               catch(Exception e){}
+
+                   if(temp != null && sender.equals("NSW")){    // If the arriving packet was received from the North Side Wrap..
+
+                       // Check first position in packet's byte array, to ensure packet contains a readLength
+                       if(temp[0] == readLengthFlag){
+                           gui.printToScreen("LOGGER: Received a read length from NSW. Storing and ACKing.");
+                           // Convert to int everything except flag in order to get readlength.
+                           newReadLength = TCP.convertByteArrayToInt(temp, 1);  // Convert readLength to its storable form.
+                           readLengthArray[readLengthCounter] = newReadLength;  // Store read length.            
+                           sendACK(entity.NSW);   // Supply an acknowledgement
+                           readLengthCounter++;   // Increment counter to indicate number of stored readLengths.
+                       }
+
+                   }else if(temp != null && sender.equals("SSW")){  // Else, If the arriving packet was received from the South Side Wrap..
+
+                        if(temp[0] == 3){   // Check packet flag, and if it is an initialClientSequenceNumber flag..
+                            // Store initial client sequence number
+                            initialClientSequenceNumber = TCP.convertByteArrayToInt(temp, 1);   // Convert sequence number to its storable form.
+                            gui.printToScreen("LOGGER: Received and stored initial Seq number. ACKing SSW.");
+                            sendACK(entity.SSW);    // Supply an acknowledgement.
+                        }
+                        else if(temp[0] == 4){  // Check packet flag, and if it is forwarded client data..
+
+                            int receivedInt = ByteArray.getShort(temp, 1);  // Convert client data to a printable form.
+                            gui.printToScreen("LOGGER: Received and stored client data: " +  receivedInt);
+
+                            /* Begin storing client data packet's payload*/
+
+                            // Store packet's sequence number.
+                            ClientData[0][clientDataCounter] = (byte)(initialClientSequenceNumber + clientDataCounter);
+
+                            // Loop through the packet (temp[]) copying it into the ClientData array.
+                            for(int i = 1; i < temp.length; i++){
+                                ClientData[i][clientDataCounter] = temp[i];
+                            }
+
+                            sendACK(entity.SSW);    // Supply an acknowledgement.
+                            clientDataCounter++;    // Indicate that another item of client data has been stored.
+                            gui.printToScreen("LOGGER: Now has " + clientDataCounter + " items of client data stored.");
+                        }
+                   }
+                   else if(temp != null && sender.equals("SRV")){
+                       if(temp[0] == 1){
+                           gui.printToScreen("LOGGER: Received a heartbeat from the server. Server is ALIVE.");
+                           heartbeatThread.beat();  // Let heartbeatThread know that a heartbeat has just been received.       
+                       }
+                   }
+
+                /*}
+              else{    // If server is not alive, sleep before checking again.
+                       System.out.println("Logger: Normal operation loop is not running (server is not alive)");
+                       gui.printToScreen("LOGGER: Normal operation loop..Server is dead.."); 
+                       try{
+                           this.sleep(1000);
+                       }
+                       catch(Exception e){}
+
+               }*/
+               
+               
+               // END OF SINGLE ITERATION OF LOOP FOR NORMAL OPERATION
+           }
+           
+           System.out.println("LOGGER: Logger has left normal operation loop.");
+           
+           
+           while(!this.operatingNormally){
+               
+               /* Faulty Operation Behaviour */
+           gui.clearServerBuffer();
+           gui.printToScreen("LOGGER: Server is dead.."); 
            
            // Check for client data from the NSW
            try{
-                temp = readPacket();
+                temp = readPacket(false);
                 // There must have been something in the buffer, or else try would have failed and gone to catch.
                 
                 if(sender.equals("NSW")){   // If packet came from North Side Wrap..
@@ -209,24 +210,21 @@ public class logger extends Thread{
                         int retrievedInt = ByteArray.getShort(catchupData, 0);
                         System.out.println("LOGGER: Retrieved " +  retrievedInt);
                         
-                        gui.printToScreen("LOGGER: Sending OLD data to server: " + retrievedInt);
                         if(retrievedInt <10){
-                            appendedString = "0" + Integer.toString(retrievedInt) ; //Unique name
+                            appendedString = "0" + Integer.toString(retrievedInt);
                         }
                         else{
-                            appendedString = Integer.toString(retrievedInt) ; //Unique name
+                            appendedString = Integer.toString(retrievedInt);
                         }
+                        
+                        gui.printToScreen("LOGGER: Sending OLD data to server: " + retrievedInt);
+                        
                         // Send the packet to the server.
                         sendPacket(catchupData, m.getServerAddress());
                         appendedString = null;
                         
-                        /*try{
-                            this.sleep(8000);
-                        }
-                        catch(Exception e){}*/
-                        
-                    }
-
+                    }   // End of FOR loop.
+                    
                     System.out.println("LOGGER: Finished sending client data to restarting server.");
                     gui.printToScreen("LOGGER: Finished sending all stored data to server.");
                                      
@@ -236,27 +234,42 @@ public class logger extends Thread{
                     }
                     
                     // Switch normal operation back on.
-                    heartbeatThread.setInteractingWithClient(false);
+                    //heartbeatThread.setInteractingWithClient(false);
                     // this.setServerAlive(true);
-                    heartbeatThread.setServerAlive(true);
+                    //heartbeatThread.setServerAlive(true);
+                    
                     heartbeatThread.setDetectBeats(true);
+                    operatingNormally = true;   // End this faulty-operation loop.
                 }
            }
            catch(Exception e){
                 // There was nothing in the buffer or something else went wrong.
            }
-           System.out.println("REACHED END OF LOGGER's CLIENT INTERACTION LOOP (for a single iter)");
-
-       }while(heartbeatThread.getServerAlive() == false);   // End once a packet from the server is detected (and so serverAlive is set to true).
+           System.out.println("REACHED END OF LOGGER's CLIENT INTERACTION LOOP (for a single iter)");               
+           }
+       }
+    }
+       
+    
+    
+    /**
+     * clientInteraction is a method called by the heartbeatThread once the server has timed out and normal operation has been halted.
+     */
+    public void clientInteraction(){
+        gui.printToScreen("LOGGER: Confirmed Server is dead.");
+        gui.printToScreen("LOGGER: Interacting with client...");
+        gui.clearServerBuffer();
+        
+        this.serverAlive = false;
     }
     
     /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
-    private byte[] readPacket(){
+    private byte[] readPacket(boolean useOpNorm){
         try{
-            while(true){
+            while((useOpNorm && operatingNormally) || !useOpNorm){
                 FilenameFilter filter = new LOGFileFilter();
                 File f = new File("loggerBuffer");
                 String[] files = f.list(filter);
@@ -279,13 +292,14 @@ public class logger extends Thread{
                 else{
                     try{
                         //Sleep for 3 seconds, then look again for file
-                        this.sleep(1000);
+                        this.sleep(3000);
                     }
                     catch(java.lang.InterruptedException e){
                         
                     }
                 }
             }
+            return null;
         }
         catch(java.io.FileNotFoundException e){
             return null;
@@ -312,7 +326,6 @@ public class logger extends Thread{
             else{
                 writeFile(data,"loggerBuffer/toSend.LOG.SRV.TCP");
             }
-            
         }
         else if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
@@ -376,4 +389,9 @@ public class logger extends Thread{
      public void setServerAlive(boolean newStatus){
          this.serverAlive = newStatus;
      }     
+     
+     public void setOperatingNormally(boolean newBoolean){
+         System.out.println("LOGGER: Updating state of Logger's 'Operating Normally': " + newBoolean);
+         operatingNormally = newBoolean;
+     }
 }
