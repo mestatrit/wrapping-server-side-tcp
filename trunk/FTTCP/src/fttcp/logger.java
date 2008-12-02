@@ -74,8 +74,6 @@ public class logger extends Thread{
                temp = readPacket();     // Attempt to read a packet.
            }
            catch(Exception e){}
-                
-               gui.printToScreen("LOGGER: Confirmed Server is alive");
                
                if(sender.equals("NSW")){    // If the arriving packet was received from the North Side Wrap..
                    
@@ -119,7 +117,7 @@ public class logger extends Thread{
                }
                else if(sender.equals("SRV")){
                    if(temp[0] == 1){
-                       gui.printToScreen("LOGGER: Received a heartbeat from the server.");
+                       gui.printToScreen("LOGGER: Received a heartbeat from the server. Server is ALIVE.");
                        heartbeatThread.beat();  // Let heartbeatThread know that a heartbeat has just been received.       
                    }
                }
@@ -148,7 +146,7 @@ public class logger extends Thread{
 
          do{
             
-           gui.printToScreen("Server is dead..");
+           gui.printToScreen("Server is dead.."); 
            
            // Check for client data from the NSW
            try{
