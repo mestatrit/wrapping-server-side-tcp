@@ -14,6 +14,7 @@ import java.io.*;
 import org.knopflerfish.util.ByteArray;
 import java.math.BigInteger;
 import java.lang.InterruptedException;
+import java.util.Arrays;
 
 public class TCP extends Thread{
     private Main m;
@@ -270,6 +271,8 @@ public class TCP extends Thread{
                 FilenameFilter filter = new TCPFileFilter();
                 File f = new File(entityBuffer);
                 String[] files = f.list(filter);
+                java.util.Arrays.sort(files);
+                
                 if(files != null && files.length != 0){
                     // find out direction the TCP Layer is intercepting buffer data
                     // insteam - received (receive header)
@@ -294,8 +297,8 @@ public class TCP extends Thread{
                     //}
                         
                         //This is to allow extra strings after file name.
-                    if(files.length == 5){
-                            extraInfo = files[4];
+                    if(info.length == 5){
+                            extraInfo = info[4];
                     }
                     else{
                             extraInfo = null;
@@ -455,7 +458,13 @@ public class TCP extends Thread{
                 // TCP (in logger) strips data and makes available to logger - loggerBuffer/receivedHeartbeat.SRV.LOG
                 gui.log2srv();
                 gui.ssw2tcp();
-                writeFile(data,"serverBuffer/received.LOG.SRV.TCP");
+                if(extraInfo != null){
+                    String path = "serverBuffer/received.LOG.SRV.TCP." + extraInfo; 
+                    writeFile(data,path);
+                }
+                else{
+                    writeFile(data,"serverBuffer/received.LOG.SRV.TCP");
+                }
             }
             
 

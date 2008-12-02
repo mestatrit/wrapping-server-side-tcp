@@ -218,6 +218,7 @@ public class northSideWrap extends Thread{
                 FilenameFilter filter = new NSWFileFilter();
                 File f = new File("serverBuffer");
                 String[] files = f.list(filter);
+                java.util.Arrays.sort(files);
                 if(files != null && files.length != 0){
                     FileInputStream fileinputstream = new FileInputStream("serverBuffer/"+files[0]);
                     int numberBytes = fileinputstream.available();
@@ -231,8 +232,8 @@ public class northSideWrap extends Thread{
                     
                         sender = info[1];
                         destination = info[2];
-                    if(files.length == 5){
-                            extraInfo = files[4];
+                    if(info.length == 5){
+                            extraInfo = info[4];
                     }
                     else{
                             extraInfo = null;

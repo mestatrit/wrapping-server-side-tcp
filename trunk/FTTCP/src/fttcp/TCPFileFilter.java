@@ -11,7 +11,7 @@ import java.io.*;
  */
 class TCPFileFilter implements FilenameFilter {
     public boolean accept(File dir, String name) {
-        boolean accept = name.toLowerCase().endsWith(".tcp") || name.toLowerCase().matches("received[.]log[.]srv[.]tcp.*");
+        boolean accept = name.toLowerCase().endsWith(".tcp") || name.toLowerCase().matches("tosend[.]log[.]srv[.]tcp.*") || name.toLowerCase().matches("received[.]log[.]srv[.]tcp.*");
         return accept;
     }
     
