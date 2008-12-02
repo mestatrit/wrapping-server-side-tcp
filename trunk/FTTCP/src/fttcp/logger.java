@@ -212,7 +212,7 @@ public class logger extends Thread{
                     }
 
                     System.out.println("LOGGER: Finished sending client data to restarting server.");
-                    gui.printToScreen("LOGGER: Finished sending stored data to server. Server is up to speed.");
+                    gui.printToScreen("LOGGER: Finished sending all stored data to server.");
                     
                     // Switch normal operation back on.
                     this.setServerAlive(true);
@@ -228,6 +228,7 @@ public class logger extends Thread{
            catch(Exception e){
                 // There was nothing in the buffer or something else went wrong.
            }
+           System.out.println("REACHED END OF LOGGER's CLIENT INTERACTION LOOP (for a single iter)");
 
        }while(heartbeatThread.getServerAlive() == false);   // End once a packet from the server is detected (and so serverAlive is set to true).
     }
