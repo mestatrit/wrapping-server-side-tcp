@@ -75,7 +75,7 @@ public class GUI extends Thread{
         }
     }
 
-    private void clearServerBuffer() {
+    public void clearServerBuffer() {
         File f = new File("serverBuffer");
         String[] files = f.list();
         if(files != null && files.length != 0){
