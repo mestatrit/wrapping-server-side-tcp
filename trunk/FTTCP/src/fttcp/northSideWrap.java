@@ -20,6 +20,9 @@ public class northSideWrap extends Thread{
     private States NSWcurrentState = States.normal;
     private byte readFlag = 2;
     private int bytesWritten = 0;
+    private int messagesRead = 0;
+    private boolean lastRound = false;
+    
     
     /**
      * Constructor
@@ -81,6 +84,7 @@ public class northSideWrap extends Thread{
                  sendPacket(readLengthArray, m.getLoggerAddress());
                  gui.printToScreen("NSW: Sending packet to server");
                  sendPacket(NSWreadData, m.getServerAddress());
+                 messagesRead++;
                  
             
                  //increment unstable reads by 1
@@ -149,12 +153,18 @@ public class northSideWrap extends Thread{
             if(sender.equals("LOG")) {
                     // NSW replies data read from logger
                     sendPacket(NSWreadData, m.getServerAddress());
+                    messagesRead--;
+                    if(messagesRead==0) {
+                        lastRound = true;
+                    }
+                    
                   }
 
               //if it's a write socket call
             else if (sender.equals("SRV")) {
                 // NSW keeps track of bytes written.
                 bytesWritten = bytesWritten + NSWreadData.length;
+                
 
                 //if data has previous been written
                 //if (TCP.getSequenceNumber(NSWreadData) < m.getServer_seq()) {
@@ -170,6 +180,12 @@ public class northSideWrap extends Thread{
                   //  m.setRestarting(false);
 
                 }
+            
+            if(lastRound){
+                readPacket();
+                m.setRestarting(false);
+                lastRound = false;
+            }
           
         }
         
