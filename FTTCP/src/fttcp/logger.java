@@ -128,7 +128,7 @@ public class logger extends Thread{
            else{    // If server is not alive, sleep before checking again.
                    System.out.println("Logger: Normal operation loop is not running (server is not alive)");
                    try{
-                       this.sleep(500);
+                       this.sleep(1000);
                    }
                    catch(Exception e){}
                    
@@ -147,6 +147,9 @@ public class logger extends Thread{
         this.serverAlive = false;
 
          do{
+            
+           gui.printToScreen("Server is dead..");
+           
            // Check for client data from the NSW
            try{
                 temp = readPacket();
@@ -194,7 +197,7 @@ public class logger extends Thread{
 
                     // Loop through client data array, retrieving and sending (to the server buffer) all of the stored data.
                     for(int i = 0; i < clientDataCounter; i++){
-                        System.out.println("LOG: Server is restarting. Sending an item of data to Server.");
+                        System.out.println("LOGGER: Server is restarting. Sending an item of data to Server.");
                         // Create a new byte array to send to server.
                         byte[] catchupData = new byte[TCP.DATA_SIZE];
                         // For each position in the byte array, collect it's value from ClientData[][]
@@ -332,7 +335,6 @@ public class logger extends Thread{
         empty[0] = 0;
         if(e == entity.NSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.NSW.TCP");
-            gui.printToScreen("LOG: Sending ACK to NSW");
         }
         else if(e == entity.SSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.SSW.TCP");
