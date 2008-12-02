@@ -222,19 +222,17 @@ public class logger extends Thread{
 
                     System.out.println("LOGGER: Finished sending client data to restarting server.");
                     gui.printToScreen("LOGGER: Finished sending all stored data to server.");
+                                     
+                    // If the packet from the server was a heartbeat, let the heartbeatThread know.
+                    if(temp[0] == 1){
+                        heartbeatThread.beat();
+                    }
                     
                     // Switch normal operation back on.
                     this.setServerAlive(true);
                     heartbeatThread.setServerAlive(true);
                     heartbeatThread.setInteractingWithClient(false);
                     heartbeatThread.setDetectBeats(true);
-                    
-                    // If the packet from the server was a heartbeat, let the heartbeatThread know.
-                    if(temp[0] == 1){
-                        heartbeatThread.beat();
-                    }
-                    
-                    this.serverAlive = true;
                 }
            }
            catch(Exception e){
