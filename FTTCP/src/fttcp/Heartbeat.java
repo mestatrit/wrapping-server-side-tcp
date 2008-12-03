@@ -84,9 +84,7 @@ public class Heartbeat extends Thread {
                     System.out.println("HEARTBEAT: No beat arrived, setting operatingNormally to false.");
                     thisLogger.setOperatingNormally(false);
                   
-                        this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger.
-                    
-                    
+                        this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger. 
                 }
            }
         }while(finished == false);    
