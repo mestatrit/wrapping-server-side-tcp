@@ -91,7 +91,9 @@ abstract public class TCP extends Thread{
                 
                 System.out.println("TCP "+entity+": Check files for ACK packet: files "+files.length);
                 
+                
                 if(files != null && files.length != 0){
+
                 
                     for (int iFile = 0; iFile < files.length; iFile++) {
 
@@ -105,10 +107,12 @@ abstract public class TCP extends Thread{
                                 localDirection = "toSend";
 
                             // check whether heartbeat signal (or not
-                            if (files[iFile].indexOf("heartbeat",0) == -1) {
+                            if (files[iFile].indexOf("Heartbeat",0) == -1) {
                                 localHeartbeat = false;
+                                System.out.println("Is not heartbeat");
                             } else {
                                 localHeartbeat = true;
+                                System.out.println("Is heartbeat");
                             }
 
                             // store sender and receiver
@@ -141,16 +145,17 @@ abstract public class TCP extends Thread{
                             // check file for ACK flag and correct entity
                             if (isACKPacket && localSender.equals(dest)) {
 
-                                //System.out.println("TCP "+entity+": SEQ packet found with required dest");
+                                System.out.println("TCP "+entity+": SEQ packet found with required dest");
 
                                 if (packetSequenceNumber < sequenceNumber) {
                                     // if less than SEQ number then assume duplicate => delete + ignore
                                     boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
+                                    System.out.println("Duplicate, Ignore");
 
                                 } else if (packetSequenceNumber == sequenceNumber) {
                                     // else delete and return data
                                     boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
-                                    //System.out.println("TCP "+entity+": ACK packet found return array "+bytearray);
+                                    System.out.println("TCP "+entity+": ACK packet found return array "+bytearray);
                                     return bytearray;
                                 }
 
@@ -168,6 +173,10 @@ abstract public class TCP extends Thread{
                     }
                 
                 }
+                              
+                
+                
+               
                 
                 if (slept) {
                     //System.out.println("TCP "+entity+": unable to find ACK packets - need to resend");
@@ -176,11 +185,11 @@ abstract public class TCP extends Thread{
                 
                 try{
                     //Sleep for 3 seconds, then look again for file
-                    this.sleep(5000);
+                    this.sleep(2000);
                     slept = true;
                 }
                 catch(java.lang.InterruptedException e){
-
+ 
                 }
                 
                 // end for
@@ -196,6 +205,8 @@ abstract public class TCP extends Thread{
             return null;
         } 
     }
+    
+    
     
     
     /**
@@ -224,7 +235,7 @@ abstract public class TCP extends Thread{
                         direction = "toSend";
                     
                     // check whether heartbeat signal (or not
-                    if (files[0].indexOf("heartbeat",0) == -1) {
+                    if (files[0].indexOf("Heartbeat",0) == -1) {
                         heartbeat = false;
                     } else {
                         heartbeat = true;

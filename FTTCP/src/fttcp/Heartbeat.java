@@ -25,7 +25,7 @@ public class Heartbeat extends Thread {
     private boolean currentBeat = true;     // This is set to true by the logger every time it receives a beat. Heartbeat knows if currentbeat is true, the server must be alive.
     boolean detectBeats = true;     // This variable indicates whether heartbeat should be detecting heartbeats, or should temporarily not look for them.
     boolean finished = false;       // This variable controls a while loop that ensures that Heartbeat's behaviour is repeated until the program is finished.
-    int timeoutPeriod = 20000;      // The number of milliseconds currently being used as the timeout period.
+    int timeoutPeriod = 25000;      // The number of milliseconds currently being used as the timeout period.
     
     /** 
      * Constructor
