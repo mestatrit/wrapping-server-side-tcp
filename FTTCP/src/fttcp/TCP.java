@@ -8,47 +8,41 @@ package fttcp;
 
 /**
  *
- * @author James Bossingham
+ * @author James SYNCHRONIZED Bossingham 
  */
 import java.io.*;
 import org.knopflerfish.util.ByteArray;
 import java.math.BigInteger;
 import java.lang.InterruptedException;
-import java.util.Arrays;
 
-public class TCP extends Thread{
-    private Main m;
-    private GUI gui;
-    private String entity;
-    private String direction;
-    private String extraInfo;
+abstract public class TCP extends Thread{
+    protected Main m;
+    protected GUI gui;
+    protected String entity;
+    protected String direction;
+    protected String extraInfo;
     
     public static final int HEADER_SIZE = 24;
     public static final int DATA_SIZE = 24;
     public static final int PACKET_SIZE = TCP.HEADER_SIZE + TCP.DATA_SIZE;
     
-    private static final int NOT_IN_USE = -1;
-    private static final int CLOSED = 0;
-    private static final int LISTEN = 1;
-    private static final int SYN_RCVD = 2;
-    private static final int SYN_SENT = 3;
-    private static final int ESTABLISHED = 4;
-    private static final int CLOSE_WAIT = 5;
-    private static final int LAST_ACK = 6;
-    private static final int FIN_WAIT_1 = 7;
-    private static final int FIN_WAIT_2 = 8;
-    private static final int CLOSING = 8;
+    protected static final int NOT_IN_USE = -1;
+    protected static final int CLOSED = 0;
+    protected static final int LISTEN = 1;
+    protected static final int SYN_RCVD = 2;
+    protected static final int SYN_SENT = 3;
+    protected static final int ESTABLISHED = 4;
+    protected static final int CLOSE_WAIT = 5;
+    protected static final int LAST_ACK = 6;
+    protected static final int FIN_WAIT_1 = 7;
+    protected static final int FIN_WAIT_2 = 8;
+    protected static final int CLOSING = 8;
     
-    private String messageDetails = "";
+    protected String messageDetails = "";
     
-    private String sender = "x";
-    private String destination = "x";
-    private boolean heartbeat = false;
-    private int status = TCP.CLOSED;
-    private int serverTCPState = TCP.NOT_IN_USE; // assume tcp connection to logger already established (so only tcp connec to client)
-    private int clientTCPState = TCP.NOT_IN_USE;
-    private byte[] initialDataFromClient = null;
-    private boolean send = true;
+    protected String sender = "x";
+    protected String destination = "x";
+    protected boolean heartbeat = false;
     
     /**
      * Constructor
@@ -58,188 +52,15 @@ public class TCP extends Thread{
         m = main;
         entity =e;
         gui = g;
-        
-        serverTCPState = TCP.LISTEN;
-        clientTCPState = TCP.CLOSED;
-        
-        
-        // if a passive entity then set status from CLOSED -> LISTEN
-        
-      
-        
-            
-            
-        // receieved - to go in 
-        // send - to go out
-        // next value: sender e.g. logger
-        // next value: sender ultimately
-        // who reads it next
-
-        
-        // E.G.     NSW and Logger
-        // NSW serverBuffer/toSend.NSW.LOG.TCP -- sending inital  message to TCP (ultimately LOG)
-        // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
-        // TCP (in logger) reads - strips header - label for logger - loggerBuffer/received.NSW.LOG
-        // Logger does stuff need to send to server so passes data to TCP - loggerBuffer/toSend.LOG.NSW.TCP
-        // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
-        // TCP (in server) strips header and marks for NSW in server - serverBuffer/received.LOG.NSW
-        
-        // E.G. App (SRV) and Logger - in error recovery
-        
-        
-        // E.G.    Client and Server
-        
-        // Client - send message to TCP ultimately Server - clientBuffer/toSend.CLT.SRV.TCP
-        // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
-        // SSW (in server) plays with it sends to logger gets ack then marks for TCP - serverBuffer/received.CLT.SRV.TCP
-        // TCP (in server) strips header and marks for NSW (ultimately server) - serverBuffer/received.CLT.SRV.NSW
-        // * NSW (in server) passes info to server app - serverBuffer/received.CLT.SRV
-        // * App client message (send first to NSW) serverBuffer/toSend.SRV.CLT.NSW
-        // NSW (in server) send data to TCP serverBuffer/toSend.SRV.CLT.TCP
-        // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
-        // SSW (in server) sends stuff to logger gets ack does stuff mark for client TCP - clientBuffer/received.SRV.CLT.TCP
-        // TCP (in client) strips header and marks for client - clientBuffer/received.SRV.CLT
-        
-        // E.G. SSW and Logger
-        
-        // SSW (in server) sends message to logger (first stop tcp) - loggerBuffer/receieved.SSW.LOG.TCP
-        // TCP (in logger) strips header and makes available for logger - loggerBuffer/receieved.SSW.LOG
-        // Logger sends ack (first to TCP) loggerBuffer/toSend.LOG.SSW.TCP
-        // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
-        
-        // E.G. Heartbeat to Logger
-        
-        // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/toSendHeartbeat.SRV.LOG.TCP
-        // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receievedHeartbeat.SRV.LOG.TCP
-        // TCP (in logger) strips data and makes available to logger - loggerBuffer/receievedHeartbeat.SRV.LOG
-        
     }
     
     /**
      * TCP thread
      */
-    @Override
-    public void run(){
-        gui.printToScreen("TCP " +entity +" reporting in.");
-        
-        while (true) {
-            send = true;
-            byte[] buffer = readPacket();
-            if (buffer != null) {
-                byte[] data = null;
-                
-                // add or strip header depending on direction data is travelling
-                if (direction.equals("toSend")) {
-                    // add header
-                    gui.printToScreen("TCP " +entity +": Read packet, adding header.");
-                    data = TCP.createTCPSegment();
-                    //System.out.println("add header/data index 0: "+data[1]+" buffer index 0: "+buffer[1]);
-                    
-                    TCP.setData(buffer,data);
-                    //System.out.println("add header/data index 0: "+data[25]+" buffer index 0: "+buffer[1]);
-                } else {
-                    try{
-                    // strip header
-                    //System.out.println("send "+sender+" destination "+destination);
-                        gui.printToScreen("TCP " +entity +": Read packet, stripping header.");
-                        //System.out.println("strip header/buffer index 0: "+buffer[25]);
-                        data = TCP.stripHeader(buffer);
-                        //System.out.println("strip header/data index 0: "+data[1]+" buffer index 0: "+buffer[25]);
-                    }
-                    catch(Exception e){
-                        gui.printToScreen("TCP: ERROR in " + entity + ": " + e);
-                    }
-                }
-                
-                // modify status in accordance to contents of data and current state
-                if (entity.equals("SRV")) {
-                    switch (serverTCPState) {
-                        case TCP.LISTEN:
-                            if (buffer.length == TCP.PACKET_SIZE) {
-                                // check if SYN bit set
-                                if (TCP.getSYNFlag(buffer)) {
-                                    gui.printToScreen("TCP " +entity +": Received SYN Packet");
-                                    // create new TCP seg with SYN, ACK
-                                    byte[] response = TCP.createTCPSegment();
-                                    TCP.setSYNFlag(true,response);
-                                    TCP.setACKFlag(true,response);
-                                    gui.printToScreen("TCP " +entity +": Creating/Sending response.");
-                                    data = response; // set new seg as data to send
-                                    send = false;
-                                    sendPacket(data,m.getClientAddress(), true);
-                                    // change state
-                                    serverTCPState = TCP.SYN_RCVD;
-                                }
-                            }
-                        break;
-                        case TCP.SYN_RCVD:
-                            if (buffer.length == TCP.PACKET_SIZE) {
-                                if (TCP.getACKFlag(buffer)) {
-                                    gui.printToScreen("TCP " +entity +": Connection established.");
-                                    serverTCPState = TCP.ESTABLISHED;
-                                    //Dont forward on
-                                    send = false;
-                                }
-                            }
-                        break;
-                    }
-                } else if (entity.equals("CLT")) {
-                     switch (clientTCPState) {
-                         case TCP.CLOSED:
-                             if (buffer.length == TCP.DATA_SIZE) {
-                                 // set SYN flag
-                                 TCP.setSYNFlag(true,data);
-                                 clientTCPState = TCP.SYN_SENT;
-                                 gui.printToScreen("TCP " +entity +": Connection closed, sending SYN packet.");
-                                 // store data from client to send when connection established
-                                 initialDataFromClient = buffer; 
-                             }
-                         break;
-                         case TCP.SYN_SENT:
-                             if (buffer.length == TCP.PACKET_SIZE) {
-                                 if (TCP.getSYNFlag(buffer) && TCP.getACKFlag(buffer)) {
-                                     send = false;
-                                     // create new TCP seg ACK
-                                     byte[] response = TCP.createTCPSegment();
-                                     TCP.setACKFlag(true,response);
-                                     data = response; // set new seg as data to send
-                                     clientTCPState = TCP.ESTABLISHED;
-                                     gui.printToScreen("TCP " +entity +": Connection established, sending ACK.");
-                                     sendPacket(data, m.getServerAddress(), true);
-                                     
-                                    // create seg from initial data
-                                      byte[] dataToSend = TCP.createTCPSegment();
-                                      TCP.setData(initialDataFromClient,dataToSend);
-                                      
-                                      //TO BE REMOVED, HERE TO MAKE SURE LOG ACK ARRIVES BEFORE THIS PACKET
-                                      try{
-                                            //Sleep for 5 seconds
-                                            this.sleep(5000);
-                                        }
-                                        catch(java.lang.InterruptedException e){
 
-                                        }
-                                      gui.printToScreen("TCP " +entity +": Sending original client packet.");
-                                      sendPacket(dataToSend, m.getServerAddress(), false); 
-                                      initialDataFromClient = null;
-                                     
-                                     
-                                 }
-                             }
-                         break;
-                     }
-                }
-                if(send){
-                    gui.printToScreen("TCP " +entity +": Sending packet.");
-                    // send data to the correct buffer
-                    sendPacket(data);
-                }
-            }
-        }
- 
-    }
+    abstract public void run(); 
     
-    private static byte[] addHeader(byte[] data) {
+    protected static byte[] addHeader(byte[] data) {
         // create TCP segment
         byte[] seg = TCP.createTCPSegment();
         // add data to tcp segment
@@ -248,32 +69,151 @@ public class TCP extends Thread{
         return seg;
     }
     
-    private static byte[] stripHeader(byte[] seg) {
+    protected static byte[] stripHeader(byte[] seg) {
        return TCP.getData(seg);
     }
+    
+    protected byte[] readACKPacket(String entityBuffer, String dest, int acknowledgementNumber){
+        boolean slept = false;
+        
+        boolean localHeartbeat = false;
+        String localSender = "";
+        String localDestination = "";
+        String localDirection = "";
+        String localExtraInfo = "";
+        
+        try{
+            while(true){
+                       
+                FilenameFilter filter = new TCPFileFilter();
+                File f = new File(entityBuffer);
+                String[] files = f.list(filter);
+                
+                System.out.println("TCP "+entity+": Check files for ACK packet: files "+files.length);
+                
+                if(files != null && files.length != 0){
+                
+                    for (int iFile = 0; iFile < files.length; iFile++) {
+
+
+                            // find out direction the TCP Layer is intercepting buffer data
+                            // insteam - received (receive header)
+                            // outstream - toSend (add header)
+                            if (files[iFile].startsWith("received")) 
+                                localDirection = "received";
+                            else
+                                localDirection = "toSend";
+
+                            // check whether heartbeat signal (or not
+                            if (files[iFile].indexOf("heartbeat",0) == -1) {
+                                localHeartbeat = false;
+                            } else {
+                                localHeartbeat = true;
+                            }
+
+                            // store sender and receiver
+                            String[] info = files[iFile].split("[.]");
+                            if(info.length == 3 || info.length == 4){
+                                localSender = info[1];
+                                localDestination = info[2];
+                            }
+
+                            //This is to allow extra strings after file name.
+                            if(info.length == 5){
+                                    localExtraInfo = info[4];
+                            }
+                            else {
+                                    localExtraInfo = null;
+                            }
+                            
+                            FileInputStream fileinputstream = new FileInputStream(entityBuffer+"/"+files[iFile]);
+                            int numberBytes = fileinputstream.available();
+                            byte[] bytearray = new byte[numberBytes];
+                            fileinputstream.read(bytearray);
+                            fileinputstream.close();
+
+                            
+                            boolean isACKPacket = TCP.getACKFlag(bytearray);
+                            int packetAcknowledgementNumber = TCP.getAcknowledgementNumber(bytearray);
+                            
+                            //System.out.println("file found from "+sender+" to "+destination+": ACK "+isACKPacket+" ACKnum found: "+packetAcknowledgementNumber+" ACKcomp "+acknowledgementNumber);
+                            //System.out.println("dest: "+dest);
+                            // check file for ACK flag and correct entity
+                            if (isACKPacket && localSender.equals(dest)) {
+
+                                //System.out.println("TCP "+entity+": ACK packet found with required dest");
+
+                                if (packetAcknowledgementNumber < acknowledgementNumber) {
+                                    // if less than ACK number then assume duplicate => delete + ignore
+                                    boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
+
+                                } else if (packetAcknowledgementNumber == acknowledgementNumber) {
+                                    // else delete and return data
+                                    boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
+                                    //System.out.println("TCP "+entity+": ACK packet found return array "+bytearray);
+                                    return bytearray;
+                                }
+
+
+
+
+                            }
+
+
+
+
+
+
+
+                    }
+                
+                }
+                
+                if (slept) {
+                    //System.out.println("TCP "+entity+": unable to find ACK packets - need to resend");
+                    return null;
+                }
+                
+                try{
+                    //Sleep for 3 seconds, then look again for file
+                    this.sleep(20000);
+                    slept = true;
+                }
+                catch(java.lang.InterruptedException e){
+
+                }
+                
+                // end for
+                
+                
+                
+            }
+        }
+        catch(java.io.FileNotFoundException e){
+            return null;
+        } 
+        catch(java.io.IOException e){
+            return null;
+        } 
+    }
+    
     
     /**
      * Periodically check to see if data to be read, if so, read it, and return
      * @return Object Packet read
      */
-    private byte[] readPacket(){
+    protected byte[] readPacket(String entityBuffer){
         try{
             while(true){
-                
-                String entityBuffer = "serverBuffer";
-                
-                if (entity.equals("CLT")) {
-                        entityBuffer = "clientBuffer";
-                } else if (entity.equals("LOG")) {
-                    entityBuffer = "loggerBuffer";
-                }
-                
+                       
                 FilenameFilter filter = new TCPFileFilter();
                 File f = new File(entityBuffer);
                 String[] files = f.list(filter);
-                java.util.Arrays.sort(files);
+                
+                //System.out.println("TCP "+entity+": Check for files: total "+files.length);
                 
                 if(files != null && files.length != 0){
+                    //System.out.println("TCP "+entity+": "+"File found "+files[0]);
                     // find out direction the TCP Layer is intercepting buffer data
                     // insteam - received (receive header)
                     // outstream - toSend (add header)
@@ -291,16 +231,16 @@ public class TCP extends Thread{
                     
                     // store sender and receiver
                     String[] info = files[0].split("[.]");
-                    //if(info.length == 3 || info.length == 4){
+                    if(info.length == 3 || info.length == 4){
                         sender = info[1];
                         destination = info[2];
-                    //}
-                        
-                        //This is to allow extra strings after file name.
+                    }
+                    
+                    //This is to allow extra strings after file name.
                     if(info.length == 5){
                             extraInfo = info[4];
                     }
-                    else{
+                    else {
                             extraInfo = null;
                     }
                     
@@ -319,7 +259,7 @@ public class TCP extends Thread{
                 else{
                     try{
                         //Sleep for 3 seconds, then look again for file
-                        this.sleep(1000);
+                        this.sleep(3000);
                     }
                     catch(java.lang.InterruptedException e){
                         
@@ -335,149 +275,18 @@ public class TCP extends Thread{
         } 
     }
      
-    private void sendPacket(byte[] data, short address, boolean tcp){
-        if(address == m.getClientAddress()){
-            gui.tcp2ssw();
-            gui.srv2clt();
-            writeFile(data, "clientBuffer/received.TCP.TCP.TCP");
-        }
-        else if(address == m.getServerAddress() && tcp){
-            gui.clt2srv();
-            gui.ssw2tcp();
-            writeFile(data, "serverBuffer/received.TCP.TCP.TCP");
-        }
-        else if(address == m.getServerAddress() && !tcp){
-            gui.clt2srv();
-            writeFile(data, "serverBuffer/received.CLT.SRV.SSW");
-        }
-    }
     /**
      * Send packet to address
      * @param object Packet to be sent
      */
-    private void sendPacket(byte[] data){
-        
-        if (entity.equals("SRV")) {
-            
-            // NSW serverBuffer/toSend.NSW.LOG.TCP -- sending inital  message to TCP (ultimately LOG)
-            if (sender.equals("NSW") && destination.equals("LOG")) {
-                // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
-                gui.tcp2ssw();
-                gui.srv2log();
-                writeFile(data,"loggerBuffer/received.NSW.LOG.TCP");
-            }
-            // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
-            else if (sender.equals("LOG") && destination.equals("NSW")) {
-                // TCP (in server) strips header and marks for NSW in server - serverBuffer/received.LOG.NSW
-                gui.tcp2nsw();
-                writeFile(data,"serverBuffer/received.LOG.NSW");
-            }
-            // SSW (in server) plays with it sends to logger gets ack then marks for TCP - serverBuffer/received.CLT.SRV.TCP
-            else if (sender.equals("CLT") && destination.equals("SRV")) {
-                // TCP (in server) strips header and marks for NSW (ultimately server) - serverBuffer/received.CLT.SRV.NSW
-                gui.tcp2nsw();
-                writeFile(data,"serverBuffer/received.CLT.SRV.NSW");
-            }
-            // NSW (in server) send data to TCP serverBuffer/toSend.SRV.CLT.TCP
-            else if (sender.equals("SRV") && destination.equals("CLT")) {
-                // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
-                gui.tcp2ssw();
-                writeFile(data,"serverBuffer/toSend.SRV.CLT.SSW");
-            }  
-            // handling heartbeat
-            
-            // Heartbeat (in server) sends data to logger (but TCP first) - serverBuffer/toSendHeartbeat.SRV.LOG.TCP
-            else if (sender.equals("SRV") && destination.equals("LOG")) {
-                // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
-                gui.htcp2ssw();
-                gui.hsrv2log();
-                writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG.TCP");
-            }
-            else if (sender.equals("LOG") && destination.equals("SRV")) {
-                // TCP (in server) adds header mark for SSW - serverBuffer/toSend.SRV.CLT.SSW
-                gui.tcp2nsw();
-                if(extraInfo != null){
-                    String path = "serverBuffer/received.LOG.SRV.NSW." + extraInfo; 
-                    writeFile(data,path);
-                }
-                else{
-                    writeFile(data,"serverBuffer/received.LOG.SRV.NSW");
-                }
-                
-            }  
-            
-            
-            
-        } else if (entity.equals("CLT")) {
-            // Client - send message to TCP ultimately Server - clientBuffer/toSend.CLT.SRV.TCP
-            if (sender.equals("CLT") && destination.equals("SRV")) {
-                // TCP (in client) adds header and marks for SSW - serverBuffer/received.CLT.SRV.SSW
-                gui.clt2srv();
-                writeFile(data,"serverBuffer/received.CLT.SRV.SSW");
-            } 
-            // SSW (in server) sends stuff to logger gets ack does stuff mark for client TCP - clientBuffer/received.SRV.CLT.TCP
-            else if (sender.equals("SRV") && destination.equals("CLT")) {
-                // TCP (in client) strips header and marks for client - clientBuffer/received.SRV.CLT
-                gui.tcp2clt();
-                writeFile(data,"clientBuffer/received.SRV.CLT");
-            }   
-        } else { // LOG
-            // TCP (in server) reads first - adds header - loggerBuffer/received.NSW.LOG.TCP (message is in server buffer need to process and put in logger buffer)
-            if (sender.equals("NSW") && destination.equals("LOG")) {
-                // TCP (in logger) reads - strips header - label for logger - loggerBuffer/received.NSW.LOG
-                gui.tcp2log();
-                writeFile(data,"loggerBuffer/received.NSW.LOG");
-            }
-            // Logger does stuff need to send to server so passes data to TCP - loggerBuffer/toSend.LOG.NSW.TCP
-            else if (sender.equals("LOG") && destination.equals("NSW")) {
-                // TCP (in logger) adds header and marks for NSW in server - serverBuffer/received.LOG.NSW.TCP
-                gui.log2srv();
-                gui.ssw2tcp();
-                writeFile(data,"serverBuffer/received.LOG.NSW.TCP");
-            }
-            // SSW (in server) sends message to logger (first stop tcp) - loggerBuffer/receieved.SSW.LOG.TCP
-            else if (sender.equals("SSW") && destination.equals("LOG")) {
-                // TCP (in logger) strips header and makes available for logger - loggerBuffer/receieved.SSW.LOG
-                gui.tcp2log();
-                writeFile(data,"loggerBuffer/received.SSW.LOG");
-            }
-            // Logger sends ack (first to TCP) loggerBuffer/toSend.LOG.SSW.TCP
-            else if (sender.equals("LOG") && destination.equals("SSW")) {
-                // TCP (in logger) adds header and sends to SSW - serverBuffer/received.LOG.SSW
-                gui.log2srv();
-                writeFile(data,"serverBuffer/received.LOG.SSW");
-            }       
-            // handling hearbeat
-            // TCP (in server) adds header then sends to logger (first to TCP) - loggerBuffer/receivedHeartbeat.SRV.LOG.TCP
-            else if  (sender.equals("SRV") && destination.equals("LOG")) {
-                // TCP (in logger) strips data and makes available to logger - loggerBuffer/receivedHeartbeat.SRV.LOG
-                gui.htcp2log();
-                writeFile(data,"loggerBuffer/receivedHeartbeat.SRV.LOG");
-            }
-            else if  (sender.equals("LOG") && destination.equals("SRV")) {
-                // TCP (in logger) strips data and makes available to logger - loggerBuffer/receivedHeartbeat.SRV.LOG
-                gui.log2srv();
-                gui.ssw2tcp();
-                if(extraInfo != null){
-                    String path = "serverBuffer/received.LOG.SRV.TCP." + extraInfo; 
-                    writeFile(data,path);
-                }
-                else{
-                    writeFile(data,"serverBuffer/received.LOG.SRV.TCP");
-                }
-            }
-            
-
-        } 
-        
-    }
+    abstract protected void sendPacket(byte[] data);
     
     /**
      * Writes data array to given path
      * @param data byte[] to be written
      * @param path location to save file
      */
-    private void writeFile(byte[] data, String path){
+    protected void writeFile(byte[] data, String path){
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
@@ -488,12 +297,12 @@ public class TCP extends Thread{
             outStream.close();
         }
         catch(IOException e){
-            System.out.println("SSW Cannot write file to: " + path);
+            //System.out.println("SSW Cannot write file to: " + path);
         }
     }
     
     // format of string {0,X,1} X = don't overwrite that value (assumption string 8 characters in length)
-    private static void writeByteStringToByteArray(String data, byte bt[], int offset) {
+    protected static void writeByteStringToByteArray(String data, byte bt[], int offset) {
         // get string rep of byte needed to replace
         byte[] currentData = new byte[1];
         currentData[0] = bt[offset];
@@ -573,7 +382,7 @@ public class TCP extends Thread{
         return ByteArray.getByte(b,offset);
     }
     
-    private static String convertByteToBinaryString(byte b) {
+    protected static String convertByteToBinaryString(byte b) {
         // get string rep of byte needed to replace
         byte[] bAsArray = new byte[1];
         bAsArray[0] = b;
@@ -823,7 +632,7 @@ public class TCP extends Thread{
     }
     
     // only overwritting single bit of byte so mark all other bits as 'don't care' (X)
-    private static String generateFlagByteString(boolean flag, int flagConsidered) {
+    protected static String generateFlagByteString(boolean flag, int flagConsidered) {
         
         String flagByteString = "";
         for (int i = 0; i < 8; i++) {
@@ -841,7 +650,7 @@ public class TCP extends Thread{
         return flagByteString;
     }
     // assumption string input is of length 8 {0,1}
-    private static boolean generateFlagBooleanValue(String flags, int flagConsidered) {
+    protected static boolean generateFlagBooleanValue(String flags, int flagConsidered) {
         
         boolean flag = false;
         char bit = flags.charAt(flagConsidered);
