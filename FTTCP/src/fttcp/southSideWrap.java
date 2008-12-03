@@ -266,11 +266,12 @@ public class southSideWrap extends Thread{
 
         //Fabricate SYN Packet that has the initial sequence# of stable_seq, 
         // and send this to servers TCP layer.
+        //REMOVE FOR REAL TCP
         byte[] SYNPacket = TCP.createTCPSegment();
         TCP.setSYNFlag(true, SYNPacket);
         TCP.setSequenceNumber(m.getStable_seq(),SYNPacket);
         gui.printToScreen("SSW: Sending fake SYN to server.");
-        sendPacket(SYNPacket,m.getServerAddress());
+       /* sendPacket(SYNPacket,m.getServerAddress());
         
         byte[] receivedPacket2 = null;
         while(!sender.equals("SRV")){
@@ -281,10 +282,10 @@ public class southSideWrap extends Thread{
         //Reply with fake corresponding ACK
         m.setDelta_seq(m.getDelta_seq() -TCP.getSequenceNumber(receivedPacket2));
         byte[] ACKPacket = TCP.createTCPSegment();
-        TCP.setACKFlag(true,ACKPacket);
+        TCP.setACKFlag(true,ACKPacket);*/
         gui.printToScreen("SSW: Sending fake ACK to server.");
-        sendPacket(ACKPacket,m.getServerAddress());
-        /*}*/
+        /*sendPacket(ACKPacket,m.getServerAddress());
+        }*/
         
         //Loop sending closed windows while system is in restarting mode (this 
         //exits when server is fully recovered)
