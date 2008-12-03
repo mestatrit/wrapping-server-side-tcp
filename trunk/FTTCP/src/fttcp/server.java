@@ -32,17 +32,16 @@ public class server extends Thread{
         short numberRecv = 1;
         
         
-        // Begin serverHeartbeat here.
-               System.out.println("SERVER: Server Heartbeat begins.");
+        /* Begin serverHeartbeat here by starting the serverHeartbeat thread. this is called every time
+            a new server thread is created, which is when the program starts or when the server
+            is restarted*/
+        System.out.println("SERVER: Server Heartbeat begins.");
         serverHeartbeatThread.start();
         
         
         while(true){
-            
-           /* sendPacket(readPacket(),m.getClientAddress());
-            System.out.println("server sending" + readPacket());*/
-
-        byte[] serverReadData = readPacket();
+           
+        byte[] serverReadData = readPacket();//packet read is copied to the serverReadData array
         char returnLetter = 'a';
         short returnNumber = 0;
         byte[] byteReturnLetter;
@@ -68,7 +67,6 @@ public class server extends Thread{
         returnNumber = (short)(numberRecv + 64);
         
         //convert short to byte array
-       // byteReturnLetter = TCP.convertDataToByteArray(returnNumber);
         byteReturnLetter = new byte[TCP.DATA_SIZE];
             
         ByteArray.setShort(returnNumber,byteReturnLetter,0);
@@ -136,10 +134,10 @@ public class server extends Thread{
             writeFile(data,"serverBuffer/toSend.SRV.CLT.NSW");
         }
         else if(address == m.getLoggerAddress()){
-            //Put in file called received.TCP in client folder
+            //Put in file called receivedheartbeat.TCP in logger folder
             gui.hsrv2nsw();
             gui.hnsw2tcp();
-            writeFile(data,"serverBuffer/toSend.SRV.LOG.TCP");
+            writeFile(data,"serverBuffer/toSendheartbeat.SRV.LOG.TCP");
         }
         
     }
@@ -171,7 +169,7 @@ public class server extends Thread{
         byteArr[0] =(byte)( (num << 24) >> 24 );
         return byteArr;
     }
-     
+    /*method to send heartbeat to the logger. Heartbeat is an empty packet with a flag=1*/
     public void sendHeartbeat(){
         
         byte[] heartbeatByte=new byte[TCP.DATA_SIZE];
@@ -179,7 +177,8 @@ public class server extends Thread{
         
         sendPacket(heartbeatByte,m.getLoggerAddress());
     } 
-     
+     /*Method to stop the serverHeartbeat thread sending a heartbeat to the logger. It basically stops the
+      *thread from running*/
     public void killServerHeartbeat(){
         serverHeartbeatThread.stop();
         System.out.println("SERVER :killServerHeartbeat() is called");
