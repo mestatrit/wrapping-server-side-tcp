@@ -6,7 +6,6 @@
 package fttcp;
 
 /**
- *
  * @author James Bossingham
  */
 import java.io.*;
@@ -32,9 +31,9 @@ public class server extends Thread{
         short numberRecv = 1;
         
         
-        /* Begin serverHeartbeat here by starting the serverHeartbeat thread. this is called every time
-            a new server thread is created, which is when the program starts or when the server
-            is restarted*/
+        /* Spawn serverHeartbeat thread. This will continuously send heartbeat packets to the logger buffer
+         * while the server is still operational.
+         */
         System.out.println("SERVER: Server Heartbeat begins.");
         serverHeartbeatThread.start();
         
@@ -85,6 +84,7 @@ public class server extends Thread{
      * @return Object Packet read
      */
     private byte[] readPacket(){
+        // See SSW for full commenting on this method.
         try{
             while(true){
                 FilenameFilter filter = new SRVFileFilter();
@@ -109,15 +109,17 @@ public class server extends Thread{
                         this.sleep(1000);
                     }
                     catch(java.lang.InterruptedException e){
-                        
+                        System.out.println("Thread error: " + e);
                     }
                 }
             }
         }
         catch(java.io.FileNotFoundException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
         catch(java.io.IOException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
     }
@@ -128,6 +130,7 @@ public class server extends Thread{
      * @param address Place to send it to
      */
     private void sendPacket(byte[] data, short address){
+        // See SSW for full commenting on this method.
         if(address == m.getClientAddress()){
             //Put in file called received.TCP in client folder
             gui.srv2nsw();
@@ -148,6 +151,7 @@ public class server extends Thread{
      * @param path location to save file
      */
     private void writeFile(byte[] data, String path){
+        // See SSW for full commenting on this method.
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
@@ -158,17 +162,11 @@ public class server extends Thread{
             outStream.close();
         }
         catch(IOException e){
+            System.out.println("Thread error: " + e);
             System.out.println("SSW Cannot write file to: " + path);
         }
     }
-     private byte[] intToByteArr(int num){
-        byte[] byteArr = new byte[4];
-        byteArr[3] =(byte)( num >> 24 );
-        byteArr[2] =(byte)( (num << 8) >> 24 );
-        byteArr[1] =(byte)( (num << 16) >> 24 );
-        byteArr[0] =(byte)( (num << 24) >> 24 );
-        return byteArr;
-    }
+
     /*method to send heartbeat to the logger. Heartbeat is an empty packet with a flag=1*/
     public void sendHeartbeat(){
         
