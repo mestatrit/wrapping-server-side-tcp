@@ -80,7 +80,7 @@ public class logger extends Thread{
                try{
                    temp = readPacket(true);     // Attempt to read a packet.
                }
-               catch(Exception e){}
+               catch(Exception e){System.out.println("Thread error: " + e);}
 
                    if(temp != null && sender.equals("NSW")){    // If the arriving packet was received from the North Side Wrap..
 
@@ -255,7 +255,8 @@ public class logger extends Thread{
                     }
                }
                catch(Exception e){
-                    // There was nothing in the buffer, or something else went wrong.
+                   // There was nothing in the buffer, or something else went wrong.
+                   System.out.println("Thread error: " + e);
                }
                System.out.println("REACHED END OF LOGGER's FAULTY OPERATION LOOP (for a single iteration)");               
            } // End of faulty operation loop.
@@ -267,6 +268,7 @@ public class logger extends Thread{
      * @return Object Packet read
      */
     private byte[] readPacket(boolean useOpNorm){
+        // See South Side Wrap for full commenting on this method.
         try{
             while((useOpNorm && operatingNormally) || !useOpNorm){
                 FilenameFilter filter = new LOGFileFilter();
@@ -294,16 +296,18 @@ public class logger extends Thread{
                         this.sleep(3000);
                     }
                     catch(java.lang.InterruptedException e){
-                        
+                        System.out.println("Thread error: " + e);
                     }
                 }
             }
             return null;
         }
         catch(java.io.FileNotFoundException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
         catch(java.io.IOException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
     }
@@ -315,6 +319,7 @@ public class logger extends Thread{
      * @param address Place to send it to
      */
     private void sendPacket(byte[] data, short address){
+        // See South Side Wrap for full commenting on this method.
         if(address == m.getServerAddress()){
             //Put in file called received.TCP in server folder
             gui.log2tcp();
@@ -350,6 +355,7 @@ public class logger extends Thread{
      * @param path location to save file
      */
     private void writeFile(byte[] data, String path){
+        // See South Side Wrap for full commenting on this method.
         try{
             FileOutputStream outStream = new FileOutputStream(path);
             PrintWriter printW = new PrintWriter(outStream);
@@ -360,29 +366,22 @@ public class logger extends Thread{
             outStream.close();
         }
         catch(IOException e){
+            System.out.println("Thread error: " + e);
             System.out.println("SSW Cannot write file to: " + path);
         }
     }
     
     public void sendACK(entity e){
         /* This may need parameters showing WHO the ACK is meant for (i.e. SSW or NSW) */
-        byte[] empty = new byte[TCP.DATA_SIZE];
+        byte[] empty = new byte[TCP.DATA_SIZE]; // Create a new byte array of correct length to be sent as an ACK.
         empty[0] = 0;
+        // Write file to different locations depending on the address extension on the packet.
         if(e == entity.NSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.NSW.TCP");
         }
         else if(e == entity.SSW){
             writeFile(empty, "loggerBuffer/toSend.LOG.SSW.TCP");
         }        
-    } 
-    
-     private byte[] intToByteArr(int num){
-        byte[] byteArr = new byte[4];
-        byteArr[3] =(byte)( num >> 24 );
-        byteArr[2] =(byte)( (num << 8) >> 24 );
-        byteArr[1] =(byte)( (num << 16) >> 24 );
-        byteArr[0] =(byte)( (num << 24) >> 24 );
-        return byteArr;
     } 
      
      /**
