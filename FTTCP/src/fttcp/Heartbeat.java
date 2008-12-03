@@ -10,8 +10,8 @@
 package fttcp;
 
 /**
- *
- * @author csugbe
+ * @author Will Isseyugh
+ * @author Sam Corcoran
  */
 
 import java.io.*;
@@ -25,10 +25,11 @@ public class Heartbeat extends Thread {
     private boolean currentBeat = true;     // This is set to true by the logger every time it receives a beat. Heartbeat knows if currentbeat is true, the server must be alive.
     boolean detectBeats = true;     // This variable indicates whether heartbeat should be detecting heartbeats, or should temporarily not look for them.
     boolean finished = false;       // This variable controls a while loop that ensures that Heartbeat's behaviour is repeated until the program is finished.
+    int timeoutPeriod = 20000;      // The number of milliseconds currently being used as the timeout period.
     
     /** 
      * Constructor
-     * Creates a new instance of Heartbeat 
+     * (Creates a new instance of Heartbeat)
      */
     public Heartbeat(Main main, logger newLogger) {
         m = main;
@@ -45,15 +46,29 @@ public class Heartbeat extends Thread {
        
        System.out.println("HEARTBEAT IS RUNNING");
        
+       /******************************************************************************************
+        *** Heartbeat is spawned by the logger. It contains a variable called currentBeat that ***
+        *** is updated to TRUE each time the logger detects a heartbeat packet from the server.***
+        *** Heartbeat thread sleeps for a given timeout period before waking and checking the  ***
+        *** state of currentBeat. If, while the thread was sleeping, a heartbeat was recorded  ***
+        *** then currentBeat will be TRUE. Heartbeat thread then sets currentBeat to false in  ***
+        *** preparation for the next heartbeat, before sleeping again.                         ***
+        *** If, when heartbeat thread wakes, currentBeat is FALSE then no heartbeat has arrived***
+        *** during the timeout period. We can assume, therefore, that the server has failed and***
+        *** so is unable to send heartbeats.                                                   ***
+        *** For each value of currentBeat, update logger's 'operatingNormally' variable        ***
+        *** accordingly.                                                                       ***
+        ******************************************************************************************/
+       
        // Repeat the following behaviour until the program is over (finished == true)
        do{
            
             try{
                 // Sleep for timeout period.
                 // If no heartbeat has arrived in this time, we must assume the server has died.
-                this.sleep(20000);
+                this.sleep(timeoutPeriod);
                 
-            }catch(Exception e){}
+            }catch(java.lang.InterruptedException e){System.out.println("Thread error: " + e);}
            
            // Only check for heartbeats if detectBeats indicates that this is desired.
            if(this.detectBeats == true){ 
@@ -66,7 +81,7 @@ public class Heartbeat extends Thread {
                 }
                 else{
                     // No beat arrived during sleeping.
-                    System.out.println("HEARTBEAT: No beat arrived, setting serverAlive to false.");
+                    System.out.println("HEARTBEAT: No beat arrived, setting operatingNormally to false.");
                     thisLogger.setOperatingNormally(false);
                   
                         this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger.
@@ -76,8 +91,7 @@ public class Heartbeat extends Thread {
            }
         }while(finished == false);    
     }
-   
-    
+
     /*called by the logger when the server restarts to indicate
     to the heartbeat class that heartbeat is back*/
     public void beat(){
