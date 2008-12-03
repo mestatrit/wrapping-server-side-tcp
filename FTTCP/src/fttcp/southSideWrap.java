@@ -94,7 +94,7 @@ public class southSideWrap extends Thread{
         sendPacket(clientSYN,m.getServerAddress());
         
         //While both packets aren't received, wait for them
-        //UNCOMMENT STUFF WHEN SERV ACKS PACKETS
+        //UNCOMMENT FOR REAL TCP
         while(/*!servAckRecv || */!logAckRecv){
             gui.printToScreen("SSW: Waiting for server and logger ACKs.");
             byte[] received = readPacket(false);
@@ -208,7 +208,7 @@ public class southSideWrap extends Thread{
             TCP.setWindowSize(closedWindow, closedWindowPacket);
             gui.printToScreen("SSW: Sending closed window to client.");
             //WILL ENABLE THIS WHEN TCP IMPLEMENTED
-            //sendPacket(closedWindowPacket, m.getClientAddress());
+            sendClosedPacket(closedWindowPacket, m.getClientAddress());
             
             byte[] receivedPacket = tryReadPacket();
             
@@ -378,6 +378,13 @@ public class southSideWrap extends Thread{
         }
         
     }
+    
+  private void sendClosedPacket(byte[] data, short address){
+        if(address == m.getClientAddress()){
+            //Put in file called received.TCP in server folder
+            gui.srv2clt();
+        }
+  }
     
 /**
      * Writes data array to given path
