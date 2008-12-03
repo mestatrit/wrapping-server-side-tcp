@@ -55,45 +55,47 @@ public class server extends Thread{
         
         
         while(true){
-           
-        byte[] serverReadData = readPacket();//packet read is copied to the serverReadData array
-        char returnLetter = 'a';
-        short returnNumber = 0;
-        byte[] byteReturnLetter;
-        short readData =0;
-        
-        //convert data read to type short
-        if(serverReadData.length == 1){
-            byte[] stuffedRD = new byte[2];
-            stuffedRD[0] = 0;
-            stuffedRD[1] = serverReadData[0];
-            readData = TCP.convertByteArrayToShort(stuffedRD, 0);
-        }
-        else{
-            readData = TCP.convertByteArrayToShort(serverReadData, 0);
-        }
-        gui.printToServer("Received " + readData);
-        gui.printToScreen("SRV: Received " + readData);
-        
-        //get char representation
-        returnLetter = (char)numberRecv; /*readData;*/
-        
-        //set correct ASCII representation
-        returnNumber = (short)(numberRecv + 64);
-        
-        //convert short to byte array
-        byteReturnLetter = new byte[TCP.DATA_SIZE];
             
-        ByteArray.setShort(returnNumber,byteReturnLetter,0);
-        //send packet to client
-        gui.printToServer("Sending " + (char)returnNumber);
-        gui.printToScreen("SRV: Sending " + (char)returnNumber);
-        sendPacket(byteReturnLetter, m.getClientAddress());
-        numberRecv++;
-       
-        System.out.println("SERVER LOOP HAS FINISHED EXECUTING. ABOUT TO REPEAT.");
+            /* Repeat the following server behaviour */
+           
+            byte[] serverReadData = readPacket();//packet read is copied to the serverReadData array
+            char returnLetter = 'a';
+            short returnNumber = 0;
+            byte[] byteReturnLetter;
+            short readData =0;
+
+            //convert data read to type short
+            if(serverReadData.length == 1){
+                byte[] stuffedRD = new byte[2];
+                stuffedRD[0] = 0;
+                stuffedRD[1] = serverReadData[0];
+                readData = TCP.convertByteArrayToShort(stuffedRD, 0);
+            }
+            else{
+                readData = TCP.convertByteArrayToShort(serverReadData, 0);
+            }
+            gui.printToServer("Received " + readData);
+            gui.printToScreen("SRV: Received " + readData);
+
+            //get char representation
+            returnLetter = (char)numberRecv; /*readData;*/
+
+            //set correct ASCII representation
+            returnNumber = (short)(numberRecv + 64);
+
+            //convert short to byte array
+            byteReturnLetter = new byte[TCP.DATA_SIZE];
+
+            ByteArray.setShort(returnNumber,byteReturnLetter,0);
+            //send packet to client
+            gui.printToServer("Sending " + (char)returnNumber);
+            gui.printToScreen("SRV: Sending " + (char)returnNumber);
+            sendPacket(byteReturnLetter, m.getClientAddress());
+            numberRecv++;
+
+            System.out.println("SERVER LOOP HAS FINISHED EXECUTING. ABOUT TO REPEAT.");
         
-    }
+        }
     }
     /**
      * Periodically check to see if data to be read, if so, read it, and return
