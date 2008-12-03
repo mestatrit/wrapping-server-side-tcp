@@ -45,11 +45,11 @@ public class Main {
         ssw.start();
         Thread nsw = new northSideWrap(main, main.getGui());
         nsw.start();
-        Thread tcpSrv = new TCP(main, "SRV", main.getGui());
+        Thread tcpSrv = new ServerTCP(main, "SRV", main.getGui());
        tcpSrv.start();
-       Thread tcpClt = new TCP(main, "CLT", main.getGui());
+       Thread tcpClt = new ClientTCP(main, "CLT", main.getGui());
        tcpClt.start();
-       Thread tcpLog = new TCP(main, "LOG", main.getGui());
+       Thread tcpLog = new LoggerTCP(main, "LOG", main.getGui());
        tcpLog.start();
         main.setServer(new server(main, main.getGui()));
         Thread client = new client(main, main.getGui());

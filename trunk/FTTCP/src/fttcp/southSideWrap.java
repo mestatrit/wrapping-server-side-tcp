@@ -169,7 +169,7 @@ public class southSideWrap extends Thread{
                 gui.printToScreen("SSW: Received Packet From Server.");
                 //Add delta_seq to sequence#
                 int sequenceNo = TCP.getSequenceNumber(receivedPacket);
-                TCP.setSequenceNumber(sequenceNo+m.getDelta_seq(),receivedPacket);
+                TCP.setSequenceNumber(sequenceNo,receivedPacket);
                 
                 //Change ack# to stable_seqwhile(!m.getRestarting()){
                 TCP.setAcknowledgementNumber(m.getStable_seq(),receivedPacket);
