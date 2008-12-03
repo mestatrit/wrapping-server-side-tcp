@@ -34,7 +34,7 @@ public class ServerTCP extends TCP {
             byte[] data = readPacket("serverBuffer");
             // asumption: connection established
 
-            System.out.println("TCP SRV: Data found in buffer sender: "+sender+" receiver: "+destination+" state "+serverStatusForCLT+" seq "+sequenceNumberForCLT);
+            //System.out.println("TCP SRV: Data found in buffer sender: "+sender+" receiver: "+destination+" state "+serverStatusForCLT+" seq "+sequenceNumberForCLT);
             if (isLoggerConnection() || (isClientConnection() && serverStatusForCLT == TCP.ESTABLISHED)) {
                 
                 if (direction.equals("received")) {
@@ -42,7 +42,7 @@ public class ServerTCP extends TCP {
                     // get sequence number
                     int sequenceNumber = TCP.getSequenceNumber(data);
 
-                    System.out.println("TCP SRV receieved: Client connection? "+(!isLoggerConnection())+" seq found "+sequenceNumber+" seq comp "+sequenceNumberForCLT);
+                    //System.out.println("TCP SRV receieved: Client connection? "+(!isLoggerConnection())+" seq found "+sequenceNumber+" seq comp "+sequenceNumberForCLT);
                     
                     if (isLoggerConnection()) { // LOG (assume perfect channel)
                         sendPacket(segContents);
@@ -96,13 +96,16 @@ public class ServerTCP extends TCP {
                         byte[] result = null;
 
                         do {
+                            //checkForHeartbeats();
                             // send data (to other entity)
                             sendPacket(newSeg);
                             gui.printToScreen("TCP " +entity +": Sending data to "+destination+" , waiting for ACK.");
-                            result = readACKPacket("serverBuffer","CLT",sequenceNumberForCLT+1); 
+                            //System.out.println("TCP " +entity +": Sending data to "+destination+" , waiting for ACK.");
+                            result = readACKPacket("serverBuffer","CLT",sequenceNumberForCLT); 
                         } while (result == null);
                         
                         gui.printToScreen("TCP " +entity +": ACK receieved from "+sender);
+                        //System.out.println("TCP " +entity +": ACK receieved from "+sender);
                     }
                 }
             } else if (isClientConnection()) {
@@ -208,5 +211,7 @@ public class ServerTCP extends TCP {
             writeFile(data,"serverBuffer/received.LOG.SRV.NSW");
         }  
     }
+    
+    
     
 }

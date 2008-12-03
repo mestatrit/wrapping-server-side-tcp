@@ -41,7 +41,7 @@ public class ClientTCP extends TCP {
                     // get sequence number
                     int sequenceNumber = TCP.getSequenceNumber(data);
 
-                    System.out.println("TCP CLT receieved: Server connection? "+(!isLoggerConnection())+" seq found "+sequenceNumber+" seq comp "+sequenceNumberForSRV);
+                    //System.out.println("TCP CLT receieved: Server connection? "+(!isLoggerConnection())+" seq found "+sequenceNumber+" seq comp "+sequenceNumberForSRV);
                     
                     if (isLoggerConnection()) { // LOG (assume perfect channel)
                         sendPacket(segContents);
@@ -67,7 +67,7 @@ public class ClientTCP extends TCP {
                     }
                 } else if (direction.equals("toSend")) { // if sendTo add header
 
-                    System.out.println("TCP CLT toSend: Cient connection? "+(!isLoggerConnection())+" seq comp "+sequenceNumberForSRV);
+                    //System.out.println("TCP CLT toSend: Cient connection? "+(!isLoggerConnection())+" seq comp "+sequenceNumberForSRV);
                     
 
                     if (isLoggerConnection()) { // LOG connection
@@ -96,17 +96,17 @@ public class ClientTCP extends TCP {
 
                         do {
                             // send data (to other entity)
-                            //System.out.println("TCP " +entity +": Sending data to "+destination+" , waiting for ACK. seq"+sequenceNumberForSRV);
+                            System.out.println("TCP " +entity +": Sending data to "+destination+" , waiting for ACK. seq"+sequenceNumberForSRV);
                             gui.printToScreen("TCP " +entity +": Sending data to "+destination+" , waiting for ACK. seq"+sequenceNumberForSRV);
                             sendPacket(newSeg);
                             
-                            result = readACKPacket("clientBuffer","SRV",sequenceNumberForSRV+1); 
-                            //System.out.println("TCP Client: end of while for aiting for ACK "+result);
+                            result = readACKPacket("clientBuffer","SRV",sequenceNumberForSRV); 
+                            System.out.println("TCP CLT: end of while for aiting for ACK "+result);
 
                         } while (result == null);
                         
                         gui.printToScreen("TCP " +entity +": ACK receieved from "+sender);
-                        //System.out.println("TCP " +entity +": ACK receieved from "+sender);
+                        System.out.println("TCP " +entity +": ACK receieved from "+sender);
                     }
                 }
             } else if (isServerConnection()) {

@@ -136,7 +136,7 @@ abstract public class TCP extends Thread{
                             boolean isACKPacket = TCP.getACKFlag(bytearray);
                             int packetSequenceNumber = TCP.getSequenceNumber(bytearray);
                             
-                            //System.out.println("file found from "+sender+" to "+destination+": ACK "+isACKPacket+" ACKnum found: "+packetAcknowledgementNumber+" ACKcomp "+acknowledgementNumber);
+                            System.out.println("file found from "+localSender+" to "+localDestination+": ACK "+isACKPacket+" SeqNum found: "+packetSequenceNumber+" SeqComp "+sequenceNumber);
                             //System.out.println("dest: "+dest);
                             // check file for ACK flag and correct entity
                             if (isACKPacket && localSender.equals(dest)) {
@@ -176,7 +176,7 @@ abstract public class TCP extends Thread{
                 
                 try{
                     //Sleep for 3 seconds, then look again for file
-                    this.sleep(20000);
+                    this.sleep(5000);
                     slept = true;
                 }
                 catch(java.lang.InterruptedException e){
@@ -214,7 +214,7 @@ abstract public class TCP extends Thread{
                 //System.out.println("TCP "+entity+": Check for files: total "+files.length);
                 
                 if(files != null && files.length != 0){
-                    //System.out.println("TCP "+entity+": "+"File found "+files[0]);
+                    System.out.println("TCP "+entity+": "+"File found "+files[0]);
                     // find out direction the TCP Layer is intercepting buffer data
                     // insteam - received (receive header)
                     // outstream - toSend (add header)
