@@ -16,8 +16,7 @@ public class client extends Thread{
     private Main m;
     private GUI gui;
     
-    //TO BE REMOVED WHEN TCP FULLY IMPLEMENTED!!
-    private boolean dataAckRec = true;
+
     
     public client(Main main, GUI g){
         m = main;
@@ -25,28 +24,27 @@ public class client extends Thread{
     }
 
     /**
-     * Client thread
-     */
+     * Client thread:
+     *
+     * Client sends numbers 1 to 100
+     * to server, waiting for server to
+     * reply with its response before sending
+     * the next message.
+     *
+     **/
     @Override
     public void run(){
         gui.printToScreen("Client reporting in.");
-      /*  boolean Serverreplied = true;
-        do
-            for (int i = 0; i<20; i++)
-            {
-                sendPacket(intToByteArr(i),m.getServerAddress());
-                System.out.println("client sending" + i);
-            }
-        while (Serverreplied = true); */
         
         //set initial number to send
         short numberSend = 1;
         
-        //client to send numbers up to 10
-        while(numberSend <= 1000) {
+        //client to send numbers up to 100
+        while(numberSend <= 100) {
             //convert integer to send to byte array
             byte[] data = new byte[TCP.DATA_SIZE];
             
+            //put into byte array to send
             ByteArray.setShort(numberSend,data,0);
             
             gui.printToClient("Sending " + numberSend);
@@ -59,20 +57,13 @@ public class client extends Thread{
             byte[] receivedPacket;
             receivedPacket = readPacket();
            
-            //IF LOOP TO BE REMOVED WHEN TCP FULLY(ISH) IMPLEMENTED
-           // if(receivedPacket[1] != 0){         
-                int receivedChar = ByteArray.getShort(receivedPacket, 0);
-                gui.printToClient("Received " + (char) receivedChar);
-                gui.printToScreen("CLT: Received " + (char) receivedChar);
-                //when server replies, increase number to send
-                numberSend++;
-                dataAckRec = true;
-            //}
-            
-            //else if(dataAckRec){
-                //numberSend++;
-                //dataAckRec = false;
-           // }
+            //convert received letter to int
+            int receivedChar = ByteArray.getShort(receivedPacket, 0);
+            gui.printToClient("Received " + (char) receivedChar);
+            gui.printToScreen("CLT: Received " + (char) receivedChar);
+            //as server has replied, increase number to send next message
+            numberSend++;
+
         }
             
     }
@@ -103,15 +94,17 @@ public class client extends Thread{
                         this.sleep(1000);
                     }
                     catch(java.lang.InterruptedException e){
-                        
+                        System.out.println("Thread error: " + e);
                     }
                 }
             }
         }
         catch(java.io.FileNotFoundException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
         catch(java.io.IOException e){
+            System.out.println("Thread error: " + e);
             return null;
         } 
     }
@@ -145,7 +138,7 @@ public class client extends Thread{
             outStream.close();
         }
         catch(IOException e){
-            System.out.println("SSW Cannot write file to: " + path);
+            System.out.println("Client Cannot write file to: " + path);
         }
     }
      private byte[] intToByteArr(int num){
