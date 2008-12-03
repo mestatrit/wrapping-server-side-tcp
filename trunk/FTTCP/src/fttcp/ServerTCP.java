@@ -94,9 +94,9 @@ public class ServerTCP extends TCP {
                         // wait for ACK
                         // do not proceed from this point until ACK has been receieved (unless timeout => null returned)
                         byte[] result = null;
-
+                        
                         do {
-                            //checkForHeartbeats();
+                            checkForHeartbeats("serverBuffer");
                             // send data (to other entity)
                             sendPacket(newSeg);
                             gui.printToScreen("TCP " +entity +": Sending data to "+destination+" , waiting for ACK.");
@@ -149,6 +149,102 @@ public class ServerTCP extends TCP {
                 }   
             } 
         }    
+    }
+    
+    private void checkForHeartbeats(String entityBuffer){
+        boolean slept = false;
+        
+        boolean localHeartbeat = false;
+        String localSender = "";
+        String localDestination = "";
+        String localDirection = "";
+        String localExtraInfo = "";
+        
+        try{
+
+                       
+                FilenameFilter filter = new TCPFileFilter();
+                File f = new File(entityBuffer);
+                String[] files = f.list(filter);
+                
+                System.out.println("TCP "+entity+": Check files for ACK packet: files "+files.length);
+                
+                if(files != null && files.length != 0){
+
+                
+                    for (int iFile = 0; iFile < files.length; iFile++) {
+
+
+                            // find out direction the TCP Layer is intercepting buffer data
+                            // insteam - received (receive header)
+                            // outstream - toSend (add header)
+                            if (files[iFile].startsWith("received")) 
+                                localDirection = "received";
+                            else
+                                localDirection = "toSend";
+
+                            // check whether heartbeat signal (or not
+                            if (files[iFile].indexOf("Heartbeat",0) == -1) {
+                                localHeartbeat = false;
+                                System.out.println("Is not heartbeat");
+                            } else {
+                                localHeartbeat = true;
+                                System.out.println("Is heartbeat");
+                            }
+
+                            // store sender and receiver
+                            String[] info = files[iFile].split("[.]");
+                            if(info.length == 3 || info.length == 4){
+                                localSender = info[1];
+                                localDestination = info[2];
+                            }
+
+                            //This is to allow extra strings after file name.
+                            if(info.length == 5){
+                                    localExtraInfo = info[4];
+                            }
+                            else {
+                                    localExtraInfo = null;
+                            }
+                            
+                            FileInputStream fileinputstream = new FileInputStream(entityBuffer+"/"+files[iFile]);
+                            int numberBytes = fileinputstream.available();
+                            byte[] bytearray = new byte[numberBytes];
+                            fileinputstream.read(bytearray);
+                            fileinputstream.close();
+
+                            
+                          
+                            if (localDestination.equals("LOG") || localSender.equals("LOG")) {
+
+                                boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
+                                
+                                System.out.println("There's a heartbeat packet");
+
+                                if (direction.equals("received")) {
+                                    byte[] segContents = TCP.stripHeader(bytearray);
+                                    sendPacket(segContents);
+                                }
+                                
+                                else if(direction.equals("toSend")){
+                                    byte[] newSeg = TCP.createTCPSegment();
+                                    TCP.setData(bytearray,newSeg);
+                                    sendPacket(newSeg);
+                                }
+                           } 
+                        }
+                   }
+                
+                                
+                
+       }
+        
+           catch(java.io.FileNotFoundException e){
+
+        } 
+        catch(java.io.IOException e){
+
+        }
     }
     
     private boolean isClientConnection() {
