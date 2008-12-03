@@ -66,19 +66,13 @@ public class Heartbeat extends Thread {
                     // A heartbeat must have arrived from the logger (i.e. from the server).
                     System.out.println("HEARTBEAT: Woke up. Current beat is TRUE. Server is alive.");
                     thisLogger.setOperatingNormally(true);
-                   // thisLogger.setServerAlive(true);    // Indicate to the logger that the server is alive.
                     this.currentBeat = false;   // Set currentBeat to false in order to wait for the next heartbeat.
                 }
                 else{
                     // No beat arrived during sleeping.
                     System.out.println("HEARTBEAT: No beat arrived, setting serverAlive to false.");
                     thisLogger.setOperatingNormally(false);
-                    //thisLogger.setServerAlive(false);   // Indicate to the logger that the server has died and normal operation should cease.
-                    //if(interactingWithClient == false){     // Only interact with the client if clientInteraction isn't already running.
-                     //   thisLogger.clientInteraction();     // Call a method on the logger to handle operation while the server is dead as well as handle restarting.
-                        this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger.
-                    //    this.interactingWithClient = true;       // Indicate that clientInteraction has been called.
-                    //}
+                    this.detectBeats = false;   // Stop checking for heartbeats until told to by the logger.
                 }
            }
         }while(finished == false);    
