@@ -73,7 +73,7 @@ abstract public class TCP extends Thread{
        return TCP.getData(seg);
     }
     
-    protected byte[] readACKPacket(String entityBuffer, String dest, int acknowledgementNumber){
+    protected byte[] readACKPacket(String entityBuffer, String dest, int sequenceNumber){
         boolean slept = false;
         
         boolean localHeartbeat = false;
@@ -134,20 +134,20 @@ abstract public class TCP extends Thread{
 
                             
                             boolean isACKPacket = TCP.getACKFlag(bytearray);
-                            int packetAcknowledgementNumber = TCP.getAcknowledgementNumber(bytearray);
+                            int packetSequenceNumber = TCP.getSequenceNumber(bytearray);
                             
                             //System.out.println("file found from "+sender+" to "+destination+": ACK "+isACKPacket+" ACKnum found: "+packetAcknowledgementNumber+" ACKcomp "+acknowledgementNumber);
                             //System.out.println("dest: "+dest);
                             // check file for ACK flag and correct entity
                             if (isACKPacket && localSender.equals(dest)) {
 
-                                //System.out.println("TCP "+entity+": ACK packet found with required dest");
+                                //System.out.println("TCP "+entity+": SEQ packet found with required dest");
 
-                                if (packetAcknowledgementNumber < acknowledgementNumber) {
-                                    // if less than ACK number then assume duplicate => delete + ignore
+                                if (packetSequenceNumber < sequenceNumber) {
+                                    // if less than SEQ number then assume duplicate => delete + ignore
                                     boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
 
-                                } else if (packetAcknowledgementNumber == acknowledgementNumber) {
+                                } else if (packetSequenceNumber == sequenceNumber) {
                                     // else delete and return data
                                     boolean hadDel = (new File(entityBuffer+"/"+files[iFile]).delete());
                                     //System.out.println("TCP "+entity+": ACK packet found return array "+bytearray);
