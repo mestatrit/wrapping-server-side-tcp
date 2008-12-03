@@ -209,6 +209,7 @@ abstract public class TCP extends Thread{
                 FilenameFilter filter = new TCPFileFilter();
                 File f = new File(entityBuffer);
                 String[] files = f.list(filter);
+                java.util.Arrays.sort(files);
                 
                 //System.out.println("TCP "+entity+": Check for files: total "+files.length);
                 
