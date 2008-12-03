@@ -47,7 +47,7 @@ public class server extends Thread{
         short numberRecv = 1;
         
         /* 
-         *Spawn serverHeartbeat thread. This will continuously send heartbeat packets to the logger buffer
+         * Spawn serverHeartbeat thread. This will continuously send heartbeat packets to the logger buffer
          * while the server is still operational.
          */
         System.out.println("SERVER: Server Heartbeat begins.");
