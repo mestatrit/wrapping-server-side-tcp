@@ -25,7 +25,10 @@ public class ServerHeartbeat extends Thread {
         this.s = newServer;
     }
     
-    
+    /*A new thread sending the heartbeat from the server
+     This is stopped when the server goes down by killing the thread
+     
+     */
      public void run(){
         
          while(true){
@@ -33,6 +36,7 @@ public class ServerHeartbeat extends Thread {
               s.sendHeartbeat();
              
              try{
+                 //amount of time that thread sleeps before sending next heartbeat.
                 this.sleep(500);
                 
             }catch(Exception e){}
