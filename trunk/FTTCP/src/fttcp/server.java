@@ -27,11 +27,27 @@ public class server extends Thread{
      */
     @Override
     public void run(){
+        
+        /***************************************************************************************************
+         *** An instance of server is created by Main. Server then creates a thread for serverHeartbeat, ***
+         *** which continuously sends heartbeat packets to the logger. If the logger does not receive    ***
+         *** these packets then it will assume that the server has failed. The server receives messages  ***
+         *** from the client (via the wraps) and responds with the corresponding messages (also via the  ***
+         *** wraps).                                                                                     ***
+         *** Failure of the application layer is caused by killing the existing server thread. Restarting***
+         *** creates a new instance of server, which will (unknowingly) communicate with the logger as   ***
+         *** the logger sends it all stored client data. The North Side Wrap discards all outgoing data  ***
+         *** from the server while the restarting process is going on.                                   ***
+         *** When all of the stored data has been fed into the server, the North Side Wrap stops         ***
+         *** discarding outgoing data and so all client-bound packets leaving the server from then on are***
+         *** delivered.                                                                                  ***
+         ***************************************************************************************************/
+        
         gui.printToScreen("Server reporting in.");
         short numberRecv = 1;
         
-        
-        /* Spawn serverHeartbeat thread. This will continuously send heartbeat packets to the logger buffer
+        /* 
+         *Spawn serverHeartbeat thread. This will continuously send heartbeat packets to the logger buffer
          * while the server is still operational.
          */
         System.out.println("SERVER: Server Heartbeat begins.");
