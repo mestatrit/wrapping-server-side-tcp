@@ -44,8 +44,6 @@ public class logger extends Thread{
     private byte initClientSeqNumber = 3;
     private byte fwdClientPktFlag = 4;
     
-    private boolean serverAlive = true; // Indicates whether the logger thinks the server is ALIVE of DEAD. Determines whether logger's normal operation loop is performed.
-   
     private enum entity {SSW,NSW,SRV};
     Thread WrappersThread= new Thread();
     Thread bufferChecker= new Thread();
@@ -385,11 +383,7 @@ public class logger extends Thread{
         byteArr[1] =(byte)( (num << 16) >> 24 );
         byteArr[0] =(byte)( (num << 24) >> 24 );
         return byteArr;
-    }
-     
-     public void setServerAlive(boolean newStatus){
-         this.serverAlive = newStatus;
-     }     
+    } 
      
      /**
       * This method is called by heartbeatThread in order to change the value of operatingNormally.
