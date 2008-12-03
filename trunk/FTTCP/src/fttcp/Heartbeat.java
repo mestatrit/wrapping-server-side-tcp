@@ -10,7 +10,7 @@
 package fttcp;
 
 /**
- * @author Will Isseyugh
+ * @author Will Isseyegh
  * @author Sam Corcoran
  */
 
